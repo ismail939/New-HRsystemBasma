@@ -1,0 +1,18 @@
+{
+  "version": "3.0",
+  "defaultProvider": "unpkg",
+  "libraries": [
+    {
+      "library": "flatpickr@4.6.13",
+      "destination": "wwwroot/lib/flatpickr"
+    },
+    {
+      "library": "bootstrap-icons@1.13.1",
+      "destination": "wwwroot/lib/bootstrap-icons"
+    },
+    {
+      "library": "alpinejs@3.15.1",
+      "destination": "wwwroot/lib/alpinejs"
+    }
+  ]
+}

@@ -1,0 +1,723 @@
+@model IEnumerable<HRsystem.Models.HRApplier>;
+
+@{
+    ViewData["Title"] = "المتقدمون";
+}
+
+<div class="flex flex-row flex-start gap-2 mb-1">
+
+    <div class="flex flex-row justify-start">
+        <a href="/appliers/add" id="createBtn" class="col-button-dark px-4 py-2 rounded mb-2">
+            إضافة المتقدمون
+        </a>
+    </div>
+    <div x-data="{
+        showSearch: false,
+        toggleSearch() {
+            this.showSearch = !this.showSearch;
+
+            if (this.showSearch) {
+                // Focus the input after it appears
+                this.$nextTick(() => document.getElementById('searchInput')?.focus());
+            } else {
+                // Clear and show all employees when refresh is clicked
+                const input = document.getElementById('searchInput');
+                if (input) input.value = '';
+                showAllEmployees();
+            }
+        }
+    }" class="flex items-center gap-2">
+        <!-- Search / Refresh Button -->
+        <button @@click="toggleSearch"
+            class="p-2 rounded-full bg-[#404E3B] text-white hover:bg-[#A7B89A] transition-all duration-300">
+            <i :class="showSearch ? 'bi-arrow-clockwise' : 'bi-search'" class="text-lg"></i>
+        </button>
+
+        <!-- Search input -->
+        <template x-if="showSearch">
+            <div class="flex items-center gap-2 animate-fade-in">
+                <input id="searchInput" type="text" placeholder="ابحث عن المتقدمون..." oninput="searchForApplier()"
+                    class="border border-gray-300 rounded-md px-5 py-2 focus:ring focus:ring-[#BAC8B1] focus:outline-none text-sm" />
+            </div>
+        </template>
+    </div>
+
+</div>
+
+
+<div id="tableResponsive" class="overflow-y-auto max-h-[500px] rounded-lg shadow-md ">
+    <table class="table-base min-w-full border-separate border-spacing-0">
+        <thead class="table-dark col-table-header sticky top-0 z-10">
+            <tr>
+                <th>الاسم</th>
+                <th>الرقم القومي</th>
+                <th>رقم الهاتف</th>
+                <th>الحالة الاجتماعية</th>
+                <th>الديانة</th>
+                <th>تاريخ الميلاد</th>
+                <th>رقم التأمين</th>
+                <th>تاريخ التعيين</th>
+                <th>تاريخ الانتهاء</th>
+                <th>القسم</th>
+                <th>المسمى الوظيفي</th>
+                <th>نوع العقد</th>
+                <th>تعديل بيانات</th>
+            </tr>
+        </thead>
+    
+    </table>
+</div>
+
+
+<!-- Modal Background -->
+<div id="createModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50
+            transition-all duration-300 ease-out opacity-0 scale-95">
+    <!-- Modal Box -->
+    <div class="col-modal w-full md:w-11/12 h-full md:h-[90%] p-6 relative" dir="rtl">
+        <!-- Close Button -->
+        <button onclick="closeModalCreate()" class="absolute top-3 left-3 text-gray-500 hover:text-gray-700 text-xl">
+            ✕
+        </button>
+        @* 
+        <!-- Tabs -->
+        <div class="flex border-b mb-4">
+           
+        </div> *@
+
+        <h2 class="text-2xl font-semibold mb-4 text-blue-700 text-center">إضافة المتقدمون جديد</h2>
+        <form id="employeeFormCreate" method="post"
+            class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-1 w-full h-full">
+
+            <input type="hidden" name="Id" />
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">الاسم</label>
+                <input type="text" name="Name"
+                    class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">الرقم القومي</label>
+                <input type="text" name="NationalId"
+                    class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">رقم الهاتف</label>
+                <input type="tel" name="PhoneNumber"
+                    class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">الحالة الاجتماعية</label>
+                <input type="text" name="MarriageStatus"
+                    class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">الديانة</label>
+                <input type="text" name="Religion"
+                    class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">تاريخ الميلاد</label>
+                <input type="date" name="DateOfBirth"
+                    class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">رقم التأمين</label>
+                <input type="text" name="InsuranceNumber"
+                    class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">تاريخ التعيين</label>
+                <input type="date" name="HireDate"
+                    class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">تاريخ الانتهاء</label>
+                <input type="date" name="EndDate"
+                    class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">القسم</label>
+                <input type="text" name="Department"
+                    class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">المسمى الوظيفي</label>
+                <input type="text" name="JobName"
+                    class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">نوع العقد</label>
+                <input type="text" name="ContractType"
+                    class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+            </div>
+
+            <div class="mt-0 bg-gray-200 col-span-3 rounded-2xl p-2">
+                <div class="upload-container w-full">
+                    <label for="fileUploadCreate" class="upload-label">📤 رفع ملف جديد</label>
+                    <input type="file" id="fileUploadCreate" class="upload-input" name="imageFiles" multiple />
+                </div>
+
+            </div>
+            <!-- Submit Button -->
+            <div class="col-span-3 text-center m-4">
+                <button type="submit" class="px-8 py-2 rounded col-button-dark">
+                    💾 حفظ
+                </button>
+                @* <button class="bg-gray-600 text-white px-8 py-2 rounded hover:bg-gray-300 transition">
+                            الملفات
+                        </button> *@
+
+            </div>
+
+        </form>
+
+
+
+    </div>
+</div>
+
+
+<!-- Modal Background -->
+<div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50
+            transition-all duration-300 ease-out opacity-0 scale-95">
+    <!-- Modal Box -->
+    <div class="col-modal w-full md:w-11/12 h-full md:h-[90%] p-6 relative overflow-y-auto" dir="rtl">
+        <!-- Close Button -->
+        <button onclick="closeModal()" class="absolute top-3 left-3 text-gray-500 hover:text-gray-700 text-xl">
+            ✕
+        </button>
+
+        <!-- Tabs -->
+        <div class="flex border-b mb-4">
+            <button id="tab-info"
+                class="flex-1 py-2 text-center font-semibold border-b-2 border-[#404E3B] text-[#404E3B] hover:text-[#404E3B]"
+                onclick="switchTab('info')">
+                🧍 بيانات الالمتقدمون
+            </button>
+            <button id="tab-files"
+                class="flex-1 py-2 text-center font-semibold border-b-2 text-[#7B9669] hover:text-[#404E3B]"
+                onclick="switchTab('files')">
+                📂 ملفات الالمتقدمون
+            </button>
+        </div>
+        <div id="tab-content-info">
+            <h2 class="text-2xl font-semibold mb-4 text-blue-700 text-center">تعديل بيانات الالمتقدمون</h2>
+            <form id="employeeForm" method="post" class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full h-full">
+
+                <input type="hidden" name="Id" />
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">الاسم</label>
+                    <input type="text" name="Name"
+                        class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">الرقم القومي</label>
+                    <input type="text" name="NationalId"
+                        class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">رقم الهاتف</label>
+                    <input type="tel" name="PhoneNumber"
+                        class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">الحالة الاجتماعية</label>
+                    <input type="text" name="MarriageStatus"
+                        class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">الديانة</label>
+                    <input type="text" name="Religion"
+                        class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">تاريخ الميلاد</label>
+                    <input type="date" name="DateOfBirth"
+                        class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">رقم التأمين</label>
+                    <input type="text" name="InsuranceNumber"
+                        class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">تاريخ التعيين</label>
+                    <input type="date" name="HireDate"
+                        class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">تاريخ الانتهاء</label>
+                    <input type="date" name="EndDate"
+                        class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">القسم</label>
+                    <input type="text" name="Department"
+                        class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">المسمى الوظيفي</label>
+                    <input type="text" name="JobName"
+                        class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">نوع العقد</label>
+                    <input type="text" name="ContractType"
+                        class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+
+                <!-- Submit Button -->
+                <div class="col-span-3 text-center mt-4">
+                    <button type="submit" class=" px-8 py-2 rounded col-button-dark">
+                        💾 حفظ التعديلات
+                    </button>
+                    @* <button class="bg-gray-600 text-white px-8 py-2 rounded hover:bg-gray-300 transition">
+                            الملفات
+                        </button> *@
+
+                </div>
+
+            </form>
+        </div>
+        <div id="tab-content-files" class="hidden">
+            <!-- Employee files -->
+            <div class="space-y-3">
+                <h3 class="font-semibold text-gray-700">📎 ملفات الالمتقدمون</h3>
+                <ul class="flex flex-row flex-wrap gap-10">
+
+                </ul>
+                <div class="mt-4 bg-gray-200 w-full rounded-2xl p-2">
+                    <div class="upload-container w-full">
+                        <form id="uploadFileForm" enctype="multipart/form-data">
+                            <input type="hidden" name="EmployeeId" />
+                            <label for="fileUpload" class="upload-label">📤 رفع ملف جديد</label>
+                            <input type="file" id="fileUpload" class="upload-input" name="imageFiles" multiple />
+                            <button type="button" id="submitBtn" class="col-button-dark px-5">رفع</button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ✅ The lightbox -->
+<div id="imageLightbox"
+    class="fixed inset-0 w-full h-full bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <img id="lightboxImage"
+        class="max-w-3xl max-h-[90vh] rounded-2xl shadow-2xl transition-transform duration-300 scale-95" />
+</div>
+
+@section Scripts {
+
+    <!-- Modal Script -->
+    <script>
+        window.addEventListener("beforeunload", () => {
+            console.log("🚨 PAGE IS RELOADING or navigating away!");
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.getElementById("employeeForm");
+            const modal = document.getElementById("editModal"); // assume you have a modal container
+            const createForm = document.getElementById("employeeFormCreate");
+            const createModal = document.getElementById("createModal");
+            document.getElementById('uploadFileForm').addEventListener('click', e => e.stopPropagation());
+            document.getElementById('uploadFileForm').addEventListener('submit', e => e.stopPropagation());
+
+            document.getElementById("tableResponsive").addEventListener("click", e => {
+                const btn = e.target.closest(".openModal");
+                if (!btn) return;
+                document.getElementById('tableResponsive').classList.add('hidden');
+                const index = parseInt(btn.getAttribute("index"), 10);
+                sessionStorage.setItem("editIndex", index);
+                modal.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    modal.classList.remove("opacity-0", "scale-95");
+                    modal.classList.add("opacity-100", "scale-100", "flex");
+                });
+                console.log("*******************************")
+                console.log(employees);
+                const emp = employees.find(e => e.Id === index);
+                if (!emp) return;
+                console.log("**********--------------************");
+                console.log(emp);
+                document.getElementById("uploadFileForm").querySelector('input[name="EmployeeId"]').value = emp.Id ?? "";
+
+                // fill inputs by name attribute
+                form.querySelector('[name="Id"]').value = emp.Id ?? "";
+                form.querySelector('[name="Name"]').value = emp.Name ?? "";
+                form.querySelector('[name="NationalId"]').value = emp.NationalId ?? "";
+                form.querySelector('[name="PhoneNumber"]').value = emp.PhoneNumber ?? "";
+                form.querySelector('[name="MarriageStatus"]').value = emp.MarriageStatus ?? "";
+                form.querySelector('[name="Religion"]').value = emp.Religion ?? "";
+                form.querySelector('[name="DateOfBirth"]').value = emp.DateOfBirth?.split('T')[0] ?? "";
+                form.querySelector('[name="InsuranceNumber"]').value = emp.InsuranceNumber ?? "";
+                form.querySelector('[name="HireDate"]').value = emp.HireDate?.split('T')[0] ?? "";
+                form.querySelector('[name="EndDate"]').value = emp.EndDate?.split('T')[0] ?? "";
+                form.querySelector('[name="Department"]').value = emp.Department ?? "";
+                form.querySelector('[name="JobName"]').value = emp.JobName ?? "";
+                form.querySelector('[name="ContractType"]').value = emp.ContractType ?? "";
+
+                // open modal (Bootstrap, Tailwind, or your custom)
+                modal.classList.remove("hidden");
+            });
+        });
+        function closeModal() {
+            const modal = document.getElementById("editModal");
+            modal.classList.add("opacity-0", "scale-95");
+            modal.classList.remove("opacity-100", "scale-100");
+
+            // wait for transition to finish
+            setTimeout(() => {
+                modal.classList.add("hidden");
+            }, 300);
+            document.getElementById('tableResponsive').classList.remove('hidden');
+            switchTab('info');
+            sessionStorage.removeItem("editIndex");
+        }
+        function closeModalCreate() {
+            const modal = document.getElementById('createModal');
+            modal.classList.add("opacity-0", "scale-95");
+            modal.classList.remove("opacity-100", "scale-100");
+
+            // wait for transition to finish
+            setTimeout(() => {
+                modal.classList.add("hidden");
+            }, 300);
+            document.getElementById('tableResponsive').classList.remove('hidden');
+        }
+        document.getElementById('createBtn').addEventListener('click', function (e) {
+            e.preventDefault();
+            document.getElementById('tableResponsive').classList.add('hidden');
+            createModal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                createModal.classList.remove("opacity-0", "scale-95");
+                createModal.classList.add("opacity-100", "scale-100", "flex");
+            });
+        });
+        function switchTab(tab) {
+            const infoTab = document.getElementById('tab-info');
+            const filesTab = document.getElementById('tab-files');
+            const infoContent = document.getElementById('tab-content-info');
+            const filesContent = document.getElementById('tab-content-files');
+
+            if (tab === 'info') {
+                infoTab.classList.add('border-[#404E3B]', 'text-[#404E3B]');
+                infoTab.classList.remove('text-[#7B9669]');
+                filesTab.classList.remove('border-[#404E3B]', 'text-[#404E3B]');
+                filesTab.classList.add('text-[#7B9669]');
+                infoContent.classList.remove('hidden');
+                filesContent.classList.add('hidden');
+            } else {
+                filesTab.classList.add('border-[#404E3B]', 'text-[#404E3B]');
+                filesTab.classList.remove('text-[#7B9669]');
+                infoTab.classList.remove('border-[#404E3B]', 'text-[#404E3B]');
+                infoTab.classList.add('text-[#7B9669]');
+                filesContent.classList.remove('hidden');
+                infoContent.classList.add('hidden');
+                console.log(sessionStorage.getItem("editIndex"))
+                getEmployeeFiles(employees.find(e => e.Id == parseInt(sessionStorage.getItem("editIndex"), 10)));
+            };
+        }
+        // ✅ expose functions to global scope so onclick can find them
+        window.switchTab = switchTab;
+        window.closeModal = closeModal;
+        window.closeModalCreate = closeModalCreate;
+        window.deleteFile = deleteFile;
+        async function getEmployeeFiles(emp) {
+            console.log('Getting files for employee:', emp);
+            // ✅ Fetch employee files dynamically
+            const filesList = document.querySelector("#tab-content-files ul");
+            filesList.innerHTML = `
+                                                                    <div class="flex flex-col justify-center items-center py-4">
+                                                                        <div class="loader border-4 border-blue-500 border-t-transparent rounded-full w-8 h-8 animate-spin mb-2"></div>
+                                                                        <p class="text-gray-600 text-sm">جارٍ تحميل الملفات...</p>
+                                                                    </div>
+                                                                `;
+
+            try {
+                const res = await fetch(`/employees/files/${emp.Id}`);
+                const files = await res.json();
+                console.log('Fetched files:');
+                console.log(files);
+
+                if (files.length === 0) {
+                    filesList.innerHTML = "<p class='text-gray-500'>لا توجد ملفات لهذا الالمتقدمون.</p>";
+                } else {
+                    filesList.innerHTML = files.map(file => `
+                                                                <li class="file-item flex flex-col justify-center align-items-center">
+                                                                    <label>${file.FileName}</label>
+                                                                    <div class="img-wrapper position-relative">
+                                                                        <img src="${file.Url}" alt="${file.FileName}" class="imgFile rounded transition-opacity" onclick="openImage(this.src)">
+                                                                        <button class="hover-button btn btn-danger btn-sm" onclick="deleteFile(${file.Id})">✕</button>
+                                                                    </div>
+                                                                    <a href="${file.Url}" download class="green-button m-1 py-1">تحميل</a>
+                                                                </li>
+                                                            `).join('');
+                }
+            } catch (err) {
+                console.error(err);
+                filesList.innerHTML = "<p class='text-red-600'>حدث خطأ أثناء تحميل الملفات.</p>";
+            }
+        }
+        document.getElementById('submitBtn').addEventListener('click', async function uploadFile(event) {
+            event.preventDefault();
+            event.stopPropagation(); // 🧱 stop the event from closing the modal
+            console.log('Uploading files...');
+            const form = document.getElementById('uploadFileForm');
+            const formData = new FormData(form); // mfesh form data ezaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaay!
+            const files = form.querySelector('#fileUpload').files;
+            if (!files || files.length === 0) {
+                alert('⚠️ الرجاء اختيار ملف قبل الرفع.');
+                return;
+            }
+
+            console.log('FormData prepared:', formData);
+
+            try {
+                const response = await fetch('/employees/uploadImage', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('فشل رفع الملفات');
+                }
+
+                const result = await response.json();
+                alert('✅ تم رفع الملفات بنجاح!');
+                document.getElementById("fileUpload").value = ""; // clear file
+
+                console.log('Server response:', result);
+
+                await getEmployeeFiles(employees[sessionStorage.getItem("editIndex")]);
+
+
+            } catch (err) {
+                console.error(err);
+                console.log(err);
+                alert('❌ حدث خطأ أثناء رفع الملفات.');
+            }
+        });
+        async function deleteFile(fileId) {
+            if (!confirm('هل أنت متأكد من حذف هذا الملف؟')) return;
+
+            try {
+                const response = await fetch(`/employees/deleteFile/${fileId}`, {
+                    method: 'POST'
+                });
+
+                if (!response.ok) {
+                    throw new Error('فشل حذف الملف');
+                }
+
+                @* alert('✅ تم حذف الملف بنجاح!'); *@
+
+                    await getEmployeeFiles(employees[sessionStorage.getItem("editIndex")]);
+
+            } catch (err) {
+                console.error(err);
+                alert('❌ حدث خطأ أثناء حذف الملف.');
+            }
+        }
+
+
+        document.getElementById('employeeForm').addEventListener('submit', async function (e) {
+            if (e.target.id !== 'employeeForm') return; // 🧱 ignore bubbled submits
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            const response = await fetch('/Employees/Edit', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const index = sessionStorage.getItem("editIndex");
+                const row = document.getElementById('row-' + index);
+                row.querySelectorAll('td')[0].innerText = formData.get('Name');
+                row.querySelectorAll('td')[1].innerText = formData.get('NationalId');
+                row.querySelectorAll('td')[2].innerText = formData.get('PhoneNumber');
+                row.querySelectorAll('td')[3].innerText = formData.get('MarriageStatus');
+                row.querySelectorAll('td')[4].innerText = formData.get('Religion');
+                row.querySelectorAll('td')[5].innerText = formData.get('DateOfBirth');
+                row.querySelectorAll('td')[6].innerText = formData.get('InsuranceNumber');
+                row.querySelectorAll('td')[7].innerText = formData.get('HireDate');
+                row.querySelectorAll('td')[8].innerText = formData.get('EndDate');
+                row.querySelectorAll('td')[9].innerText = formData.get('Department');
+                row.querySelectorAll('td')[10].innerText = formData.get('JobName');
+                row.querySelectorAll('td')[11].innerText = formData.get('ContractType');
+                closeModal();
+                setTimeout(() => {
+                    alert('تم الحفظ بنجاح ✅');
+                }, 200);
+            } else {
+                alert('حدث خطأ أثناء الحفظ ❌');
+            }
+        });
+        document.getElementById('employeeFormCreate').addEventListener('submit', async function (e) {
+            if (e.target.id !== 'employeeFormCreate') return; // 🧱 ignore bubbled submits
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            const response = await fetch('/employees/add', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                alert('تم الإضافة بنجاح ✅');
+                closeModalCreate();
+                this.reset()
+                const newEmp = await response.json();
+                console.log('New employee added:', newEmp);
+                addEmployeeRow(newEmp);
+            } else {
+                alert('حدث خطأ أثناء الإضافة ❌');
+            }
+        });
+        function addEmployeeRow(emp) {
+            employees = [...employees, emp]; // update local employees array
+            const tbody = document.getElementById("appliersBody");
+            console.log('employee dateofbirth:', emp);
+            console.log('employee dateofbirth:', emp.id);
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                                <td>${emp.Name}</td>
+                                <td>${emp.NationalId}</td>
+                                <td>${emp.PhoneNumber}</td>
+                                <td>${emp.MarriageStatus}</td>
+                                <td>${emp.Religion}</td>
+                                <td>${emp.DateOfBirth ? new Date(emp.DateOfBirth).toISOString().split('T')[0] : ''}</td>
+                                <td>${emp.InsuranceNumber}</td>
+                                <td>${emp.HireDate ? new Date(emp.HireDate).toISOString().split('T')[0] : ''}</td>
+                                <td></td>
+                                <td>${emp.Department}</td>
+                                <td>${emp.JobName}</td>
+                                <td>${emp.ContractType}</td>
+                                <td>
+                                    <!-- Button to open modal -->
+                                    <button class="openModal col-button-dark m-1  rounded "
+                                        index="${emp.Id}">
+                                        تعديل
+                                    </button>
+                                </td>
+                            `;
+            // add 1 to the index
+            @* @ViewData["curIndex"] = @ViewData["curIndex"] + 1;
+            const index = @ViewData["curIndex"] - 1; *@
+                row.setAttribute('id', 'row-' + emp.Id);
+            row.classList.add('snap-start');
+            console.log(row);
+            tbody.appendChild(row);
+        }
+
+        function openImage(src) {
+            const lightbox = document.getElementById('imageLightbox');
+            const img = document.getElementById('lightboxImage');
+
+            img.src = src;
+            lightbox.classList.remove('hidden');
+            lightbox.classList.add('flex');
+            setTimeout(() => img.classList.add('scale-100'), 10); // smooth zoom-in
+        }
+
+        document.getElementById('imageLightbox').addEventListener('click', function () {
+            const img = document.getElementById('lightboxImage');
+            img.classList.remove('scale-100');
+            setTimeout(() => {
+                this.classList.add('hidden');
+                this.classList.remove('flex');
+            }, 200); // fade out
+        });
+        ['submit', 'click', 'change'].forEach(evt => {
+            document.addEventListener(evt, function (e) {
+                console.log(
+                    `🔹 EVENT: ${evt} | TARGET: ${e.target.tagName}#${e.target.id || '(no id)'} | CLASS: ${e.target.className}`
+                );
+            }, true); // <-- use capture phase
+        });
+        const modal = document.getElementById("editModal");
+        // Optional: close modal when background is clicked
+        modal.addEventListener('click', function (e) {
+            if (e.target === this) closeModal();
+        });
+        // Optional: close modal when background is clicked
+        document.getElementById('createModal').addEventListener('click', function (e) {
+            if (e.target === this) closeModalCreate();
+        });
+
+        function searchForApplier() {
+            const input = document.getElementById('searchInput');
+            const query = input.value.toLowerCase();
+            const rows = document.querySelectorAll('#appliersBody tr');
+
+            rows.forEach(row => {
+                const name = row.cells[0].innerText.toLowerCase();
+                const nationalId = row.cells[1].innerText.toLowerCase();
+                if (name.includes(query) || nationalId.includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        function showAllEmployees() {
+            const rows = document.querySelectorAll('#appliersBody tr');
+            rows.forEach(row => row.style.display = '');
+        }
+
+
+        // 🧭 Watch for any class change on the modal
+        const observer = new MutationObserver(mutations => {
+            mutations.forEach(m => {
+                if (m.attributeName === "class") {
+                    console.log(
+                        "⚠️ Modal class changed:",
+                        modal.className,
+                        "at",
+                        new Date().toLocaleTimeString(),
+                        new Error().stack
+                    );
+                }
+            });
+        });
+
+        observer.observe(modal, { attributes: true });
+
+    </script>
+
+
+
+
+    <script>
+        var employees = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));// from Razor
+    </script>
+
+}

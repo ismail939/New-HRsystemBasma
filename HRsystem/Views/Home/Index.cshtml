@@ -1,0 +1,104 @@
+﻿@{
+    ViewData["Title"] = "الموارد البشرية";
+    Layout = "";
+}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>@ViewData["Title"]</title>
+    <link href="~/css/output.css" rel="stylesheet" />
+    <link rel="icon" href="~/images/logo2.png" sizes="96x96" type="image/png">
+    <style>
+        body.index_body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background:
+                linear-gradient(90deg,
+                    #303B2E 0%,
+                    #374334 15%,
+                    #4C5A45 30%,
+                    #6F8660 45%,
+                    #7B9669 50%,
+                    #6F8660 55%,
+                    #4C5A45 70%,
+                    #374334 85%,
+                    #303B2E 100%);
+            background-size: 260px 100%;
+        }
+    </style>
+
+
+</head>
+
+<body class="index_body">
+
+    <div class="group relative rounded-3xl p-6 w-1/4 h-1/2
+         flex flex-col items-center justify-center gap-6
+         bg-white/30 backdrop-blur-md
+         shadow-lg shadow-black/10
+         hover:bg-white/40 hover:shadow-2xl
+         transition-all duration-500">
+
+        <!-- Logo -->
+        <img src="/images/logo2.png" class="w-[200px] h-[200px] object-contain
+           group-hover:scale-105 transition-transform duration-300" alt="logo">
+
+        <!-- Title -->
+        <p class="text-xl font-semibold text-gray-800 tracking-wide">
+            إدارة الموارد البشرية
+        </p>
+
+        <!-- Button -->
+        <a href="/dashboard" class="mt-2 inline-flex items-center gap-2
+           bg-color3 text-white
+           px-8 py-3 rounded-full
+           shadow-md shadow-color3/40
+           hover:bg-color2 hover:shadow-lg
+           hover:-translate-y-1
+           transition-all duration-300">
+
+            الدخول
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+        </a>
+    </div>
+
+    @* <!-- ✅ Your normal image -->
+    <img src="/images/hr logo1.png" alt="صورة الموظف"
+        class="w-32 h-32 rounded-lg cursor-pointer hover:opacity-80 transition" onclick="openImage(this.src)" />
+
+    <!-- ✅ The lightbox -->
+    <div id="imageLightbox" class="fixed inset-0  bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <img id="lightboxImage"
+            class="max-w-3xl max-h-[90vh] rounded-2xl shadow-2xl transition-transform duration-300 scale-95" />
+    </div> *@
+</body>
+
+</html>
+
+
+<script>
+    function openImage(src) {
+        const lightbox = document.getElementById('imageLightbox');
+        const img = document.getElementById('lightboxImage');
+
+        img.src = src;
+        lightbox.classList.remove('hidden');
+        setTimeout(() => img.classList.add('scale-100'), 10); // smooth zoom-in
+    }
+
+    document.getElementById('imageLightbox').addEventListener('click', function () {
+        const img = document.getElementById('lightboxImage');
+        img.classList.remove('scale-100');
+        setTimeout(() => this.classList.add('hidden'), 200); // fade out
+    });
+
+
+</script>

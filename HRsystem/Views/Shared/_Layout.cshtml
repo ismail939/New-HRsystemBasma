@@ -1,0 +1,95 @@
+﻿@{
+    @* var currentController = Context.Request.RouteValues["controller"]?.ToString(); *@
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    Console.WriteLine("Current Controller: 🟢" + currentController);
+}
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" /> 
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.css" />
+    <link href="~/css/output.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/HRsystem.styles.css" asp-append-version="true" />
+    <link rel="icon" href="~/images/logo2.png" sizes="96x96" type="image/png">
+</head>
+
+<body id="" class="h-full min-h-screen bg-color1">
+
+
+
+    <div class="flex flex-row min-h-screen relative">
+
+        <!-- Sidebar -->
+        <navbar id="" class="w-full h-16 col-nav text-white flex flex-row 
+                      fixed inset-0 z-40 transform transition-transform duration-700 ease-in-out">
+
+            <div class="w-full flex flex-row items-center justify-start h-full mx-2">
+                <div class="flex items-center justify-center border-l-2 border-white h-full p-4">
+                    <img src="/images/logo2.png" alt="" class="w-16 h-16">
+                    <span class="fs-4  p-2 font-bold">الموارد البشرية</span>
+                </div>
+
+                <ul class="flex flex-row gap-1 w-4/6 mx-4 h-full">
+                    <li><a href="/dashboard" class="nav-link  @(currentController == "Home" ? "active" : "")">تقرير
+                            اليوم</a></li>
+                    <li><a href="/employees"
+                            class="nav-link  @(currentController == "Employee" ? "active" : "")">الموظفين</a></li>
+                    <li><a href="/basma" class="nav-link  @(currentController == "Basma" ? "active" : "")">البصمة</a>
+                    </li>
+                    <li><a href="/OffDays" class="nav-link  @(currentController == "OffDay" ? "active" : "")">الاجازات
+                        </a></li>
+                    <li><a href="/penalties"
+                            class="nav-link  @(currentController == "Penalty" ? "active" : "")">الجزاءات</a></li>
+                    <li><a href="/reports"
+                            class="nav-link  @(currentController == "Report" ? "active" : "")">التقارير</a></li>
+                </ul>
+            </div>
+            @* <img src="/images/logo2.png" alt="HR Logo" class="w-14 h-14"> *@
+
+
+        </navbar>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-6 transition-all duration-700 mt-16" id="main-content">
+
+            @* <!-- زر فتح/إغلاق الـ sidebar -->
+            <button class="bg-blue-600 text-white px-4 py-2 rounded mb-4" onclick="toggleSidebar()">
+                ☰ القائمة
+            </button> *@
+
+            <main role="main" class="pb-3 h-full">
+                <div id="loadingOverlay" class="loading-overlay hidden">
+                    <div class="spinner"></div>
+                </div>
+
+                @RenderBody()
+            </main>
+        </div>
+        <footer class="bg-color2   
+        w-full text-white text-[10px] italic absolute bottom-2 
+        flex justify-center items-center h-6 tracking-wide">
+            Developed By Ismail Salama (IT) ©2026
+        </footer>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <link href="~/lib/flatpickr/dist/flatpickr.min.css" rel="stylesheet" />
+    <script src="~/lib/flatpickr/dist/flatpickr.min.js"></script>
+    <script src="~/lib/flatpickr/dist/l10n/ar.js"></script>
+    <script src="~/lib/alpinejs/dist/cdn.min.js" defer></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>
+
+
+
+    

@@ -1,0 +1,149 @@
+@model IEnumerable<HRsystem.ViewModels.BasmaList>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "البصمة";
+}
+
+<div class="flex flex-row flex-start gap-2 mb-1">
+
+    <input type="date" id="datePicker" placeholder="تاريخ البداية"
+        class="border border-gray-300 rounded-md py-2 focus:ring focus:ring-color2 focus:outline-none text-center text-color5" />
+    <input type="date" id="datePicker" onchange="filterByDate()" placeholder="تاريخ النهاية"
+        class="border border-gray-300 rounded-md py-2 focus:ring focus:ring-color2 focus:outline-none text-center text-color5" disabled />
+    <div x-data="{
+        showSearch: false,
+        toggleSearch() {
+            this.showSearch = !this.showSearch;
+
+            if (this.showSearch) {
+                // Focus the input after it appears
+                this.$nextTick(() => document.getElementById('searchInput')?.focus());
+            } else {
+                // Clear and show all employees when refresh is clicked
+                const input = document.getElementById('searchInput');
+                if (input) input.value = '';
+                showBasmaListForDay();
+            }
+        }
+    }" class="flex items-center gap-2">
+        <!-- Search / Refresh Button -->
+        <button @@click="toggleSearch"
+            class="p-2 rounded-full bg-[#404E3B] text-white hover:bg-[#A7B89A] transition-all duration-300">
+            <i :class="showSearch ? 'bi-arrow-clockwise' : 'bi-search'" class="text-lg"></i>
+        </button>
+
+        <!-- Search input -->
+        <template x-if="showSearch">
+            <div class="flex items-center gap-2 animate-fade-in">
+                <input id="searchInput" type="text" placeholder="ابحث عن موظف..." oninput="searchForEmployee()"
+                    class="border border-gray-300 rounded-md px-5 py-2 focus:ring focus:ring-[#BAC8B1] focus:outline-none text-sm" />
+            </div>
+        </template>
+    </div>
+
+</div>
+
+
+<div id="tableResponsive" class="hidden tableContainer ">
+    <table class="table-base min-w-full border-separate border-spacing-0" id="employeesTable">
+        <thead class="table-dark col-table-header sticky top-0 z-10">
+            <tr>
+                <th>الاسم</th>
+                <th>وقت الحضور</th>
+                <th>وقت الانصراف</th>
+                <th>عدد ساعات العمل</th>
+                <th>مدة التأخير</th>
+                <th>الحالة</th>
+            </tr>
+        </thead>
+        <tbody id="employeesBody" class="mt-3">
+            
+
+        </tbody>
+    </table>
+</div>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            showBasmaListForDay();
+            setTimeout(() =>
+            {
+            document.getElementById('tableResponsive').classList.remove('hidden');
+            }, 120);
+        });
+        function filterByDate() {
+            const dateInput = document.getElementById('datePicker').value;
+            const table = document.getElementById('employeesTable');
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) {
+                const dateCell = rows[i].getElementsByTagName('td')[1];
+                if (dateCell) {
+                    const cellDate = dateCell.textContent || dateCell.innerText;
+                    if (dateInput === "" || cellDate === dateInput) {
+                        rows[i].style.display = "";
+                    } else {
+                        rows[i].style.display = "none";
+                    }
+                }
+            }
+        }
+        async function showBasmaListForDay() {
+            const dateInput = document.getElementById('datePicker').value;
+            const tableBody = document.getElementById('employeesBody');
+            const response = await fetch(`/basmaJson`);
+
+            const list = await response.json();
+            console.log(list + "🟠");
+            var html = "";
+            list.forEach(basma => {
+                html += `
+               <tr id="row-${basma.Id}" class="snap-start">
+                <td>${basma.EmployeeName ?? ""}</td>
+                <td>${basma.ArrivalTime ? new Date(basma.ArrivalTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}</td>
+                <td>${basma.DepartureTime ? new Date(basma.DepartureTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}</td>
+                <td>${basma.TotalHours ? basma.TotalHours: ""}</td>
+                <td>${basma.LateMinutes ? basma.LateMinutes: ""}</td>
+                <td>${basma.Status ?? ""}</td>
+                </tr>
+                                            `;
+            })
+            tableBody.innerHTML = html;
+        }
+        async function searchForEmployee() {
+            const input = document.getElementById('searchInput').value.trim();
+            const tableBody = document.getElementById('employeesBody');
+
+            @* tableBody.innerHTML = `
+            <tr><td colspan="8" style="text-align:center;">Loading...</td></tr>
+        `; *@
+
+            const response = await fetch(`/Basma/SearchEmployees?query=${encodeURIComponent(input)}`);
+
+            const list = await response.json();
+            console.log(list + "🟠");
+            var html = "";
+            list.forEach(basma => {
+                html += `
+                <tr id="row-${basma.Id}" class="snap-start">
+                <td>${basma.EmployeeName ?? ""}</td>
+                <td>${basma.ArrivalTime ? new Date(basma.ArrivalTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}</td>
+                <td>${basma.DepartureTime ? new Date(basma.DepartureTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}</td>
+                <td>${basma.TotalHours ? basma.TotalHours: ""}</td>
+                <td>${basma.LateMinutes ? basma.LateMinutes: ""}</td>
+                <td>${basma.Status ?? ""}</td>
+                </tr>
+
+
+                                            `;
+            })
+            tableBody.innerHTML = html;
+        }
+
+
+
+
+    </script>
+}

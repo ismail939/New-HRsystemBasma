@@ -1,0 +1,100 @@
+<div x-data="{ filterOpen: false }" class="p-6 bg-gray-50 min-h-screen">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-[#404E3B]">📊 التقارير</h1>
+        <button @@click="filterOpen = !filterOpen"
+            class="bg-[#A7B89A] hover:bg-[#404E3B] text-white font-semibold px-4 py-2 rounded transition">
+            الفلاتر
+        </button>
+    </div>
+
+    <!-- Filters -->
+    <div x-show="filterOpen" x-transition class="bg-white p-4 rounded-lg shadow mb-6 flex flex-wrap gap-4">
+        <div>
+            <label class="block text-sm mb-1">من</label>
+            <input type="date" class="border rounded px-2 py-1" />
+        </div>
+        <div>
+            <label class="block text-sm mb-1">إلى</label>
+            <input type="date" class="border rounded px-2 py-1" />
+        </div>
+        <div>
+            <label class="block text-sm mb-1">نوع التقرير</label>
+            <select class="border rounded px-2 py-1">
+                <option>الغيابات</option>
+                <option>الحضور</option>
+                <option>الإجازات</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="bg-white rounded-lg shadow p-4 flex items-center gap-3">
+            <i class="bi bi-person-check text-2xl text-[#404E3B]"></i>
+            <div>
+                <p class="text-gray-500 text-sm">عدد الحضور</p>
+                <p class="text-xl font-bold">245</p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-4 flex items-center gap-3">
+            <i class="bi bi-person-x text-2xl text-[#404E3B]"></i>
+            <div>
+                <p class="text-gray-500 text-sm">عدد الغيابات</p>
+                <p class="text-xl font-bold">12</p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-4 flex items-center gap-3">
+            <i class="bi bi-calendar-check text-2xl text-[#404E3B]"></i>
+            <div>
+                <p class="text-gray-500 text-sm">إجمالي الإجازات</p>
+                <p class="text-xl font-bold">32</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <table class="w-full border-collapse">
+            <thead class="bg-[#BAC8B1] text-white">
+                <tr>
+                    <th class="py-3 px-4 text-left">الموظف</th>
+                    <th class="py-3 px-4 text-left">القسم</th>
+                    <th class="py-3 px-4 text-left">عدد الأيام</th>
+                    <th class="py-3 px-4 text-left">النوع</th>
+                    <th class="py-3 px-4 text-left">التاريخ</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="hover:bg-gray-100 transition">
+                    <td class="py-2 px-4">أحمد علي</td>
+                    <td class="py-2 px-4">المبيعات</td>
+                    <td class="py-2 px-4">3</td>
+                    <td class="py-2 px-4">سنوي</td>
+                    <td class="py-2 px-4">10 - 12 نوفمبر</td>
+                </tr>
+                <tr class="hover:bg-gray-100 transition">
+                    <td class="py-2 px-4">منى سمير</td>
+                    <td class="py-2 px-4">الموارد البشرية</td>
+                    <td class="py-2 px-4">1</td>
+                    <td class="py-2 px-4">عارضة</td>
+                    <td class="py-2 px-4">9 نوفمبر</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex justify-end gap-4 mt-6">
+        <button class="bg-[#A7B89A] hover:bg-[#404E3B] text-white px-4 py-2 rounded transition">
+            طباعة
+        </button>
+        <button
+            class="border border-[#404E3B] text-[#404E3B] hover:bg-[#404E3B] hover:text-white px-4 py-2 rounded transition">
+            تصدير PDF
+        </button>
+    </div>
+</div>

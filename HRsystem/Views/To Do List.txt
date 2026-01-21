@@ -1,0 +1,5 @@
+- alpine js deep understand.
+- .net pdf report install
+- .net pdf report usage
+- i want to delete the offday -> by making the form get the days with their respective 
+offdays entries if they are found so when u uncheck one you delete it from the database.

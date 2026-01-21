@@ -1,0 +1,84 @@
+############################
+# Node / Frontend
+############################
+node_modules/
+wwwroot/lib/
+
+############################
+# .NET build outputs
+############################
+bin/
+obj/
+out/
+
+############################
+# User-specific files
+############################
+*.user
+*.rsuser
+*.suo
+*.userosscache
+
+############################
+# IDEs
+############################
+.vs/
+.vscode/
+.idea/
+
+############################
+# Logs
+############################
+*.log
+
+############################
+# NuGet
+############################
+*.nupkg
+*.snupkg
+*.nuspec
+packages/
+project.lock.json
+project.fragment.lock.json
+
+############################
+# Publish / IIS
+############################
+publish/
+*.publishsettings
+*.pubxml
+*.pubxml.user
+app_offline.htm
+
+############################
+# App settings / secrets
+############################
+appsettings.Development.json
+secrets.json
+
+############################
+# Databases / backups
+############################
+*.mdf
+*.ldf
+*.bak
+*.dbmdl
+
+############################
+# Windows junk
+############################
+Thumbs.db
+Desktop.ini
+
+############################
+# ZKTeco / COM / SDK
+############################
+Interop.zkemkeeper.dll
+zkemkeeper.dll
+*.ocx
+
+############################
+# OS temp
+############################
+*.tmp
+*.temp

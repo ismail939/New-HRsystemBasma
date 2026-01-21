@@ -1,0 +1,51 @@
+@{
+    ViewData["Title"] = "اليوم";
+    Layout = "_Layout";
+}
+<div class="p-6">
+
+<div class="w-full flex justify-center items-center">
+    <img src="images/logo2.png" class="w-[200px] h-[200px]">
+</div>
+<div class="p-6 flex flex-row gap-2 justify-center align-items-center">
+    <h1 class="text-2xl font-bold mb-4 text-center ">تاريخ اليوم:</h1>
+    <p class="mb-6 fs-4 bg-white rounded-lg p-1 w-1/5  text-center" id="dateDiv"></p>
+</div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-white p-4 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold mb-2">إجمالي الموظفين</h2>
+            <p class="text-3xl font-bold text-blue-600">150</p>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold mb-2">الموظفين الحاضرين </h2>
+            <p class="text-3xl font-bold text-green-600">120</p>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold mb-2">الموظفين الغائبين </h2>
+            <p class="text-3xl font-bold text-red-600">3</p>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold mb-2">الموظفين الاجازة </h2>
+            <p class="text-3xl font-bold text-gray-600">27</p>
+        </div>
+        
+    </div>
+</div>
+
+
+@section Scripts{
+    <script>
+       const now = new Date();
+
+document.getElementById("dateDiv").innerText =
+  now.toLocaleDateString("ar-EG", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
+
+
+    </script>
+}

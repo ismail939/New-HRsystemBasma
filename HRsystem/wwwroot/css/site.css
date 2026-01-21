@@ -1,0 +1,558 @@
+﻿@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.index_body {
+  background: linear-gradient(to right, #497c5e, #5ea680);
+  background-size: cover;
+  /* تخلي الصورة تغطي الصفحة */
+  background-repeat: no-repeat;
+  /* تمنع التكرار */
+  background-attachment: fixed;
+  /* الصورة ثابتة مع السكرول */
+  width: 100%;
+  height: 100vh;
+  /* تخلي الطول يساوي طول الشاشة */
+  display: flex;
+  justify-content: center;
+  /* توسيط المحتوى أفقياً */
+  align-items: center;
+  /* توسيط المحتوى عمودياً */
+}
+
+
+
+
+
+.img-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 300px;
+  height: 300px;
+}
+
+.imgFile {
+  transition: opacity 0.3s ease;
+  height: 300px;
+  width: 300px;
+  object-fit: cover;
+  @apply border-4 border-black rounded-2xl;
+}
+
+.img-wrapper:hover .imgFile {
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+/* The delete button */
+.hover-button {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+  border: none;
+  border-radius: 4px;
+}
+
+/* Show the button on hover */
+.img-wrapper:hover .hover-button {
+  opacity: 1;
+}
+
+.upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  font-family: "Tajawal", sans-serif;
+}
+
+.upload-label {
+  font-weight: 600;
+  color: #333;
+}
+
+.upload-input {
+  position: relative;
+  font-size: 16px;
+  padding: 10px;
+  width: 100%;
+  max-width: 280px;
+  @apply border-2 border-dashed border-color3 !important;
+  border-radius: 8px;
+  background-color: #f9fafb;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* When hovering */
+.upload-input:hover {
+  @apply border-color3 !important;
+  background-color: #eff6ff;
+}
+
+/* When a file is selected */
+.upload-input:focus {
+  outline: none;
+  @apply border-color3 !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+}
+
+
+
+
+
+.flatpickr-calendar {
+  direction: rtl;
+  text-align: right;
+}
+
+/* .flatpickr-months .flatpickr-prev-month {
+    right: 1em !important;
+    left: auto !important;
+}
+
+.flatpickr-months .flatpickr-next-month {
+    left: 1em !important;
+    right: auto !important;
+} */
+.flatpickr-weekdays {
+  direction: rtl;
+}
+
+
+
+/* Colors Palette 1*/
+.col-background {
+  @apply bg-color1 !important;
+}
+
+.col-modal {
+  @apply bg-color1 backdrop-blur-md rounded-2xl shadow-2xl p-8 max-w-[90vw] max-h-[90vh]  w-fit;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  @apply text-color3 !important;
+
+}
+
+.col-modal h2 {
+  /* color: #7B9669!important; */
+  @apply text-color3 !important;
+}
+
+.col-modal label {
+  @apply text-color3 !important;
+}
+
+.col-modal input {
+  background-color: #E6E6E6 !important;
+}
+
+.col-button-dark {
+  @apply bg-color3 text-white font-bold py-1 px-2 rounded transition-all duration-500 border border-transparent !important;
+}
+
+.col-button-dark:hover {
+  @apply bg-color1 text-color3 shadow-sm border-color3 !important;
+  transform: scale(1.02);
+}
+
+.col-button-light {
+  @apply bg-color2 text-white font-bold py-1 px-2 rounded transition-all duration-500 border-transparent border !important;
+}
+
+.col-button-light:hover {
+  @apply bg-color1 text-color3 shadow-lg border-color3 !important;
+  transform: scale(1.02);
+}
+
+.col-card-dark {
+  @apply bg-color2 text-white px-40 py-2 hover:bg-color3 transition-colors duration-300 !important;
+}
+
+.col-card-light {
+  @apply bg-[#ffffff] text-color3 py-1 px-2 rounded transition-all duration-200 !important;
+}
+
+.col-card-light:hover {
+  @apply bg-color3 text-white shadow-lg !important;
+  transform: scale(1.02);
+}
+
+.col-table-header tr th {
+  @apply bg-color5 !important;
+  color: white !important;
+  padding: 7px !important;
+}
+
+.col-nav {
+  @apply bg-color2 !important;
+}
+
+.tableContainer {
+  @apply overflow-y-auto max-h-[75vh] rounded-lg shadow-md;
+}
+
+.table-base {
+  @apply w-full text-right shadow-sm;
+}
+
+.table-base th {
+  @apply bg-gray-100 text-gray-700 border;
+  white-space: normal;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.table-base td {
+  @apply border px-2 border-color3;
+}
+
+.table-base tr:hover {
+  @apply bg-gray-50;
+}
+
+.table-base tbody tr {
+  @apply odd:bg-white even:bg-[#dae0d7eb] hover:bg-color4 transition;
+}
+
+.nav-link {
+  @apply relative text-[17px] block !text-white px-8 pt-4 rounded-md transition-all duration-500 ease-in-out h-full;
+  transform: scale(1);
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 0;
+  @apply bg-color3;
+  /* keep it elegant white */
+  transition: width 0.5s ease-in-out 0.15s;
+}
+
+/* Hover effect */
+.nav-link:hover {
+  @apply text-white bg-[#bac8b1cc] shadow-lg !important;
+  /* brighter + shadow */
+  transform: scale(1.1);
+  /* gently grow */
+}
+
+/* underline animation */
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* .dropdown-item{
+  @apply transition-colors duration-200;
+}
+.dropdown-item:hover{
+  @apply bg-[#bac8b1cc];
+} */
+
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #e5e7eb;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #6C8480;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #404E3B;
+}
+
+input[type="date"] {
+  direction: rtl;
+  /* flips the input text */
+  text-align: right;
+  /* aligns displayed date */
+}
+
+input[type="date"]::-webkit-datetime-edit {
+  direction: rtl;
+  text-align: right;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  float: left;
+}
+
+/* /* Change selected date color */
+.flatpickr-day.selected,
+.flatpickr-day.selected:hover,
+.flatpickr-day.selected:focus {
+  background: #7B9669 !important;
+  /* your custom color */
+  border-color: #7B9669 !important;
+  color: #fff !important;
+  /* text color */
+}
+
+/* Force Arabic numerals & RTL direction */
+.flatpickr-calendar,
+.flatpickr-days,
+.flatpickr-day {
+  direction: rtl !important;
+  font-family: "Tajawal";
+  /* Arabic-friendly fonts */
+}
+
+/* Weekday labels */
+.flatpickr-weekday {
+  direction: rtl !important;
+  text-align: center !important;
+  font-family: inherit;
+}
+
+/* <select class="flatpickr-monthDropdown-months" aria-label="شهر" tabindex="-1"><option class="flatpickr-monthDropdown-month" value="0" tabindex="-1">يناير</option><option class="flatpickr-monthDropdown-month" value="1" tabindex="-1">فبراير</option><option class="flatpickr-monthDropdown-month" value="2" tabindex="-1">مارس</option><option class="flatpickr-monthDropdown-month" value="3" tabindex="-1">أبريل</option><option class="flatpickr-monthDropdown-month" value="4" tabindex="-1">مايو</option><option class="flatpickr-monthDropdown-month" value="5" tabindex="-1">يونيو</option><option class="flatpickr-monthDropdown-month" value="6" tabindex="-1">يوليو</option><option class="flatpickr-monthDropdown-month" value="7" tabindex="-1">أغسطس</option><option class="flatpickr-monthDropdown-month" value="8" tabindex="-1">سبتمبر</option><option class="flatpickr-monthDropdown-month" value="9" tabindex="-1">أكتوبر</option><option class="flatpickr-monthDropdown-month" value="10" tabindex="-1">نوفمبر</option><option class="flatpickr-monthDropdown-month" value="11" tabindex="-1">ديسمبر</option></select> */
+
+select.flatpickr-monthDropdown-months {
+  direction: rtl !important;
+  margin: 5px !important;
+}
+
+select.numInputWrapper {
+  direction: rtl !important;
+  margin: 5px !important;
+  display: flex !important;
+  gap: 10px !important;
+}
+
+/* Hide the up/down arrows inside the year input */
+.flatpickr-current-month .numInputWrapper span.arrowUp,
+.flatpickr-current-month .numInputWrapper span.arrowDown {
+  display: none !important;
+}
+
+/* Optional: shrink padding since arrows are gone */
+.flatpickr-current-month .numInputWrapper {
+  padding: 0 !important;
+}
+
+
+
+.flatpickr-current-month {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 10px !important;
+  /* now works */
+}
+
+.flatpickr-year-select {
+  direction: rtl;
+  border: 1px solid #ccc;
+  background: white;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.flatpickr-year-select:focus {
+  border-color: #7B9669;
+  outline: none;
+}
+
+
+@font-face {
+  font-family: "Tajawal";
+  src: url("/fonts/Tajawal-Regular.ttf") format("truetype");
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: "Tajawal";
+  src: url("/fonts/Tajawal-Bold.ttf") format("truetype");
+  font-weight: bold;
+}
+
+/* Apply Arabic font for all Arabic content */
+:root {
+  --arabic-font: 'Tajawal', sans-serif;
+}
+
+/* Any element containing Arabic will use your font */
+body:lang(ar),
+html[lang="ar"],
+*[lang="ar"],
+:lang(ar),
+*[dir="rtl"] {
+  font-family: var(--arabic-font) !important;
+}
+
+#dayDateText {
+  font-family: "Tajawal", sans-serif !important;
+  line-height: 1.2;
+}
+
+#dayDateText * {
+  font-family: "Tajawal", sans-serif !important;
+}
+
+.reportCard {
+  @apply p-5 my-2 text-lg text-color3 shadow-sm bg-white rounded-lg transition-colors duration-150 !important;
+}
+
+.reportCard:hover {
+  @apply bg-opacity-80 !important;
+  transform: scale(1.02);
+}
+
+td {
+  text-align: center;
+  vertical-align: middle;
+  /* optional */
+}
+
+th {
+  text-align: center;
+  vertical-align: middle;
+  /* optional */
+}
+
+.active {
+  @apply text-white bg-[#bac8b1cc] shadow-lg !important;
+}
+
+.inactive {
+  @apply text-gray-500 bg-gray-200 !important;
+}
+
+.outlineActive{
+  outline: 2px solid white !important;  
+  outline-offset: 2px !important;        
+
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+}
+
+.loading-overlay.hidden {
+  display: none;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 8px solid #eee;
+  border-top: 8px solid #7B9669;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
+.tabs-container {
+    background: #c9d6be;
+    border-radius: 14px;
+    padding: 16px;
+}
+
+.tabs {
+    display: flex;
+    gap: 8px;
+    background: #b6c4a4;
+    padding: 6px;
+    border-radius: 12px;
+}
+
+.tab {
+    flex: 1;
+    padding: 10px 0;
+    border-radius: 10px;
+    background: transparent;
+    border: none;
+    font-weight: 600;
+    color: #2f3e2f;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab:hover {
+    background: rgba(255,255,255,0.35);
+}
+
+.tab.active {
+    @apply bg-color3;
+    color: white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.tab-content {
+    margin-top: 16px;
+    background: #eef3e8;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+
+
+.stat-card {
+  background: #cdddc3;
+  border-radius: 16px;
+  padding: 5px;
+  text-align: center;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+
+
+.stat-icon {
+  font-size: 32px;
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-size: 34px;
+  font-weight: bold;
+  color: #3f5f3c;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #425c45;
+  margin-top: 4px;
+}
+
+.listEmpTableThead th {
+  font-size: 13px;
+}
+
+.listEmpTableTbody td {
+  font-size: 14px;
+}

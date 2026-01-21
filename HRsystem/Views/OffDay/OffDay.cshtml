@@ -1,0 +1,401 @@
+@model IEnumerable<HRsystem.Models.HREmployee>
+
+@{
+    ViewData["Title"] = "إدارة الإجازات";
+}
+
+<!-- MODAL BACKDROP -->
+<div id="modalBackdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50
+            transition-all duration-300 ease-out opacity-0 scale-95">
+
+    <!-- MODAL -->
+    <div class="col-modal w-5/6 h-3/4 relative bg-white rounded-lg shadow-lg p-6" dir="rtl">
+
+        <!-- Close -->
+        <button onclick="closeModal()"
+            class="absolute top-3 left-3 p-0 rounded-full text-gray-600 hover:text-red-700 text-2xl">
+            <i class="bi bi-x-circle"></i>
+        </button>
+
+        <h2 class="text-xl font-semibold text-center mb-6">إضافة إجازة</h2>
+
+        <input type="hidden" id="empId">
+
+        <!-- Dates -->
+        <div class="w-full flex flex-row justify-center gap-3 mt-6" id="dateInputs">
+            <label>من</label>
+            <input class="border p-2  rounded  focus:outline-none focus:ring focus:ring-[#7B9669]" placeholder="البداية"
+                type="date" id="from"/>
+            <label>إلى</label>
+            <input class="border p-2  rounded  focus:outline-none focus:ring focus:ring-[#7B9669]" placeholder="النهاية"
+                type="date" id="to" disabled/>
+        </div>
+        <div class="w-full flex justify-center">
+            <button onclick="loadDays()" class="col-button-dark mt-3 ">بحث</button>
+        </div>
+
+        <!-- DAYS CONTAINER -->
+        <div id="daysContainer" class=" rounded-md gap-2 m-4 p-2 hidden overflow-auto max-h-[200px]">
+        </div>
+
+        <div class="mt-8 justify-center hidden" id="saveBtn">
+            <button onclick="submitVacation()" class="col-button-dark py-2 px-6 rounded transition-all duration-300">
+                حفظ
+            </button>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- EMPLOYEE TABLE -->
+<div id="tableResponsive" class="tableContainer">
+    <table class="table-base min-w-full border-separate border-spacing-0" id="OffDaysTable">
+        <thead class="table-dark col-table-header sticky top-0 z-10">
+            <tr>
+                <th>اسم الموظف</th>
+                <th>القسم</th>
+                <th>المسمى الوظيفي</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var e in Model)
+            {
+                <tr>
+                    <td>@e.Name</td>
+                    <td>@e.Department</td>
+                    <td>@e.JobName</td>
+                    <td>
+                        <button class="col-button-dark m-1" onclick="openModal('@e.Id')">
+                            تعديل
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- SMALL DROPDOWN POPUP -->
+<div id="typePopupBackdrop" class="hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-50
+              items-center justify-center">
+
+    <form id="typePopup" class="bg-white p-6 rounded-2xl shadow-xl w-64 text-center">
+        <h3 class="text-lg font-bold mb-3">اختر نوع الإجازة</h3>
+
+        <select id="popupSelect" class="w-full border rounded-lg p-2 text-right">
+            <option class="dropdown-item" value="">اختر نوع الإجازة</option>
+            <option class="dropdown-item" value="راحة">راحة</option>
+            <option class="dropdown-item" value="سنوي">سنوي</option>
+            <option class="dropdown-item" value="عارضة">عارضة</option>
+            <option class="dropdown-item" value="مرضي">مرضي</option>
+            <option class="dropdown-item" value="أخرى">أخرى</option>
+        </select>
+        <input id="otherInput" type="text"
+            class="hidden mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]"
+            name="OffDayType" required placeholder="اكتب السبب هنا" />
+        <div class="hidden bg-red-300 text-bold rounded-lg p-2 m-2" id="error">من فضلك ادخل السبب</div>
+        <button type="button" onclick="makeOffDay()" class="mt-4  py-2 px-4 rounded-lg col-button-dark">
+            تأكيد
+        </button>
+    </form>
+</div>
+
+
+@section Scripts {
+    <script>
+        // ⭐ Open Modal 
+        function openModal(empId) {
+            const modalBackdrop = document.getElementById('modalBackdrop');
+            document.getElementById('tableResponsive').classList.add('hidden');
+            modalBackdrop.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                modalBackdrop.classList.remove("opacity-0", "scale-95");
+                modalBackdrop.classList.add("opacity-100", "scale-100", "flex");
+            });
+            document.getElementById("empId").value = empId;
+        }
+
+        // ⭐ Close Modal
+        function closeModal() {
+            // empty or reset all inputs
+            document.getElementById('from').value = "";
+            document.getElementById('to').value = "";
+            clearFlatpickrInModal('dateInputs');
+            const modal = document.getElementById('modalBackdrop');
+            modal.classList.add("opacity-0", "scale-95");
+            modal.classList.remove("opacity-100", "scale-100");
+
+            // wait for transition to finish
+            setTimeout(() => {
+                modal.classList.add("hidden");
+            }, 300);
+            document.getElementById('tableResponsive').classList.remove('hidden');
+            document.getElementById("daysContainer").innerHTML = "";
+            document.getElementById("daysContainer").classList.add("hidden");
+            hideSaveButton();
+        }
+        @* document.getElementById('otherInput').addEventListener('input', () => {
+            console.log("entered input handleer");
+            const otherInput = document.getElementById('otherInput');
+            if (otherInput.value.trim() == "") {
+                document.getElementById('error').classList.remove('hidden')
+            } else {
+                if (!document.getElementById('error').classList.contains('hidden')) {
+                    document.getElementById('error').classList.add('hidden');
+                }
+            }
+        }) *@
+            function makeOffDay() {
+                const form = document.getElementById('typePopup');
+                const daysArray = loadDaysFromSession();
+                let dateValue = JSON.parse(sessionStorage.getItem("curCardDate"));
+                console.log(dateValue + "   💕\n" + daysArray);
+                let item = daysArray.find(day => day.OffDayDate === dateValue);
+                console.log(JSON.stringify(item) + " 💕before");
+                item.isOffDay = true;
+                let selectValue = document.getElementById('popupSelect').value;
+                let otherValue = document.getElementById('otherInput').value;
+                item.OffDayType = (selectValue === "أخرى" ? otherValue : selectValue);
+                if (item.OffDayType.trim() == "") { // show error div if there is no value
+                    document.getElementById('error').classList.remove('hidden');
+                    return;
+                } else { // 
+                    if (!document.getElementById('error').classList.contains('hidden')) {
+                        document.getElementById('error').classList.add('hidden');
+                    }
+                }
+
+                saveDaysToSession(daysArray);
+                console.log(JSON.stringify(item) + "  💕after");
+                highlightCard(dateValue, item.OffDayType);
+                closeTypePopup();
+            }
+        let popupTarget = null; // the card or day being edited
+
+        function openTypePopup(dateValue) {
+            sessionStorage.setItem("curCardDate", JSON.stringify(dateValue));
+            document.getElementById("typePopupBackdrop").classList.remove("hidden");
+            document.getElementById("typePopupBackdrop").classList.add("flex");
+        }
+        document.getElementById('popupSelect').addEventListener('input', () => {
+            const select = document.getElementById('popupSelect');
+            const otherInput = document.getElementById('otherInput');
+
+            if (select.value === "أخرى") {
+                otherInput.classList.remove("hidden");
+            } else {
+                otherInput.classList.add("hidden");
+                otherInput.value = ""; // optional: clear previous text
+            }
+        });
+
+
+        function closeTypePopup() {
+            document.getElementById('typePopup').reset();
+            if (!document.getElementById('otherInput').classList.contains('hidden')) {
+                document.getElementById('otherInput').classList.add('hidden');
+            }
+            if (!document.getElementById('error').classList.contains('hidden')) {
+                document.getElementById('error').classList.add('hidden');
+            }
+            const popup = document.getElementById("typePopupBackdrop");
+            popup.classList.add("hidden");
+        }
+        const fromInput = document.getElementById("from");
+        const toInput = document.getElementById("to");
+
+        fromInput.addEventListener("change", () => {
+            if (fromInput.value) {
+                toInput.disabled = false;
+                toInput.min = fromInput.value;
+                toInput.value = ""; // reset previous value
+            } else {
+                toInput.disabled = true;
+                toInput.value = "";
+            }
+        });
+
+        // ⭐ Load Days via GET /employees/offdays/{id}?from=...&to=...
+        async function loadDays() {
+            const id = document.getElementById("empId").value;
+            const from = document.getElementById("from").value;
+            const to = document.getElementById("to").value;
+
+            if (!from || !to) {
+                alert("من فضلك أدخل تاريخ البداية والنهاية");
+                return;
+            }
+            console.log(`to: ${to} and from: ${from}`)
+            const url = `/employees/offdays/${id}?from=${from}&to=${to}`;
+            console.log("GET:", url);
+
+            let days = [];
+
+            try {
+                const res = await fetch(url);
+                days = await res.json();
+                console.log(days);
+            } catch {
+                // fallback
+                days = [
+                    { id: 1, name: "الأحد", date: "10 نوفمبر 2025", type: "" },
+                    { id: 2, name: "الاثنين", date: "11 نوفمبر 2025", type: "" },
+                    { id: 3, name: "الثلاثاء", date: "12 نوفمبر 2025", type: "" }
+                ];
+            }
+
+            console.log(`FROM: ${from} to: ${to}`)
+            showSaveButton();
+            renderDays(days, from, to);
+        }
+
+
+        function showSaveButton() {
+            document.getElementById('saveBtn').classList.remove('hidden');
+            document.getElementById('saveBtn').classList.add('flex');
+        }
+        function hideSaveButton() {
+            document.getElementById('saveBtn').classList.remove('flex');
+            document.getElementById('saveBtn').classList.add('hidden');
+        }
+        // ⭐ Render selectable cards
+        let selectedDays = [];
+
+        function renderDays(existingDays, from, to) {
+            const container = document.getElementById("daysContainer");
+            container.innerHTML = "";
+            container.classList.remove("hidden");
+            container.classList.add("grid", "grid-cols-7")
+            selectedDays = [];
+
+            let start = new Date(from);
+            let end = new Date(to);
+            var currentDate = new Date(start);
+            let daysArray = []
+            // loop each day
+            for (let index = 1; currentDate <= end; index++) {
+                console.log(`currentdate: ${currentDate.getDate()} and end is : ${end.getDate()}`);
+                let iso = currentDate.toISOString().split("T")[0]; // yyyy-mm-dd
+                console.log(iso + "after getting the current date 😢")
+                @* console.log(`iso is ${iso}------day coming from db is ${existingDays[0].OffDayDate}`) *@
+                    // check if this day exists in backend list
+                    let match = existingDays.find(d => d.OffDayDate.split("T")[0] === iso);
+                console.log(`match value is : ${JSON.stringify(match)} 🟢`)
+                let dayName = currentDate.toLocaleDateString("ar-EG", { weekday: "long" });
+                let dayDateText = currentDate.toLocaleDateString("ar-EG");
+
+                let card = document.createElement("div");
+                card.className =
+                    "p-1 w-21 text-center box-border border-[6px] border-transparent h-[60px] rounded-xl shadow transition cursor-pointer bg-white hover:shadow-lg";
+                card.id = iso;
+                card.innerHTML = `
+                                                                <div class="flex flex-col xl:flex-row items-center justify-center px-3 text-center" id="dayDateText">
+                                                                            <div class="font-bold flex flex-col">${dayName}<br><span class="text-xs xl:text-sm text-[#6C8480]">${dayDateText}</span></div>
+                                                                            <div id="type-${iso}" class="xl:mr-1  bg-red-100 p-1 rounded-lg hidden text-xs xl:text-sm"></div>
+                                                                </div>
+                                                            `;
+                // click toggle
+                card.onclick = (event) => {
+                    event.stopPropagation(); // prevent clicks inside from closing modal
+                    const daysArray = loadDaysFromSession();
+                    let item = daysArray.find(d => d.OffDayDate === iso);
+                    console.log(item + "🔴");
+                    if (item.isOffDay) {
+                        item.isOffDay = false;
+                        item.OffDayType = "";
+                        saveDaysToSession(daysArray);
+                        document.getElementById(`type-${iso}`).classList.add('hidden');
+                        unHighlightCard(iso);
+                    } else {
+                        openTypePopup(iso); // iso = date string
+                    }
+                };
+                container.appendChild(card);
+                // highlight if already offday
+                if (match) {
+                    console.log(`i entered if condition to highlight the card`);
+                    daysArray.push({ OffDayDate: iso, isOffDay: true, OffDayType: match["OffDayType"] });
+                    console.log(`type-${currentDate.toISOString().split("T")[0]}` + "⭐");
+                    highlightCard(iso, match["OffDayType"]);
+                }
+                else {
+                    daysArray.push({ OffDayDate: iso, isOffDay: false });
+                }
+                // calculate current date
+                currentDate = new Date(start);
+                currentDate.setDate(start.getDate() + index);
+            }
+            saveDaysToSession(daysArray);
+        }
+
+        function saveDaysToSession(daysArray) {
+            sessionStorage.setItem("daysList", JSON.stringify(daysArray));
+        }
+
+        function loadDaysFromSession() {
+            let data = sessionStorage.getItem("daysList");
+            return data ? JSON.parse(data) : [];
+        }
+
+        function highlightCard(id, typeValue) {
+            const card = document.getElementById(id);
+            card.classList.remove("border-transparent");
+            card.classList.add("border-[6px]", "border-[#404E3B]", "box-border");
+            setTimeout(() => {
+                const type = document.getElementById(`type-${id}`);
+                type.innerText = typeValue;
+                type.classList.remove('hidden');
+            }, 10);
+        }
+
+        function unHighlightCard(id) {
+            const card = document.getElementById(id)
+            card.classList.remove("border-[#404E3B]");
+            card.classList.add("border-transparent");
+        }
+
+        // ⭐ Submit Vacation
+        async function submitVacation() {
+
+            const employeeId = document.getElementById("empId").value;
+            const daysArray = loadDaysFromSession(); // your stored list
+
+            const url = "/employees/offdays/edit"; // must start with / for MVC
+
+            const body = {
+                employeeId: employeeId,
+                days: daysArray
+            };
+
+            const res = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(body)
+            });
+
+            if (res.ok) {
+                alert("تم تعديل الإجازة بنجاح!");
+                closeModal();
+            } else {
+                alert("حدث خطأ أثناء الحفظ ❌");
+                console.log(await res.text());
+            }
+        }
+
+        const modalTypePopupBackdrop = document.getElementById("typePopupBackdrop");
+        // Optional: close modal when background is clicked
+        modalTypePopupBackdrop.addEventListener('click', function (e) {
+            if (e.target === this) closeTypePopup();
+        });
+        const modalBackdrop = document.getElementById("modalBackdrop");
+        // Optional: close modal when background is clicked
+        modalBackdrop.addEventListener('click', function (e) {
+            if (e.target === this) closeModal();
+        });
+
+    </script>
+}

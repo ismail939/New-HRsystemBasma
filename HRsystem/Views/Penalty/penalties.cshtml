@@ -1,0 +1,260 @@
+@model HRsystem.ViewModels.EmployeesNPenalties;
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "الجزاءات";
+}
+<div id="tableResponsive" class="tableContainer">
+    <table class="table-base min-w-full border-separate border-spacing-0" id="employeesTable">
+        <thead class="table-dark col-table-header sticky top-0 z-10">
+            <tr>
+                <th>الاسم</th>
+                <th>رقم الهاتف</th>
+                <th>تاريخ التعيين</th>
+                <th>القسم</th>
+                <th>المسمى الوظيفي</th>
+                <th>الإجراءات</th>
+            </tr>
+        </thead>
+        <tbody id="employeesBody" class="mt-3">
+            @foreach (var employee in Model.Employees)
+            {
+                <tr id="row-@employee.Id" class="snap-start">
+                    <td>@employee.Name</td>
+                    <td>@employee.PhoneNumber</td>
+                    <td>@employee.HireDate.ToString("yyyy-MM-dd")</td>
+                    <td>@employee.Department</td>
+                    <td>@employee.JobName</td>
+                    <td>
+                        <button class="col-button-dark" onclick="openModal(@employee.Id)">تعديل</button>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+</div>
+<!-- SMALL DROPDOWN POPUP -->
+<div id="typePopupBackdrop" class="hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-50 items-center justify-center">
+
+    <div id="typePopup" class="col-modal p-6 rounded-2xl shadow-xl w-1/2 h-2/3 text-center">
+
+        <!-- Tabs Header -->
+        <div class="flex border-b mb-4">
+            <button id="tabAdd"
+                class="flex-1 py-2 text-lg font-semibold border-b-2 border-color3 text-color3 hover:text-color3">
+                اضافة جزاء
+            </button>
+
+            <button id="tabList"
+                class="flex-1 py-2 text-lg font-semibold border-b-2 border-transparent text-color5 hover:text-color3">
+                قائمة الجزاءات
+            </button>
+        </div>
+
+        <!-- Tab Content: Add Penalty -->
+        <div id="contentAdd" class="block" dir="rtl">
+            <form class="space-y-4" id="addPenaltyForm">
+                <input type="hidden" id="employeeId" name="employeeId" value="" />
+                <input class="border p-2 w-full rounded  focus:outline-none focus:ring focus:ring-[#7B9669]"
+                    placeholder="القرار" name="penalty" />
+                <input class="border p-2 w-full rounded  focus:outline-none focus:ring focus:ring-[#7B9669]"
+                    placeholder="تاريخ اليوم" type="date" name="dayDate" />
+
+                <textarea class="border p-2 w-full rounded  focus:outline-none focus:ring focus:ring-[#7B9669]"
+                    placeholder="سبب الجزاء" name="reason"></textarea>
+
+                <button class="col-button-light px-4 py-2" type="button" onclick="addPenalty()">
+                    حفظ
+                </button>
+            </form>
+        </div>
+
+        <!-- Tab Content: Penalties List -->
+        <div id="contentList" class="hidden">
+            <div id="contentBody" class="overflow-y-auto max-h-64">
+                
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Optional: close modal when background is clicked
+            document.getElementById('typePopupBackdrop').addEventListener('click', function (e) {
+                if (e.target === this) closeModal();
+            });
+        });
+        let openedModalEmployeeId = 0; 
+
+        function openModal(employeeId) {
+            sessionStorage.setItem("currentEmployeeId", employeeId);
+            openedModalEmployeeId = employeeId;
+            document.getElementById('typePopupBackdrop').classList.remove('hidden');
+            document.getElementById('typePopupBackdrop').classList.add('flex');
+            const form = document.querySelector("#addPenaltyForm");
+            form.elements["employeeId"].value = employeeId;
+            getPenaltiesForEmployee();
+        }
+        function closeModal() {
+            document.getElementById('typePopupBackdrop').classList.remove('flex');
+            document.getElementById('typePopupBackdrop').classList.add('hidden');
+            const form = document.querySelector("#contentAdd form");
+            form.reset();
+            clearFlatpickrInModal('addPenaltyForm');
+            activateTab(contentAdd, contentList, tabAdd, tabList);
+        }
+
+        const tabAdd = document.getElementById("tabAdd");
+        const tabList = document.getElementById("tabList");
+
+        const contentAdd = document.getElementById("contentAdd");
+        const contentList = document.getElementById("contentList");
+
+        function activateTab(show, hide, activeTab, inactiveTab) {
+            show.classList.remove("hidden");
+            hide.classList.add("hidden");
+
+            @* if(activeTab.classList.contains("border-color3")) return; *@
+
+                activeTab.classList.add("border-color3", "text-color3");
+            activeTab.classList.remove("border-transparent", "text-color5");
+
+            inactiveTab.classList.add("border-transparent", "text-color5");
+            inactiveTab.classList.remove("border-color3", "text-color3");
+        }
+
+        tabAdd.addEventListener("click", () => {
+            activateTab(contentAdd, contentList, tabAdd, tabList);
+        });
+
+        tabList.addEventListener("click", () => {
+            activateTab(contentList, contentAdd, tabList, tabAdd);
+        });
+
+        async function addPenalty() {
+            const form = document.querySelector("#addPenaltyForm");
+            console.log("******************");
+            console.log(document.querySelector('input[name="penalty"]').value)
+            console.log(document.querySelector('input[name="dayDate"]').value)
+            console.log(document.querySelector('textarea[name="reason"]').value)
+            console.log("******************");
+            
+            if (!form) {
+                console.log("Form not found!");
+                return;
+            }
+            document.getElementById("employeeId").value = openedModalEmployeeId;
+            const formData = new FormData(form);
+            // check every input field is filled
+            for (let [key, value] of formData.entries()) {
+                console.log(key, value, "❎");
+                if (!value) {
+                    alert("يرجى ملء جميع المدخلات.");
+                    return;
+                }
+            }
+            const response = await fetch('/employee/addPenalty', {
+                method: 'POST',
+                body: formData
+            });
+            if (!response.ok) {
+                alert("حدث خطأ أثناء إضافة الجزاء.");
+                return;
+            }
+            // Implement the logic to add a penalty
+            alert("تم إضافة الجزاء بنجاح!");
+            getPenaltiesForEmployee();
+            @* form.reset(); *@
+            clearFlatpickrInModal('addPenaltyForm');
+            activateTab(contentList, contentAdd, tabList, tabAdd);
+            return;
+        }
+        async function toggleActive(isActive, penaltyId) {
+            const button = document.getElementById(`penalty-${penaltyId}`);
+            const newStatus = !isActive;
+            console.log("Toggling penalty ID", penaltyId, "to", newStatus);
+            await fetch(`/employee/togglePenaltyActive`, {
+                body: JSON.stringify({
+                    penaltyId: penaltyId,
+                    isActive: newStatus
+                }),
+            method: 'POST',
+                headers: { "Content-Type": "application/json" }
+            }).then(response => {
+                if (response.ok) {
+                    button.classList.toggle('active', newStatus);
+                    button.classList.toggle('inactive', !newStatus);
+                    button.textContent = newStatus ? 'مفعّل' : 'غير مفعّل';
+                    getPenaltiesForEmployee();
+                } else {
+                    alert("حدث خطأ أثناء تحديث حالة الجزاء.");
+                }
+            }).catch(error => {
+                console.error("Error toggling penalty status:", error);
+                alert("حدث خطأ أثناء تحديث حالة الجزاء.");
+            });
+            }
+        async function getPenaltiesForEmployee() {
+            const employeeId = sessionStorage.getItem("currentEmployeeId");;
+            console.log("Fetching penalties for employee ID:", employeeId); // ✔ correct logging
+            try {
+                const response = await fetch(`/employee/penalties/${employeeId}`);
+                const data = await response.json();
+               if(data == ""){
+                document.getElementById("contentBody").innerHTML = `
+                <div class="p-2 mt-11 fs-4">لا توجد جزاءات لهذا الموظف</div>
+                `;
+                return;
+               }
+                document.getElementById("contentBody").innerHTML = 
+                `<table class="table-base w-full border">
+                    <thead class="table-dark col-table-header">
+                        <tr class="bg-color3 text-white">
+                            <th class="p-2">سبب الجزاء</th>
+                            <th class="p-2">القرار</th>
+                            <th class="p-2">التاريخ</th>
+                            <th class="p-2">الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="penaltiesTable">
+                    </tbody>
+                </table>
+                `;
+
+                const penaltiesTable = document.getElementById("penaltiesTable");
+                penaltiesTable.innerHTML = "";
+
+                data.forEach(penalty => {
+                    console.log("Penalty:", penalty); // ✔ correct per-penalty logging
+
+                    const row = `
+        <tr>
+            <td class="border p-2">${penalty.Reason}</td>
+            <td class="border p-2">${penalty.Decision}</td>
+            <td class="border p-2">${penalty.PenaltyDate.split('T')[0]}</td>
+            <td class="border p-2">
+                <button 
+                    id="penalty-${penalty.Id}" 
+                    onclick="toggleActive(${penalty.IsActive}, ${penalty.Id})"
+                    class="rounded-lg p-2 ${penalty.IsActive ? 'active' : 'inactive'}">
+                    ${penalty.IsActive ? 'مفعّل' : 'غير مفعّل'}
+                </button>
+            </td>
+        </tr>`;
+
+                    penaltiesTable.insertAdjacentHTML('beforeend', row);
+                });
+
+            } catch (error) {
+                console.error("Error fetching penalties:", error);
+            }
+        }
+
+        var penalties = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Penalties));// from Razor
+        console.log(JSON.stringify(penalties.filter(p => p.EmployeeId == 2)) + "🟠");
+    </script>
+
+}
