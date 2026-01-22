@@ -1,0 +1,25 @@
+@model ErrorViewModel
+
+<div class="flex items-center justify-center w-full">
+  <div class="bg-white/60 text-black rounded-2xl p-12 shadow-xl text-center animate-fadeIn w-full m-2">
+    <h1 class="text-2xl font-bold mb-4">خطأ @Model.StatusCode</h1>
+    <p class=" mb-4">@Model.Message</p>
+    @if (!string.IsNullOrEmpty(Model.Path))
+    {
+        <p class="text-sm text-gray-300 mb-6">Path: @Model.Path</p>
+    }
+    <a href="/" class="inline-block col-button-light font-semibold rounded-lg shadow hover:bg-gray-100 transition">
+      العودة للرئيسية
+    </a>
+  </div>
+</div>
+
+<style> 
+@@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn {
+  animation: fadeIn 1s ease-in-out;
+}
+</style>

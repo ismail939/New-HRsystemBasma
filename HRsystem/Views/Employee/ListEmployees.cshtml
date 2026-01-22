@@ -61,9 +61,9 @@
                 <th>القسم</th>
                 <th>المسمى الوظيفي</th>
                 <th>نوع العقد</th>
-                <th>تعديل بيانات</th>
-                <th>تقييم</th>
                 <th>الشفت</th>
+                <th>تقييم</th>
+                <th>تعديل بيانات</th>
             </tr>
         </thead>
         <tbody id="employeesBody" class="listEmpTableTbody mt-3">
@@ -78,14 +78,15 @@
                     <td>@employee.DateOfBirth.ToString("yyyy-MM-dd")</td>
                     <td>@employee.InsuranceNumber</td>
                     <td>@employee.HireDate.ToString("yyyy-MM-dd")</td>
-                    <td>@employee.EndDate?.ToString("yyyy-MM-dd")</td>
+                    <td onclick="openLeaveReasonModal('@employee.LeaveReason', '@employee.EndDate')">@employee.EndDate?.ToString("yyyy-MM-dd")</td>
                     <td>@employee.Department</td>
                     <td>@employee.JobName</td>
                     <td>@employee.ContractType</td>
                     <td>
-                        <!-- Button to open modal -->
-                        <button class="openModal col-button-dark m-1 rounded" index="@employee.Id">
-                            تعديل
+                        <!-- SHIFT -->
+                        <button class="col-button-dark m-1 rounded" onclick="openShiftModal('@employee.Name', @employee.Id)"
+                            index="@employee.Id">
+                            الشفت
                         </button>
                     </td>
                     <td>
@@ -96,10 +97,9 @@
                         </button>
                     </td>
                     <td>
-                        <!-- SHIFT -->
-                        <button class="col-button-dark m-1 rounded" onclick="openShiftModal('@employee.Name', @employee.Id)"
-                            index="@employee.Id">
-                            الشفت
+                        <!-- Button to open modal -->
+                        <button class="openModal col-button-dark m-1 rounded" index="@employee.Id">
+                            تعديل
                         </button>
                     </td>
                 </tr>
@@ -107,6 +107,22 @@
 
         </tbody>
     </table>
+</div>
+
+
+<!-- LEAVE REASON -->
+<div id="LeaveReasonModal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-50
+              items-center justify-center">
+
+    <div id="" class="relative col-modal p-6 rounded-2xl shadow-xl text-center">
+        <button onclick="closeLeaveReasonModal()" class="absolute top-2 left-2 text-[25px]">
+            <i class="bi bi-x-square-fill"></i>
+        </button>
+
+        <h3 id="LeaveReasonDateText" class="text-xl font-bold mb-3"></h3> 
+        <h3 id="reasonLabel" class="text-lg font-bold mb-3">سبب انتهاء العقد</h3> 
+        <h3 id="LeaveReasonModalDescription" class="text-lg font-bold text-color5 mb-3"></h3>
+    </div>
 </div>
 
 <!-- SHIFT -->
@@ -426,6 +442,12 @@
                 </div>
 
                 <div>
+                    <label class="block text-sm font-medium text-gray-700">سبب الانتهاء</label>
+                    <input type="text" name="LeaveReason"
+                        class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+
+                <div>
                     <label class="block text-sm font-medium text-gray-700">القسم</label>
                     <input type="text" name="Department"
                         class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
@@ -529,6 +551,7 @@
                 form.querySelector('[name="InsuranceNumber"]').value = emp.InsuranceNumber ?? "";
                 form.querySelector('[name="HireDate"]').value = emp.HireDate?.split('T')[0] ?? "";
                 form.querySelector('[name="EndDate"]').value = emp.EndDate?.split('T')[0] ?? "";
+                form.querySelector('[name="LeaveReason"]').value = emp.LeaveReason ?? "";
                 form.querySelector('[name="Department"]').value = emp.Department ?? "";
                 form.querySelector('[name="JobName"]').value = emp.JobName ?? "";
                 form.querySelector('[name="ContractType"]').value = emp.ContractType ?? "";
@@ -604,11 +627,11 @@
             // ✅ Fetch employee files dynamically
             const filesList = document.querySelector("#tab-content-files ul");
             filesList.innerHTML = `
-                                                                                                        <div class="flex flex-col justify-center items-center py-4">
-                                                                                                            <div class="loader border-4 border-blue-500 border-t-transparent rounded-full w-8 h-8 animate-spin mb-2"></div>
-                                                                                                            <p class="text-gray-600 text-sm">جارٍ تحميل الملفات...</p>
-                                                                                                        </div>
-                                                                                                    `;
+                <div class="flex flex-col justify-center items-center py-4">
+                    <div class="loader border-4 border-blue-500 border-t-transparent rounded-full w-8 h-8 animate-spin mb-2"></div>
+                    <p class="text-gray-600 text-sm">جارٍ تحميل الملفات...</p>
+                </div>
+            `;
 
             try {
                 const res = await fetch(`/employees/files/${emp.Id}`);
@@ -620,15 +643,15 @@
                     filesList.innerHTML = "<p class='text-gray-500'>لا توجد ملفات لهذا الموظف.</p>";
                 } else {
                     filesList.innerHTML = files.map(file => `
-                                                                                            <li class="file-item flex flex-col justify-center align-items-center">
-                                                                                                <label class="max-w-[280px] truncate block">${file.FileName}</label>
-                                                                                                <div class="img-wrapper position-relative">
-                                                                                                    <img src="${file.Url}" alt="${file.FileName}" class="imgFile rounded transition-opacity" onclick="openImage(this.src)">
-                                                                                                    <button class="hover-button btn btn-danger btn-sm" onclick="deleteFile(${file.Id})">✕</button>
-                                                                                                </div>
-                                                                                                <a href="${file.Url}" download class="col-button-dark m-1 py-1">تحميل</a>
-                                                                                            </li>
-                                                                                        `).join('');
+                        <li class="file-item flex flex-col justify-center align-items-center">
+                            <label class="max-w-[280px] truncate block">${file.FileName}</label>
+                            <div class="img-wrapper position-relative">
+                                <img src="${file.Url}" alt="${file.FileName}" class="imgFile rounded transition-opacity" onclick="openImage(this.src)">
+                                <button class="hover-button btn btn-danger btn-sm" onclick="deleteFile(${file.Id})">✕</button>
+                            </div>
+                            <a href="${file.Url}" download class="col-button-dark m-1 py-1">تحميل</a>
+                        </li>
+                    `).join('');
                 }
             } catch (err) {
                 console.error(err);
@@ -726,7 +749,9 @@
                 closeModal();
                 setTimeout(() => {
                     alert('تم الحفظ بنجاح ✅');
+                    window.location.href="/employees";
                 }, 200);
+
             } else {
                 alert('حدث خطأ أثناء الحفظ ❌');
             }
@@ -1004,6 +1029,7 @@
         modal.addEventListener('click', function (e) {
             if (e.target === this) closeModal();
         });
+
         // Optional: close modal when background is clicked
         document.getElementById('createModal').addEventListener('click', function (e) {
             if (e.target === this) closeModalCreate();
@@ -1012,6 +1038,30 @@
 
         document.getElementById('rateModal').addEventListener('click', function (e) {
             if (e.target === this) closeRateModal();
+        });
+        function openLeaveReasonModal(LeaveReason, date){
+            console.log(date)
+            if(date!="")
+            {
+                document.getElementById("LeaveReasonDateText").innerText = formatDate(date);
+            }
+            if(LeaveReason!=""){
+            document.getElementById("LeaveReasonModalDescription").innerText = LeaveReason;
+            showDiv("reasonLabel");
+            }else{
+            document.getElementById("LeaveReasonModalDescription").innerText = "لم ينتهي العقد حتي الان";
+            }
+            showDivFlex("LeaveReasonModal");
+        }
+        function closeLeaveReasonModal(){
+            hideDivFlex("LeaveReasonModal");
+            document.getElementById("LeaveReasonDateText").innerText="";
+            hideDiv("reasonLabel");
+        }
+        const LeaveReasonModal = document.getElementById("LeaveReasonModal");
+        // Optional: close modal when background is clicked
+        LeaveReasonModal.addEventListener('click', function (e) {
+            if (e.target === this) closeLeaveReasonModal();
         });
         function searchForEmployee() {
             const input = document.getElementById('searchInput');

@@ -420,7 +420,7 @@
                     const response = await fetch(`/getRates?employeeId=${employeeId}&startMonth=${startMonth}&endMonth=${endMonth}&startYear=${startYear}&endYear=${endYear}`);
                     const rates = await response.json();
                     console.log(JSON.stringify(rates.rates));
-                    document.getElementById("tableHeading").innerText = `التقييم الكلي:  ${rates.avgRate} `;
+                    document.getElementById("tableHeading").innerText = `التقييم خلال الفترة:  ${rates.avgRate} `;
                     document.getElementById("tableHeading").classList.remove("hidden");
                     // populate the table
                     const headInnerHTML = `

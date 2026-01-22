@@ -37,6 +37,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
+// Use a global exception handler
+app.UseExceptionHandler("/Home/Error"); // Redirect to Error action
+app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

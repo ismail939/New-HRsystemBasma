@@ -3,7 +3,7 @@
     dateFormat: "Y-m-d",
     locale: "ar", // full Arabic locale (digits + weekdays RTL)
   });
-  
+
 });
 
 
@@ -32,49 +32,58 @@ function clearFlatpickrInModal(formId) {
 window.clearFlatpickrInModal = clearFlatpickrInModal;
 
 
-    // Show Loading
-    function showLoading() {
-        document.getElementById("loadingOverlay").classList.remove("hidden");
-    }
+// Show Loading
+function showLoading() {
+  document.getElementById("loadingOverlay").classList.remove("hidden");
+}
 
-    // Hide Loading
-    function hideLoading() {
-        document.getElementById("loadingOverlay").classList.add("hidden");
-    }
+// Hide Loading
+function hideLoading() {
+  document.getElementById("loadingOverlay").classList.add("hidden");
+}
 
-    // Wrap fetch globally
-    const originalFetch = window.fetch;
-    window.fetch = async (...args) => {
-        showLoading();
-        try {
-            const result = await originalFetch(...args);
-            return result;
-        } finally {
-            hideLoading();
-        }
-    };
+// Wrap fetch globally
+const originalFetch = window.fetch;
+window.fetch = async (...args) => {
+  showLoading();
+  try {
+    const result = await originalFetch(...args);
+    return result;
+  } finally {
+    hideLoading();
+  }
+};
 
-    function isNumber(value) {
-      return value !== '' && !isNaN(value);
-    }
+function isNumber(value) {
+  return value !== '' && !isNaN(value);
+}
 
-    function toggleVisibility(id, isFlex){
-      const element = document.getElementById(id);
-      if(isFlex){
-        if(element.classList.contains("hidden")){
-          element.classList.remove("hidden");
-          element.classList.add("flex");
-        }else{
-          element.classList.remove("flex");
-          element.classList.add("hidden");
-        }
-      }
-      else{
-        if(element.classList.contains("hidden")){
-          element.classList.remove("hidden");
-        }else{
-          element.classList.add("hidden");
-        }
-      }
+function toggleVisibility(id, isFlex) {
+  const element = document.getElementById(id);
+  if (isFlex) {
+    if (element.classList.contains("hidden")) {
+      element.classList.remove("hidden");
+      element.classList.add("flex");
+    } else {
+      element.classList.remove("flex");
+      element.classList.add("hidden");
     }
-    window.toggleVisibility = toggleVisibility;
+  }
+  else {
+    if (element.classList.contains("hidden")) {
+      element.classList.remove("hidden");
+    } else {
+      element.classList.add("hidden");
+    }
+  }
+}
+window.toggleVisibility = toggleVisibility;
+
+function formatDate(date) {
+  date = new Date(date);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}
