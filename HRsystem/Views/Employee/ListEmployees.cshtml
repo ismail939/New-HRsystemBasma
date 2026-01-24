@@ -78,7 +78,7 @@
                     <td>@employee.DateOfBirth.ToString("yyyy-MM-dd")</td>
                     <td>@employee.InsuranceNumber</td>
                     <td>@employee.HireDate.ToString("yyyy-MM-dd")</td>
-                    <td onclick="openLeaveReasonModal('@employee.LeaveReason', '@employee.EndDate')">@employee.EndDate?.ToString("yyyy-MM-dd")</td>
+                    <td><a class="underline cursor-pointer" onclick="openLeaveReasonModal('@employee.LeaveReason', '@employee.EndDate')">@employee.EndDate?.ToString("yyyy-MM-dd")</a></td>
                     <td>@employee.Department</td>
                     <td>@employee.JobName</td>
                     <td>@employee.ContractType</td>
