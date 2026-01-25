@@ -1040,18 +1040,13 @@
             if (e.target === this) closeRateModal();
         });
         function openLeaveReasonModal(LeaveReason, date){
-            console.log(date)
-            if(date!="")
+            if(date!=""&&LeaveReason!="")
             {
                 document.getElementById("LeaveReasonDateText").innerText = formatDate(date);
+                document.getElementById("LeaveReasonModalDescription").innerText = LeaveReason;
+                showDiv("reasonLabel");
+                showDivFlex("LeaveReasonModal");
             }
-            if(LeaveReason!=""){
-            document.getElementById("LeaveReasonModalDescription").innerText = LeaveReason;
-            showDiv("reasonLabel");
-            }else{
-            document.getElementById("LeaveReasonModalDescription").innerText = "لم ينتهي العقد حتي الان";
-            }
-            showDivFlex("LeaveReasonModal");
         }
         function closeLeaveReasonModal(){
             hideDivFlex("LeaveReasonModal");
