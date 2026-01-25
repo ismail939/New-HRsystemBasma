@@ -121,7 +121,7 @@ function renderDays(existingDays, from, to) {
     const container = document.getElementById("daysContainer");
     container.innerHTML = "";
     container.classList.remove("hidden");
-    container.classList.add("grid", "grid-cols-7")
+    container.classList.add("grid", "grid-cols-7", "place-items-stretch")
     selectedDays = [];
 
     let start = new Date(from);
@@ -142,14 +142,14 @@ function renderDays(existingDays, from, to) {
 
         let card = document.createElement("div");
         card.className =
-            "p-1 w-21 text-center box-border border-[6px] border-transparent h-[60px] rounded-xl shadow transition cursor-pointer bg-white hover:shadow-lg";
+            "p-1 text-center box-border border-[6px] border-transparent h-[60px] rounded-xl shadow transition cursor-pointer bg-white hover:shadow-lg";
         card.id = iso;
         card.innerHTML = `
-                                                                <div class="flex flex-col xl:flex-row items-center justify-center px-3 text-center" id="dayDateText">
-                                                                            <div class="font-bold flex flex-col">${dayName}<br><span class="text-xs xl:text-sm text-[#6C8480]">${dayDateText}</span></div>
-                                                                            <div id="type-${iso}" class="xl:mr-1  bg-red-100 p-1 rounded-lg hidden text-xs xl:text-sm"></div>
-                                                                </div>
-                                                            `;
+            <div class="flex flex-col xl:flex-row items-center justify-center px-3 text-center" id="dayDateText">
+                        <div class="font-bold flex flex-col">${dayName}<br><span class="text-xs xl:text-sm text-[#6C8480]">${dayDateText}</span></div>
+                        <div id="type-${iso}" class="xl:mr-1  bg-red-100 p-1 rounded-lg hidden text-xs xl:text-sm"></div>
+            </div>
+        `;
         // click toggle
         card.onclick = (event) => {
             event.stopPropagation(); // prevent clicks inside from closing modal
@@ -227,3 +227,5 @@ const editModal = document.getElementById("editModal");
 editModal.addEventListener('click', function (e) {
     if (e.target === this) closeModal();
 });
+
+

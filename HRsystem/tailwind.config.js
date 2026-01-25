@@ -3,7 +3,7 @@ module.exports = {
   content: [
     "./Pages/**/*.{cshtml,razor}",
     "./Views/**/*.{cshtml,razor}",
-    "./wwwroot/**/*.html",
+    "./wwwroot/**/*.{html,js}",   // ✅ IMPORTANT
   ],
   theme: {
     extend: {

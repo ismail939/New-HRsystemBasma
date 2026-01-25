@@ -131,7 +131,7 @@
 }
 
 .col-modal {
-  @apply bg-color1 backdrop-blur-md rounded-2xl shadow-2xl p-8 max-w-[90vw] max-h-[90vh]  w-fit;
+  @apply bg-color1 backdrop-blur-md rounded-2xl shadow-2xl p-8 max-w-[90vw] max-h-[90vh] w-[90vw] h-[90vh];
   border-radius: 10px !important;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
   @apply text-color3 !important;
@@ -148,7 +148,7 @@
 }
 
 .col-modal input {
-  background-color: #E6E6E6 !important;
+  background-color: #fffffffc !important;
 }
 
 .col-button-dark {
