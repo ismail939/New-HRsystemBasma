@@ -49,7 +49,7 @@ public class EmployeeReportDHVM : IDocument
                     });
 
                     // Left logo
-                    row.ConstantItem(80).Image("wwwroot/images/logo2.png", ImageScaling.FitArea);
+                    row.ConstantItem(80).Image("wwwroot/images/logo2hh.png", ImageScaling.FitArea);
                 });
             });
 
