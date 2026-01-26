@@ -51,12 +51,7 @@ namespace HRsystem.Controllers
             _context.SaveChanges();
             return Json(new { success = true });
         }
-        [HttpGet]
-        [Route("/employees/add")]
-        public IActionResult AddEmployee()
-        {
-            return View();
-        }
+        
         [HttpPost]
         [Route("/employees/add")]
         public IActionResult AddEmployee(HREmployee newEmployee, List<IFormFile> imageFiles)

@@ -22,8 +22,8 @@ public class HREmployee
     public string Religion { get; set; }
     [Required]
     public DateTime DateOfBirth { get; set; }
-    [Required]
-    public string InsuranceNumber { get; set; }
+    
+    public string? InsuranceNumber { get; set; }
     [Required]
     public DateTime HireDate { get; set; }
     public DateTime? EndDate { get; set; }

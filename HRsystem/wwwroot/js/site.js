@@ -87,3 +87,18 @@ function formatDate(date) {
 
   return `${year}-${month}-${day}`;
 }
+
+function showDiv(id) {
+  document.getElementById(id).classList.remove("hidden");
+}
+function hideDiv(id) {
+  document.getElementById(id).classList.add("hidden");
+}
+function showDivFlex(id) {
+  document.getElementById(id).classList.remove("hidden");
+  document.getElementById(id).classList.add("flex");
+}
+function hideDivFlex(id) {
+  document.getElementById(id).classList.remove("flex");
+  document.getElementById(id).classList.add("hidden");
+}
