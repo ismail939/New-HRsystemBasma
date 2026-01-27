@@ -229,3 +229,20 @@ editModal.addEventListener('click', function (e) {
 });
 
 
+document.getElementById("editBalancesBtn").addEventListener("click", function() {
+    document.getElementById("annualBalance").removeAttribute("disabled");
+    document.getElementById("casualBalance").removeAttribute("disabled");
+    document.getElementById("offBalance").removeAttribute("disabled");
+    document.getElementById("insteadBalance").removeAttribute("disabled");
+    hideDiv("editBalancesBtn");
+    showDiv("saveBalancesBtn");
+});
+
+document.getElementById("saveBalancesBtn").addEventListener("click", function() {
+    document.getElementById("annualBalance").setAttribute("disabled", "disabled");
+    document.getElementById("casualBalance").setAttribute("disabled", "disabled");
+    document.getElementById("offBalance").setAttribute("disabled", "disabled");
+    document.getElementById("insteadBalance").setAttribute("disabled", "disabled");
+    hideDiv("saveBalancesBtn");
+    showDiv("editBalancesBtn");
+});

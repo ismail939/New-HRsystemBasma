@@ -1,3 +1,4 @@
+@using Microsoft.EntityFrameworkCore.Query.SqlExpressions
 @model IEnumerable<HRsystem.Models.HREmployee>
 
 @{
@@ -48,25 +49,71 @@
             <i class="bi bi-x-square-fill"></i>
         </button>
 
-        <h2 class="text-xl font-semibold text-center mb-6">إضافة إجازة</h2>
+        <h2 class="text-xl font-semibold text-center mb-6">تعديل الاجازات</h2>
 
         <input type="hidden" id="empId">
 
         <!-- Dates -->
-        <div class="w-full flex flex-row justify-center gap-3 mt-6" id="dateInputs">
+        <div class="w-full relative shadow-lg p-4 flex flex-row items-center justify-start gap-3 mt-6" id="dateInputs">
             <label>من</label>
             <input class="border p-2  rounded  focus:outline-none focus:ring focus:ring-[#7B9669]" placeholder="البداية"
                 type="date" id="from" />
             <label>إلى</label>
             <input class="border p-2  rounded  focus:outline-none focus:ring focus:ring-[#7B9669]" placeholder="النهاية"
                 type="date" id="to" disabled />
-        </div>
-        <div class="w-full flex justify-center">
-            <button onclick="loadDays()" class="col-button-dark mt-3 ">بحث</button>
+            <button onclick="loadDays()" class="col-button-dark ">بحث</button>
+            <div id="offdaysBalance" class="p-1 m-2 gap-2  flex flex-row justify-end items-center absolute left-3 ">
+                <span class="font-extrabold">الرصيد المتبقي</span>
+                <table class="table-base">
+                    <thead class="table-dark col-table-header">
+                        <tr>
+                            <th>سنوي</th>
+                            <th>عارضة</th>
+                            <th>راحة</th>
+                            <th>بدل اجازة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="balancesBody">
+                        <tr style="background-color:white !important">
+                            <td>
+                                <input disabled type="number" value="5" class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " id="annualBalance" />
+                            </td>
+                            <td>
+                                <input disabled type="number" value="5" class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " id="casualBalance" />
+                            </td>
+                            <td>
+                                <input disabled type="number" value="5" class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " id="offBalance" />
+                            </td>
+                            <td>
+                                <input disabled type="number" value="5" class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " id="insteadBalance" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                @* <div class="flex flex-col text-center  p-2 rounded-lg">
+                    <span class="font-extrabold p-1 rounded-lg ">سنوي</span>
+                    <input  type="number" value="5" class="border !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " id="annualBalance" />
+                </div>
+                <div class="flex flex-col text-center  p-2 rounded-lg">
+                    <span class="font-extrabold p-1 rounded-lg ">عارضة</span>
+                    <input  type="number" value="5" class="border !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " id="casualBalance" />
+                </div>
+                <div class="flex flex-col text-center  p-2 rounded-lg">
+                    <span class="font-extrabold p-1 rounded-lg ">راحة</span>
+                    <input  type="number" value="5" class="border !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " id="offBalance" />
+                </div>
+                <div class="flex flex-col text-center  p-2 rounded-lg">
+                    <span class="font-extrabold p-1 rounded-lg ">بدل اجازة</span>
+                    <input  type="number" value="5" class="border !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " id="insteadBalance" />
+                </div> *@
+                <button id="editBalancesBtn" class="col-button-dark !h-[50%]">تعديل</button>
+                <button id="saveBalancesBtn" class="hidden col-button-dark !h-[50%]">حفظ</button>
+            </div>
         </div>
 
+
         <!-- DAYS CONTAINER -->
-        <div id="daysContainer" class=" rounded-md gap-2 m-4 p-2 hidden overflow-auto max-h-[200px]">
+        <div id="daysContainer" class="shadow-lg rounded-md gap-2 m-4 p-4 hidden overflow-auto max-h-[50vh]">
         </div>
 
         <div class="mt-8 justify-center hidden" id="saveBtn">
