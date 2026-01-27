@@ -1444,6 +1444,26 @@ video {
   padding-bottom: 1rem;
 }
 
+.\!px-2 {
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+}
+
+.\!px-4 {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+.\!py-1 {
+  padding-top: 0.25rem !important;
+  padding-bottom: 0.25rem !important;
+}
+
+.\!px-1 {
+  padding-left: 0.25rem !important;
+  padding-right: 0.25rem !important;
+}
+
 .pb-3 {
   padding-bottom: 0.75rem;
 }
@@ -1520,6 +1540,10 @@ video {
 
 .font-semibold {
   font-weight: 600;
+}
+
+.font-light {
+  font-weight: 300;
 }
 
 .uppercase {
@@ -1625,6 +1649,11 @@ video {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+}
+
+.\!text-color5 {
+  --tw-text-opacity: 1 !important;
+  color: rgb(108 132 128 / var(--tw-text-opacity, 1)) !important;
 }
 
 .underline {

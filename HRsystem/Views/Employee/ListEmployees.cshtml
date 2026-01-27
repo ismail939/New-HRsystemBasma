@@ -144,6 +144,9 @@
                 <div id="fixedShiftDiv" class="hidden">
                     الشفت يبدأ من <span id="shiftStartTime">7:30 ص</span> الي <span id="shiftEndTime">4:30 م</span>
                 </div>
+                <div id="variableShiftDiv" class="hidden">
+                    الشفت متغير
+                </div>
             </div>
             <button id="editShiftButton" class="col-button-dark my-2">تعديل</button>
         </div>
@@ -153,9 +156,13 @@
                 <i class="bi bi-x-square-fill"></i>
             </button>
             <div class="flex gap-2 flex-row justify-center items-center">
-                
-                <button id="hoursBtn" class="p-2 text-white text-center bg-color5">عدد ساعات</button>
-                <button id="fixedBtn" class="p-2 text-white text-center bg-color5">شفت ثابت</button>
+                <button id="variableShift" class="rounded-lg px-4 text-white text-center bg-color5">متغير</button>
+                <button id="hoursBtn" class="rounded-lg px-4 text-white text-center bg-color5">عدد ساعات</button>
+                <button id="fixedBtn" class="rounded-lg px-4 text-white text-center bg-color5">شفت ثابت</button>
+            </div>
+            <div id="newVariableShift" class="hidden items-center gap-2 justify-center w-full my-2">
+                <h2 class="font-light !text-color5 mb-2">الشفت متغير ولا يحتاج لتحديد وقت أو عدد ساعات</h2>
+                <button id="saveVariableShiftBtn" class="col-button-light">حفظ💾</button>
             </div>
             <div id="newHoursShift" class="hidden flex-row items-center gap-2 justify-center w-full my-2">
                 <label for="hours">عدد الساعات</label>
