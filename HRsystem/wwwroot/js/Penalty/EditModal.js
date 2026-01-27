@@ -128,6 +128,7 @@ async function getPenaltiesForEmployee() {
                     <thead class="table-dark col-table-header">
                         <tr class="bg-color3 text-white">
                             <th class="p-2">سبب الجزاء</th>
+                            <th class="p-2">نقاط الجزاء</th>
                             <th class="p-2">القرار</th>
                             <th class="p-2">التاريخ</th>
                             <th class="p-2">الحالة</th>
@@ -147,6 +148,7 @@ async function getPenaltiesForEmployee() {
             const row = `
         <tr>
             <td class="border p-2">${penalty.Reason}</td>
+            <td class="border p-2">${penalty.PenaltyPoints}</td>
             <td class="border p-2">${penalty.Decision}</td>
             <td class="border p-2">${penalty.PenaltyDate.split('T')[0]}</td>
             <td class="border p-2">

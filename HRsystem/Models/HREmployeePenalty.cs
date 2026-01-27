@@ -12,6 +12,8 @@ public class HREmployeePenalty
     [Required]
     public DateTime PenaltyDate { get; set; }
     [Required]
+    public int PenaltyPoints { get; set; }
+    [Required]
     public string Decision { get; set; }
     public string? Reason { get; set; }
     public bool IsActive { get; set; } = false;

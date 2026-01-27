@@ -36,7 +36,7 @@ namespace HRsystem.Controllers
         }
         [HttpPost]
         [Route("/employee/addPenalty")]
-        public IActionResult AddPenalty(string penalty, DateTime dayDate, string reason, int employeeId)
+        public IActionResult AddPenalty(string penalty, DateTime dayDate, string reason, int employeeId, int PenaltyPoints)
         {
             Console.WriteLine($"🔵Received data - Penalty: {penalty}, Date: {dayDate}, Reason: {reason}, EmployeeId: {employeeId}");
             if (string.IsNullOrEmpty(penalty) || string.IsNullOrEmpty(reason) || employeeId <= 0|| dayDate == default)
@@ -48,6 +48,7 @@ namespace HRsystem.Controllers
             {
                 Decision = penalty,
                 PenaltyDate = dayDate,
+                PenaltyPoints = PenaltyPoints,
                 Reason = reason,
                 EmployeeId = employeeId
             };

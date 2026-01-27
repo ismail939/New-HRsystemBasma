@@ -83,42 +83,60 @@ window.switchTab = switchTab;
 window.closeModal = closeModal;
 window.closeModalCreate = closeModalCreate;
 window.deleteFile = deleteFile;
+// ...existing code...
+
 async function getEmployeeFiles(emp) {
     console.log('Getting files for employee:', emp);
-    // ✅ Fetch employee files dynamically
     const filesList = document.querySelector("#tab-content-files ul");
     filesList.innerHTML = `
-                <div class="flex flex-col justify-center items-center py-4">
-                    <div class="loader border-4 border-blue-500 border-t-transparent rounded-full w-8 h-8 animate-spin mb-2"></div>
-                    <p class="text-gray-600 text-sm">جارٍ تحميل الملفات...</p>
-                </div>
-            `;
+        <div class="flex flex-col justify-center items-center py-4">
+            <div class="loader border-4 border-blue-500 border-t-transparent rounded-full w-8 h-8 animate-spin mb-2"></div>
+            <p class="text-gray-600 text-sm">جارٍ تحميل الملفات...</p>
+        </div>
+    `;
 
     try {
         const res = await fetch(`/employees/files/${emp.Id}`);
         const files = await res.json();
-        console.log('Fetched files:');
-        console.log(files);
+        console.log('Fetched files:', files);
 
         if (files.length === 0) {
             filesList.innerHTML = "<p class='text-gray-500'>لا توجد ملفات لهذا الموظف.</p>";
         } else {
-            filesList.innerHTML = files.map(file => `
-                        <li class="file-item flex flex-col justify-center align-items-center">
-                            <label class="max-w-[280px] truncate block">${file.FileName}</label>
-                            <div class="img-wrapper position-relative">
-                                <img src="${file.Url}" alt="${file.FileName}" class="imgFile rounded transition-opacity" onclick="openImage(this.src)">
-                                <button class="hover-button btn btn-danger btn-sm" onclick="deleteFile(${file.Id})">✕</button>
-                            </div>
-                            <a href="${file.Url}" download class="col-button-dark m-1 py-1">تحميل</a>
-                        </li>
-                    `).join('');
+            filesList.innerHTML = files.map(file => {
+                // Check if file is PDF or image
+                const isPdf = file.FileName.toLowerCase().endsWith('.pdf');
+                const fileUrl = `downloadFile/${encodeURIComponent(file.Url)}`;
+                console.log('File URL:', fileUrl);
+                return `
+                    <li class="file-item flex flex-col justify-center align-items-center">
+                        <label class="max-w-[280px] truncate block">${file.FileName}</label>
+                        <div class="img-wrapper position-relative">
+                            ${isPdf ? `
+                                <div class="w-32 h-40 bg-red-100 rounded flex flex-col items-center justify-center border-2 border-red-300">
+                                    <svg class="w-12 h-12 text-red-600 mb-2" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-8-6z"/>
+                                        <text x="12" y="16" font-size="8" font-weight="bold" text-anchor="middle" fill="currentColor">PDF</text>
+                                    </svg>
+                                    <p class="text-red-600 text-xs font-bold">PDF</p>
+                                </div>
+                            ` : `
+                                <img src="${fileUrl}" alt="${file.FileName}" class="imgFile rounded transition-opacity w-32 h-40 object-cover" onclick="openImage('${fileUrl}')">
+                            `}
+                            <button class="hover-button btn btn-danger btn-sm" onclick="deleteFile(${file.Id})">✕</button>
+                        </div>
+                        <a href="${fileUrl}" download="${file.FileName}" class="col-button-dark m-1 py-1">تحميل</a>
+                    </li>
+                `;
+            }).join('');
         }
     } catch (err) {
         console.error(err);
         filesList.innerHTML = "<p class='text-red-600'>حدث خطأ أثناء تحميل الملفات.</p>";
     }
 }
+
+
 document.getElementById('submitBtn').addEventListener('click', async function uploadFile(event) {
     event.preventDefault();
     event.stopPropagation(); // 🧱 stop the event from closing the modal

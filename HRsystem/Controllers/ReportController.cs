@@ -193,6 +193,7 @@ namespace HRsystem.Controllers
                 {
                     o.PenaltyDate,
                     o.Decision,
+                    o.PenaltyPoints,
                     o.Reason
                 })
                 .ToList();

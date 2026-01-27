@@ -95,23 +95,23 @@ async function showOffDays() {
         // fetch for the offdays and show them in the table
         const response = await fetch(`/allInfoReport/getOffDays?employeeId=${employeeId}&startDate=${start}&endDate=${end}`);
         const offDays = await response.json();
+        if(offDays.length==0){
+            showDiv("noRecordsDiv");
+            hideDiv("allInfoReportTable");
+            return;
+        }
         console.log(JSON.stringify(offDays));
         // populate the table
         const headInnerHTML = `
-                                                                                                    <tr>
-                                                                                                        <th class="px-4 py-2 border-b">التاريخ</th>
-                                                                                                        <th class="px-4 py-2 border-b">نوع الاجازة</th>
-                                                                                                    </tr>
-                                                                                                `;
-        if (offDays.length == 0) {
-            const tableBody = document.getElementById('allInfoReportBody');
-            tableBody.innerHTML = `
-                                                                                <h2 class="p-3 text-center fs-2 m-2">لا يوجد</h2>
-                                                                                `;
-
-        } else {
+            <tr>
+                <th class="px-4 py-2 border-b">التاريخ</th>
+                <th class="px-4 py-2 border-b">نوع الاجازة</th>
+            </tr>
+        `;
+            showDiv("allInfoReportTable");
+            hideDiv("noRecordsDiv");
             populateTable(headInnerHTML, offDays);
-        }
+        
 
     } else {
         alert("من فضلك اختر الموظف اولا ثم التاريخين");
@@ -125,23 +125,23 @@ async function showOffs() {
         // fetch for the offdays and show them in the table
         const response = await fetch(`/allInfoReport/getOffs?employeeId=${employeeId}&startDate=${start}&endDate=${end}`);
         const offDays = await response.json();
+        if(offDays.length==0){
+            showDiv("noRecordsDiv");
+            hideDiv("allInfoReportTable");
+            return;
+        }
         console.log(JSON.stringify(offDays));
         // populate the table
         const headInnerHTML = `
-                                                                                                    <tr>
-                                                                                                        <th class="px-4 py-2 border-b">التاريخ</th>
-                                                                                                        <th class="px-4 py-2 border-b">نوع الاجازة</th>
-                                                                                                    </tr>
-                                                                                                `;
-        if (offDays.length == 0) {
-            const tableBody = document.getElementById('allInfoReportBody');
-            tableBody.innerHTML = `
-                                                                                <h2 class="p-3 text-center fs-2 m-2">لا يوجد</h2>
-                                                                                `;
-
-        } else {
+            <tr>
+                <th class="px-4 py-2 border-b">التاريخ</th>
+                <th class="px-4 py-2 border-b">نوع الاجازة</th>
+            </tr>
+        `;
+            showDiv("allInfoReportTable");
+            hideDiv("noRecordsDiv");
             populateTable(headInnerHTML, offDays);
-        }
+        
 
     } else {
         alert("من فضلك اختر الموظف اولا ثم التاريخين");
@@ -155,23 +155,23 @@ async function showAbsences() {
         // fetch for the offdays and show them in the table
         const response = await fetch(`/allInfoReport/getAbsences?employeeId=${employeeId}&startDate=${start}&endDate=${end}`);
         const absences = await response.json();
+        if(absences.length==0){
+            showDiv("noRecordsDiv");
+            hideDiv("allInfoReportTable");
+            return;
+        }
         console.log(JSON.stringify(absences));
         // populate the table
         const headInnerHTML = `
-                                                                                                    <tr>
-                                                                                                        <th class="px-4 py-2 border-b">التاريخ</th>
-                                                                                                        <th class="px-4 py-2 border-b">النوع</th>
-                                                                                                    </tr>
-                                                                                                `;
-        if (absences.length == 0) {
-            const tableBody = document.getElementById('allInfoReportBody');
-            tableBody.innerHTML = `
-                                                                                <h2 class="p-3 text-center fs-2 m-2">لا يوجد</h2>
-                                                                                `;
-
-        } else {
+            <tr>
+                <th class="px-4 py-2 border-b">التاريخ</th>
+                <th class="px-4 py-2 border-b">النوع</th>
+            </tr>
+        `;
+            showDiv("allInfoReportTable");
+            hideDiv("noRecordsDiv");
             populateTable(headInnerHTML, absences);
-        }
+        
 
     } else {
         alert("من فضلك اختر الموظف اولا ثم التاريخين");
@@ -185,23 +185,23 @@ async function showArrivals() {
         // fetch for the offdays and show them in the table
         const response = await fetch(`/allInfoReport/getArrivals?employeeId=${employeeId}&startDate=${start}&endDate=${end}`);
         const arrivals = await response.json();
+        if(arrivals.length==0){
+            showDiv("noRecordsDiv");
+            hideDiv("allInfoReportTable");
+            return;
+        }
         console.log(JSON.stringify(arrivals));
         // populate the table
         const headInnerHTML = `
-                                                                                                    <tr>
-                                                                                                        <th class="px-4 py-2 border-b">التاريخ</th>
-                                                                                                        <th class="px-4 py-2 border-b">النوع</th>
-                                                                                                    </tr>
-                                                                                                `;
-        if (arrivals.length == 0) {
-            const tableBody = document.getElementById('allInfoReportBody');
-            tableBody.innerHTML = `
-                                                                                <h2 class="p-3 text-center fs-2 m-2">لا يوجد</h2>
-                                                                                `;
-
-        } else {
+                <tr>
+                    <th class="px-4 py-2 border-b">التاريخ</th>
+                    <th class="px-4 py-2 border-b">النوع</th>
+                </tr>
+            `;
+            showDiv("allInfoReportTable");
+            hideDiv("noRecordsDiv");
             populateTable(headInnerHTML, arrivals);
-        }
+        
 
     } else {
         alert("من فضلك اختر الموظف اولا ثم التاريخين");
@@ -215,15 +215,23 @@ async function showPenalties() {
         // fetch for the offdays and show them in the table
         const response = await fetch(`/allInfoReport/getPenalties?employeeId=${employeeId}&startDate=${start}&endDate=${end}`);
         const penalties = await response.json();
+        if(penalties.length==0){
+            showDiv("noRecordsDiv");
+            hideDiv("allInfoReportTable");
+            return;
+        }
         console.log(JSON.stringify(penalties));
         // populate the table
         const headInnerHTML = `
-                                                                                                    <tr>
-                                                                                                        <th class="px-4 py-2 border-b">التاريخ</th>
-                                                                                                        <th class="px-4 py-2 border-b">القرار</th>
-                                                                                                        <th class="px-4 py-2 border-b">سبب الجزاء</th>
-                                                                                                    </tr>
-                                                                                                `;
+            <tr>
+                <th class="px-4 py-2 border-b">التاريخ</th>
+                <th class="px-4 py-2 border-b">القرار</th>
+                <th class="px-4 py-2 border-b">نقاط الجزاء</th>
+                <th class="px-4 py-2 border-b">سبب الجزاء</th>
+            </tr>
+        `;
+        showDiv("allInfoReportTable");
+        hideDiv("noRecordsDiv");
         populateTable(headInnerHTML, penalties);
     } else {
         alert("من فضلك اختر الموظف اولا ثم التاريخين");
@@ -257,15 +265,23 @@ async function showRates() {
         const response = await fetch(`/getRates?employeeId=${employeeId}&startMonth=${startMonth}&endMonth=${endMonth}&startYear=${startYear}&endYear=${endYear}`);
         const rates = await response.json();
         console.log(JSON.stringify(rates.rates));
+        if(rates.success==false){
+            console.log("No rates found");
+            showDiv("noRecordsDiv");
+            hideDiv("allInfoReportTable");
+            return;
+        }
         document.getElementById("tableHeading").innerText = `التقييم خلال الفترة:  ${rates.avgRate} `;
         document.getElementById("tableHeading").classList.remove("hidden");
         // populate the table
         const headInnerHTML = `
-                                                                                                    <tr>
-                                                                                                        <th class="px-4 py-2 border-b">الشهر</th>
-                                                                                                        <th class="px-4 py-2 border-b">التقييم</th>
-                                                                                                    </tr>
-                                                                                                `;
+            <tr>
+                <th class="px-4 py-2 border-b">الشهر</th>
+                <th class="px-4 py-2 border-b">التقييم</th>
+            </tr>
+        `;
+        showDiv("allInfoReportTable");
+        hideDiv("noRecordsDiv");
         populateTable(headInnerHTML, rates.rates, true);
     } else {
         alert("من فضلك اختر الموظف اولا ثم التاريخين");

@@ -241,6 +241,9 @@ namespace HRsystem.Migrations
                     b.Property<DateTime>("PenaltyDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("PenaltyPoints")
+                        .HasColumnType("int");
+
                     b.Property<string>("Reason")
                         .HasColumnType("nvarchar(max)");
 
