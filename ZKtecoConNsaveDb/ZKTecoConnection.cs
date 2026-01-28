@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Xml.Linq;
@@ -12,6 +13,27 @@ namespace ZkFingerprintBridge
         private CZKEM axCZKEM1 = new CZKEM();
         private bool bIsConnected = false;
         private int iMachineNumber = 1;
+        private readonly string _connectionString =
+            "Server=localhost;Database=HR_DB;Trusted_Connection=True;";
+
+        public void InsertBasmaRecord(string name, int age)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+
+                string sql =
+                    "INSERT INTO BasmaRecords (Name, Age) VALUES (@Name, @Age)";
+
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Name", name);
+                    cmd.Parameters.AddWithValue("@Age", age);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
 
         /// <summary>
         /// Connect to ZKTeco device via network

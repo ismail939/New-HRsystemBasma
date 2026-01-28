@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using static ZkFingerprintBridge.ZKTecoConnection;
 
 namespace ZkFingerprintBridge
 {
@@ -30,8 +32,9 @@ namespace ZkFingerprintBridge
                 zk.GetAllUsers();
 
                 // Get attendance logs
-                zk.GetAttendanceLogs();
-
+                List<BasmaEntry> basmaEntries = zk.GetAttendanceLogs(); // now u have the json list
+                // zk.InsertBasmaRecord();
+                
                 // Disconnect
                 zk.DisconnectDevice();
             }
