@@ -1,0 +1,12 @@
+<Solution>
+  <Configurations>
+    <Configuration Name="Debug|x86" />
+    <Configuration Name="Release|x86" />
+    <Platform Name="Any CPU" />
+    <Platform Name="x86" />
+  </Configurations>
+
+  <Project Path="FingerPrintConnect.csproj" Id="ae1b95a2-9239-47c0-8dfb-cebfc6a4120d">
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+</Solution>

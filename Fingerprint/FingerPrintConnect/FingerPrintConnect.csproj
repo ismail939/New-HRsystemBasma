@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>EXE</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <RootNamespace>FingerPrintConnect</RootNamespace>
+    <AssemblyName>FingerPrintConnect</AssemblyName>
+    <Platforms>AnyCPU;x86</Platforms>
+  </PropertyGroup>
+<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\x86\Debug\net48\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+</PropertyGroup>
+
+<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\x86\Release\net48\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+</PropertyGroup>
+
+<ItemGroup>
+  <COMReference Include="zkemkeeper">
+    <WrapperTool>tlbimp</WrapperTool>
+    <VersionMinor>0</VersionMinor>
+    <VersionMajor>1</VersionMajor>
+    <Guid>fe9ded34-e159-408e-8490-b720a5e632c7</Guid>
+    <Lcid>0</Lcid>
+    <Isolated>false</Isolated>
+    <EmbedInteropTypes>true</EmbedInteropTypes>
+  </COMReference>
+</ItemGroup>
+
+<ItemGroup>
+  <Folder Include="Properties\" />
+</ItemGroup>
+
+</Project>

@@ -1,10 +1,10 @@
 <Solution>
   <Configurations>
     <Platform Name="Any CPU" />
-    <Platform Name="x86" />
   </Configurations>
+
   <Project Path="ZkFingerprintBridge.csproj">
-    <BuildType Solution="Debug|Any CPU" Project="Release" />
-    <Platform Solution="Release|x86" Project="x86" />
+    <BuildType Solution="Debug|Any CPU" Project="Debug|AnyCPU" />
+    <BuildType Solution="Release|Any CPU" Project="Release|AnyCPU" />
   </Project>
 </Solution>
