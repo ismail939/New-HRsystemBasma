@@ -1,54 +1,56 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using ZkFingerprintBridge;
 using static ZkFingerprintBridge.ZKTecoConnection;
 
-namespace ZkFingerprintBridge
+namespace ZkFingerprintRunner
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
+
             ZKTecoConnection zk = new ZKTecoConnection();
 
-            // Replace with your device's IP address
-            string deviceIP = "192.168.1.21";
-            int port = 4370;
-
-            Console.WriteLine("Attempting to connect to ZKTeco device...\n");
-
-            if (zk.ConnectToDevice(deviceIP, port))
+            try
             {
-                // Connection successful - perform operations
-                zk.GetDeviceInfo();
+                zk.Log("Job started");
 
-                // Make device beep to confirm connection
-                Console.WriteLine("\nTesting device beep...");
-                
+                if (zk.ConnectToDevice("192.168.1.21", 4370))
+                {
+                    zk.Log("Connected to device");
 
-                // Get device status
-                zk.GetDeviceStatus();
+                    var logs = zk.GetAttendanceLogs();
 
-                // Get all users
-                zk.GetAllUsers();
-
-                // Get attendance logs
-                List<BasmaEntry> basmaEntries = zk.GetAttendanceLogs(); // now u have the json list
-                // zk.InsertBasmaRecord();
-                
-                // Disconnect
+                    if (logs != null && logs.Count > 0)
+                    {
+                        zk.InsertBasmaRecords(logs);
+                        zk.Log($"Pulled {logs.Count} attendance records");
+                    }
+                    else
+                    {
+                        zk.Log("No attendance records found");
+                    }
+                }
+                else
+                {
+                    zk.Log("Connection FAILED");
+                }
+            }
+            catch (Exception ex)
+            {
+                zk.Log(ex.ToString());
+            }
+            finally
+            {
                 zk.DisconnectDevice();
-            }
-            else
-            {
-                Console.WriteLine("Failed to connect to device. Please check:");
-                Console.WriteLine("1. Device IP address is correct");
-                Console.WriteLine("2. Device is powered on and connected to network");
-                Console.WriteLine("3. Firewall is not blocking the connection");
-                Console.WriteLine("4. Platform target is set to x86");
+                zk.Log("Disconnected");
             }
 
-            Console.WriteLine("\nPress any key to exit...");
-            Console.ReadKey();
         }
+
+
+
     }
 }

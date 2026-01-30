@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Xml.Linq;
@@ -14,26 +16,64 @@ namespace ZkFingerprintBridge
         private bool bIsConnected = false;
         private int iMachineNumber = 1;
         private readonly string _connectionString =
-            "Server=localhost;Database=HR_DB;Trusted_Connection=True;";
+             "Server=DESKTOP-G59QIOO\\SQLEXPRESS;Database=HR_DB;User Id=production2000;Password=ismail939;TrustServerCertificate=True;";
 
-        public void InsertBasmaRecord(string name, int age)
+        private static readonly string LogFile =
+            @"C:\ZkemTask\log.txt";
+
+        public void Log(string message)
         {
+            Directory.CreateDirectory(Path.GetDirectoryName(LogFile));
+            File.AppendAllText(
+                LogFile,
+                $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {message}{Environment.NewLine}"
+            );
+        }
+
+
+        public void InsertBasmaRecords(List<BasmaEntry> basmaEntries)
+        {
+            if (basmaEntries == null || basmaEntries.Count == 0)
+                return;
+
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
 
-                string sql =
-                    "INSERT INTO BasmaRecords (Name, Age) VALUES (@Name, @Age)";
-
-                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                using (SqlTransaction tx = conn.BeginTransaction())
                 {
-                    cmd.Parameters.AddWithValue("@Name", name);
-                    cmd.Parameters.AddWithValue("@Age", age);
+                    try
+                    {
+                        string sql = @"
+                    IF NOT EXISTS (
+                        SELECT 1 FROM CheckInOuts 
+                        WHERE UserId = @UserId AND CheckTime = @CheckTime
+                    )
+                    INSERT INTO CheckInOuts (UserId, CheckTime)
+                    VALUES (@UserId, @CheckTime)";
 
-                    cmd.ExecuteNonQuery();
+                        foreach (var entry in basmaEntries)
+                        {
+                            using (SqlCommand cmd = new SqlCommand(sql, conn, tx))
+                            {
+                                cmd.Parameters.Add("@UserId", SqlDbType.Int).Value = entry.Id;
+                                cmd.Parameters.Add("@CheckTime", SqlDbType.DateTime).Value = entry.Time;
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+
+                        tx.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        tx.Rollback();
+                        Log("DB ERROR: " + ex);
+                        throw;
+                    }
                 }
             }
         }
+
 
         /// <summary>
         /// Connect to ZKTeco device via network
@@ -49,7 +89,7 @@ namespace ZkFingerprintBridge
 
                 if (bIsConnected)
                 {
-                    Console.WriteLine("Connected successfully!");
+                    Log("Connected successfully!");
                     axCZKEM1.RegEvent(iMachineNumber, 65535); // Register all events
                     return true;
                 }
@@ -57,13 +97,13 @@ namespace ZkFingerprintBridge
                 {
                     int errorCode = 0;
                     axCZKEM1.GetLastError(ref errorCode);
-                    Console.WriteLine($"Connection failed. Error code: {errorCode}");
+                    Log($"Connection failed. Error code: {errorCode}");
                     return false;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception during connection: {ex.Message}");
+                Log($"Exception during connection: {ex.Message}");
                 return false;
             }
         }
@@ -84,20 +124,20 @@ namespace ZkFingerprintBridge
 
                 if (bIsConnected)
                 {
-                    Console.WriteLine("Connected via Serial successfully!");
+                    Log("Connected via Serial successfully!");
                     return true;
                 }
                 else
                 {
                     int errorCode = 0;
                     axCZKEM1.GetLastError(ref errorCode);
-                    Console.WriteLine($"Serial connection failed. Error code: {errorCode}");
+                    Log($"Serial connection failed. Error code: {errorCode}");
                     return false;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception during serial connection: {ex.Message}");
+                Log($"Exception during serial connection: {ex.Message}");
                 return false;
             }
         }
@@ -114,7 +154,7 @@ namespace ZkFingerprintBridge
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Encoding error: {ex.Message}");
+                Log($"Encoding error: {ex.Message}");
                 return text;
             }
         }
@@ -128,7 +168,7 @@ namespace ZkFingerprintBridge
             {
                 axCZKEM1.Disconnect();
                 bIsConnected = false;
-                Console.WriteLine("Disconnected successfully!");
+                Log("Disconnected successfully!");
             }
         }
 
@@ -139,7 +179,7 @@ namespace ZkFingerprintBridge
         {
             if (!bIsConnected)
             {
-                Console.WriteLine("Device not connected!");
+                Log("Device not connected!");
                 return;
             }
 
@@ -151,11 +191,11 @@ namespace ZkFingerprintBridge
             axCZKEM1.GetFirmwareVersion(iMachineNumber, ref firmwareVersion);
             axCZKEM1.GetDeviceInfo(iMachineNumber, 1, ref deviceName);
 
-            Console.WriteLine("=== Device Information ===");
-            Console.WriteLine($"Device Name: {deviceName}");
-            Console.WriteLine($"Serial Number: {serialNumber}");
-            Console.WriteLine($"Firmware Version: {firmwareVersion}");
-            Console.WriteLine("==========================");
+            Log("=== Device Information ===");
+            Log($"Device Name: {deviceName}");
+            Log($"Serial Number: {serialNumber}");
+            Log($"Firmware Version: {firmwareVersion}");
+            Log("==========================");
         }
 
 
@@ -174,11 +214,12 @@ namespace ZkFingerprintBridge
         {
             if (!bIsConnected)
             {
-                Console.WriteLine("Device not connected!");
-                return null;
+                Log("Device not connected!");
+                return  new List<BasmaEntry>();
+                ;
             }
 
-            Console.WriteLine("Reading attendance logs...");
+            Log("Reading attendance logs...");
             
 
             List<BasmaEntry> basmaEntries = new List<BasmaEntry>();
@@ -190,7 +231,7 @@ namespace ZkFingerprintBridge
                 int year = 0, month = 0, day = 0, hour = 0, minute = 0, second = 0;
                 int workCode = 0;
                 int logCount = 0;
-                Console.WriteLine("\n=== Attendance Logs ===");
+                Log("\n=== Attendance Logs ===");
                 while (axCZKEM1.SSR_GetGeneralLogData(iMachineNumber, out enrollNumber,
                        out verifyMode, out inOutMode, out year, out month, out day,
                        out hour, out minute, out second, ref workCode))
@@ -198,25 +239,27 @@ namespace ZkFingerprintBridge
                     DateTime logTime = new DateTime(year, month, day, hour, minute, second);
                     string verifyModeStr = GetVerifyModeString(verifyMode);
                     string inOutModeStr = GetInOutModeString(inOutMode);
+                    int.TryParse(enrollNumber, out int userId);
                     var basmaEntry = new BasmaEntry
                     {
-                        Id = int.Parse(enrollNumber),
+                        Id = userId,
                         Time = logTime,
                         InOutMode = inOutMode % 2 == 0 // Even codes for Check In, odd for Check Out
                     };
                     basmaEntries.Add(basmaEntry);
-                    Console.WriteLine($"User ID: {enrollNumber} | Time: {logTime:yyyy-MM-dd HH:mm:ss} | Verify: {verifyModeStr} | InOut: {inOutModeStr}");
+                    Log($"User ID: {enrollNumber} | Time: {logTime:yyyy-MM-dd HH:mm:ss} | Verify: {verifyModeStr} | InOut: {inOutModeStr}");
                     logCount++;
                 }
 
-                Console.WriteLine($"Total logs retrieved: {logCount}");
-                Console.WriteLine("=======================\n");
+                Log($"Total logs retrieved: {logCount}");
+                Log("=======================\n");
                 return basmaEntries;
             }
             else
             {
-                Console.WriteLine("Failed to read attendance logs.");
-                return null;
+                Log("Failed to read attendance logs.");
+                return  new List<BasmaEntry>();
+                ;
             }
 
         }
@@ -237,11 +280,11 @@ namespace ZkFingerprintBridge
             var users = new List<User>();
             if (!bIsConnected)
             {
-                Console.WriteLine("Device not connected!");
+                Log("Device not connected!");
                 return null;
             }
 
-            Console.WriteLine("Reading all users...");
+           Log("Reading all users...");
             
 
             if (axCZKEM1.ReadAllUserID(iMachineNumber))
@@ -253,9 +296,9 @@ namespace ZkFingerprintBridge
                 bool enabled = false;
                 int userCount = 0;
 
-                
 
-                Console.WriteLine("\n=== Registered Users ===");
+
+                Log("\n=== Registered Users ===");
                 while (axCZKEM1.SSR_GetAllUserInfo(iMachineNumber, out enrollNumber,
                        out name, out password, out privilege, out enabled))
                 {
@@ -274,16 +317,16 @@ namespace ZkFingerprintBridge
                         Status = status,
                     };
                     users.Add(user);
-                    Console.WriteLine($"ID: {enrollNumber} | Name: {name} | Privilege: {privilegeStr} | Status: {status}");
+                    Log($"ID: {enrollNumber} | Name: {name} | Privilege: {privilegeStr} | Status: {status}");
                     userCount++;
                 }
 
-                Console.WriteLine($"Total users: {userCount}");
-                Console.WriteLine("========================\n");
+                Log($"Total users: {userCount}");
+                Log("========================\n");
             }
             else
             {
-                Console.WriteLine("Failed to read users.");
+                Log("Failed to read users.");
             }
             return users;
         }
@@ -297,7 +340,7 @@ namespace ZkFingerprintBridge
         {
             if (!bIsConnected)
             {
-                Console.WriteLine("Device not connected!");
+                Log("Device not connected!");
                 return;
             }
 
@@ -311,12 +354,12 @@ namespace ZkFingerprintBridge
             axCZKEM1.GetDeviceStatus(iMachineNumber, 6, ref logCount);  // Log count
             axCZKEM1.GetDeviceStatus(iMachineNumber, 21, ref adminCount); // Admin count
 
-            Console.WriteLine("\n=== Device Status ===");
-            Console.WriteLine($"Total Users: {userCount}");
-            Console.WriteLine($"Total Fingerprints: {fpCount}");
-            Console.WriteLine($"Total Logs: {logCount}");
-            Console.WriteLine($"Total Admins: {adminCount}");
-            Console.WriteLine("=====================\n");
+            Log("\n=== Device Status ===");
+            Log($"Total Users: {userCount}");
+            Log($"Total Fingerprints: {fpCount}");
+            Log($"Total Logs: {logCount}");
+            Log($"Total Admins: {adminCount}");
+            Log("=====================\n");
         }
 
         // Helper methods to convert codes to readable strings
