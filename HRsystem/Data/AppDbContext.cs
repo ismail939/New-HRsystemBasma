@@ -18,6 +18,7 @@ namespace HRsystem.Data
         public DbSet<HRApplierFile> HRApplierFiles { get; set; }
         public DbSet<HREmployeeShift> HREmployeeShift { get; set; }
         public DbSet<HROffDayBalance> HROffDayBalances { get; set; }
+        public DbSet<CheckInOut> CheckInOuts { get; set; }
         
     }
 }
