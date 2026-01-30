@@ -1,5 +1,12 @@
 // ⭐ Open Modal 
 function openModal(empId) {
+    fetch(`/offdays/balance/add?employeeId=${empId}`).then(res => res.json()).then(data => {
+        console.log(data);
+        document.getElementById("annualBalance").value = data.annualBalance;
+        document.getElementById("casualBalance").value = data.casualBalance;
+        document.getElementById("offBalance").value = data.offBalance;
+        document.getElementById("insteadBalance").value = data.insteadBalance;
+    });
     const editModal = document.getElementById('editModal');
     document.getElementById('tableResponsive').classList.add('hidden');
     editModal.classList.remove('hidden');
@@ -56,6 +63,13 @@ function makeOffDay() {
     closeTypePopup();
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+  const fromInput = document.getElementById("from");
+
+  if (fromInput && fromInput._flatpickr) {
+    fromInput._flatpickr.set("minDate", "today");
+  }
+});
 
 const fromInput = document.getElementById("from");
 const toInput = document.getElementById("to");
@@ -63,7 +77,7 @@ const toInput = document.getElementById("to");
 fromInput.addEventListener("change", () => {
     if (fromInput.value) {
         toInput.disabled = false;
-        toInput.min = fromInput.value;
+        toInput._flatpickr.set("minDate", fromInput.value);
         toInput.value = ""; // reset previous value
     } else {
         toInput.disabled = true;
@@ -243,6 +257,41 @@ document.getElementById("saveBalancesBtn").addEventListener("click", function() 
     document.getElementById("casualBalance").setAttribute("disabled", "disabled");
     document.getElementById("offBalance").setAttribute("disabled", "disabled");
     document.getElementById("insteadBalance").setAttribute("disabled", "disabled");
+    console.log("Saving balances...");
+    console.log(` EmployeeId: ${document.getElementById("empId").value},
+     Annual: ${document.getElementById("annualBalance").value},
+      Casual: ${document.getElementById("casualBalance").value},
+       Off: ${document.getElementById("offBalance").value},
+        Instead: ${document.getElementById("insteadBalance").value}`);
+    let empIdInput = document.getElementById("empId");
+    let annualBalanceInput = document.getElementById("annualBalance");
+    let casualBalanceInput = document.getElementById("casualBalance");
+    let offBalanceInput = document.getElementById("offBalance");
+    let insteadBalanceInput = document.getElementById("insteadBalance");
+    fetch(`/offdays/balance/edit`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            EmployeeId: empIdInput.value,
+            Annual: parseInt(annualBalanceInput.value),
+            Casual: parseInt(casualBalanceInput.value),
+            Off: parseInt(offBalanceInput.value),
+            Instead: parseInt(insteadBalanceInput.value)
+        })
+    }).then(res=>res.json()).then(data => {
+        if (data.success) {
+            console.log("Balances saved successfully");
+            annualBalanceInput.value = res.annualBalance;
+            casualBalanceInput.value =  res.casualBalance;
+            offBalanceInput.value =  res.offBalance;
+            insteadBalanceInput.value =  res.insteadBalance;
+        } else {
+            console.log("حدث خطأ أثناء الحفظ ❌");
+        }
+    });
     hideDiv("saveBalancesBtn");
     showDiv("editBalancesBtn");
 });
+

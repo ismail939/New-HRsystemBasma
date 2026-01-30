@@ -156,7 +156,7 @@
 }
 
 .col-button-dark:hover {
-  @apply bg-color1 text-color3 shadow-sm border-color3 !important;
+  @apply bg-gray-400  shadow-sm border-color3 !important;
   transform: scale(1.02);
 }
 
@@ -165,7 +165,7 @@
 }
 
 .col-button-light:hover {
-  @apply bg-color1 text-color3 shadow-lg border-color3 !important;
+  @apply bg-gray-400  shadow-lg border-color3 !important;
   transform: scale(1.02);
 }
 

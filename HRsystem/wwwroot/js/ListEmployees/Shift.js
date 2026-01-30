@@ -194,6 +194,9 @@ function openShiftModal(empName, empId) {
                 document.getElementById("shiftEndTime").innerText = endTime.toLocaleTimeString('ar-EG', options);
                 showDiv("fixedShiftDiv");
             }
+            else if(shift.shift.ShiftMode == 0){
+                showDiv("variableShiftDiv");
+            }
             showDiv("thereIsShift");
         }
     })

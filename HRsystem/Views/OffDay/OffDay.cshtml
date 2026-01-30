@@ -76,38 +76,32 @@
                     <tbody id="balancesBody">
                         <tr style="background-color:white !important">
                             <td>
-                                <input disabled type="number" value="5" class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " id="annualBalance" />
+                                <input disabled type="number" 
+                                    class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " 
+                                    id="annualBalance" />
                             </td>
                             <td>
-                                <input disabled type="number" value="5" class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " id="casualBalance" />
+                                <input disabled type="number" 
+                                    class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " 
+                                    id="casualBalance" />
                             </td>
                             <td>
-                                <input disabled type="number" value="5" class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " id="offBalance" />
+                                <input disabled type="number" 
+                                    class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " 
+                                    id="offBalance" />
                             </td>
                             <td>
-                                <input disabled type="number" value="5" class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " id="insteadBalance" />
+                                <input disabled type="number" 
+                                    class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " 
+                                    id="insteadBalance" />
                             </td>
                         </tr>
                     </tbody>
                 </table>
-                @* <div class="flex flex-col text-center  p-2 rounded-lg">
-                    <span class="font-extrabold p-1 rounded-lg ">سنوي</span>
-                    <input  type="number" value="5" class="border !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " id="annualBalance" />
-                </div>
-                <div class="flex flex-col text-center  p-2 rounded-lg">
-                    <span class="font-extrabold p-1 rounded-lg ">عارضة</span>
-                    <input  type="number" value="5" class="border !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " id="casualBalance" />
-                </div>
-                <div class="flex flex-col text-center  p-2 rounded-lg">
-                    <span class="font-extrabold p-1 rounded-lg ">راحة</span>
-                    <input  type="number" value="5" class="border !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " id="offBalance" />
-                </div>
-                <div class="flex flex-col text-center  p-2 rounded-lg">
-                    <span class="font-extrabold p-1 rounded-lg ">بدل اجازة</span>
-                    <input  type="number" value="5" class="border !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " id="insteadBalance" />
-                </div> *@
+
                 <button id="editBalancesBtn" class="col-button-dark !h-[50%]">تعديل</button>
                 <button id="saveBalancesBtn" class="hidden col-button-dark !h-[50%]">حفظ</button>
+                <button onclick="openNotesModal()" class="col-button-light !h-[50%]">الملاحظات</button>
             </div>
         </div>
 
@@ -125,13 +119,31 @@
     </div>
 </div>
 
+<!-- SMALL DROPDOWN POPUP -->
+<div id="notesModal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-50
+              items-center justify-center">
+
+    <div id="" class="col-modal relative p-6 rounded-2xl shadow-xl !h-1/2 !w-1/2 text-center">
+        <h3 class="text-lg font-bold mb-3">الملاحظات</h3>
+
+        <textarea id="notesTextarea"
+            class="w-full h-3/4 border rounded-lg p-2 text-right focus:outline-none focus:ring focus:ring-[#7B9669]"
+            placeholder="اكتب ملاحظاتك هنا..."></textarea>
+        <div class="flex flex-col inset-x-0  justify-center items-center w-full bottom-2 absolute mt-2">
+            <button type="button" onclick="saveNotes()"
+                class="py-2 px-4 rounded-lg col-button-dark">
+                حفظ
+            </button>
+        </div>
+    </div>
+</div>
 
 
 <!-- SMALL DROPDOWN POPUP -->
 <div id="typeModal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-50
               items-center justify-center">
 
-    <form id="typePopup" class="bg-white p-6 rounded-2xl shadow-xl w-64 text-center">
+    <form id="typePopup" class="col-modal p-6 rounded-2xl shadow-xl !h-64 !w-64 text-center">
         <h3 class="text-lg font-bold mb-3">اختر نوع الإجازة</h3>
 
         <select id="popupSelect" class="w-full border rounded-lg p-2 text-right">
@@ -156,4 +168,5 @@
 @section Scripts {
     <script src="~/js/OffDay/EditModal.js"></script>
     <script src="~/js/OffDay/TypeModal.js"></script>
+    <script src="~/js/OffDay/NotesModal.js"></script>
 }

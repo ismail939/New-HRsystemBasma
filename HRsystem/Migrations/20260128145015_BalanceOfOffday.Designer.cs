@@ -4,6 +4,7 @@ using HRsystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRsystem.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260128145015_BalanceOfOffday")]
+    partial class BalanceOfOffday
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -323,40 +326,6 @@ namespace HRsystem.Migrations
                     b.ToTable("HREmployeeShift");
                 });
 
-            modelBuilder.Entity("HRsystem.Models.HROffDayBalance", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Annual")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Casual")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CompensatoryOfNationalHoliday")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Off")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.ToTable("HROffDayBalances");
-                });
-
             modelBuilder.Entity("HRsystem.Models.HRApplierFile", b =>
                 {
                     b.HasOne("HRsystem.Models.HRApplier", "Applier")
@@ -424,15 +393,6 @@ namespace HRsystem.Migrations
                 });
 
             modelBuilder.Entity("HRsystem.Models.HREmployeeShift", b =>
-                {
-                    b.HasOne("HRsystem.Models.HREmployee", "HREmployee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId");
-
-                    b.Navigation("HREmployee");
-                });
-
-            modelBuilder.Entity("HRsystem.Models.HROffDayBalance", b =>
                 {
                     b.HasOne("HRsystem.Models.HREmployee", "HREmployee")
                         .WithMany()
