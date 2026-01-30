@@ -277,4 +277,8 @@ npx tailwindcss -i ./wwwroot/css/site.css -o ./wwwroot/css/output.css --watch
                 </tr>
             }
 
-        </tbody>
+        </tbody>\
+
+
+
+        "DefaultConnection": "Server=DESKTOP-G59QIOO\\SQLEXPRESS;Database=HR_DB;User Id=production2000;Password=ismail939;TrustServerCertificate=True;"

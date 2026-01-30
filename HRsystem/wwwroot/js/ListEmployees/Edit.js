@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
         form.querySelector('[name="Department"]').value = emp.Department ?? "";
         form.querySelector('[name="JobName"]').value = emp.JobName ?? "";
         form.querySelector('[name="ContractType"]').value = emp.ContractType ?? "";
+        form.querySelector('[name="BasmaId"]').value = emp.BasmaId ?? "";
 
         // open modal (Bootstrap, Tailwind, or your custom)
         modal.classList.remove("hidden");

@@ -34,4 +34,5 @@ public class HREmployee
     [Required]
     public string ContractType { get; set; }
     public string? LeaveReason {get; set;}
+    public int? BasmaId { get; set; }
 }
