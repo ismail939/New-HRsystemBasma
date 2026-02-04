@@ -9,13 +9,18 @@ public class HREmployeeBasma
     [Required]
     [ForeignKey(nameof(HREmployee))] // ← tells EF that EmployeeId is the FK for HREmployee
     public int EmployeeId { get; set; }
+    
     [Required]
     public DateTime DayDate { get; set; }
     public DateTime? ArrivalTime { get; set; }
     public DateTime? DepartureTime { get; set; }
-    public int? TotalHours { get; set; } 
+    public float? TotalHours { get; set; } 
     public int? LateMinutes { get; set; }
-    public string? Status { get; set; }
+    public int? EarlyLeaveMinutes { get; set; }
+    [Required]
+    public bool Ok {get; set;} = false;
+    
+    public int Status { get; set; } = 1; // 1: arrived, 0: absent, 2: on leave, 3: absent|on leave.
     public string? Notes { get; set; }
     [Required]
     public virtual HREmployee HREmployee { get; set; }

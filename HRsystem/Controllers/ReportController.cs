@@ -45,8 +45,8 @@ namespace HRsystem.Controllers
         [Route("/getData")]
         public IActionResult GetData(int employeeId, DateTime startDate, DateTime endDate)
         {
-            int arrivalsNumber = _context.HREmployeeBasmas.Where(e=>e.EmployeeId==employeeId&&e.Status == "حضور"&& e.DayDate>=startDate && e.DayDate<=endDate).Count();
-            int absencesNumber = _context.HREmployeeBasmas.Where(e=>e.EmployeeId==employeeId&&e.Status == "غياب"&& e.DayDate>=startDate && e.DayDate<=endDate).Count();
+            int arrivalsNumber = _context.HREmployeeBasmas.Where(e=>e.EmployeeId==employeeId&&e.Status == 0&& e.DayDate>=startDate && e.DayDate<=endDate).Count();
+            int absencesNumber = _context.HREmployeeBasmas.Where(e=>e.EmployeeId==employeeId&&e.Status == 1&& e.DayDate>=startDate && e.DayDate<=endDate).Count();
             int offdays = _context.HREmployeeOffDays.Where(o=>o.EmployeeId==employeeId&&o.OffDayType!="راحة"&&o.OffDayDate>=startDate && o.OffDayDate<=endDate).Count();
             int offs = _context.HREmployeeOffDays.Where(o=>o.EmployeeId==employeeId&&o.OffDayType=="راحة"&&o.OffDayDate>=startDate && o.OffDayDate<=endDate).Count();
             int penalties = _context.HREmployeePenalties.Where(p=>p.EmployeeId==employeeId&&p.PenaltyDate>=startDate && p.PenaltyDate<=endDate).Count();
@@ -102,7 +102,7 @@ namespace HRsystem.Controllers
             // Example: Query the OffDays table (edit to match your DB)
             var absences = _context.HREmployeeBasmas
                 .Where(o => o.EmployeeId == employeeId &&
-                            o.Status == "غياب" &&
+                            o.Status == 0 &&
                             o.DayDate >= startDate &&
                             o.DayDate <= endDate)
                 .Select(o => new
@@ -122,7 +122,7 @@ namespace HRsystem.Controllers
             // Example: Query the OffDays table (edit to match your DB)
             var arrivals = _context.HREmployeeBasmas
                 .Where(o => o.EmployeeId == employeeId &&
-                            o.Status == "حضور" &&
+                            o.Status == 0 &&
                             o.DayDate >= startDate &&
                             o.DayDate <= endDate)
                 .Select(o => new
@@ -210,6 +210,12 @@ namespace HRsystem.Controllers
             var pdf = report.GeneratePdf();
 
             return File(pdf, "application/pdf", "EmployeesReport.pdf");
+        }
+        [HttpGet]
+        [Route("/test")]
+        public IActionResult Test()
+        {
+            return View("Test");
         }
         [HttpGet]
         [Route("/reports/employeesDH/{id}")]

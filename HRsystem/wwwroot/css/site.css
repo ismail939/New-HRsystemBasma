@@ -556,3 +556,14 @@ th {
 .listEmpTableTbody td {
   font-size: 14px;
 }
+
+tr:hover input {
+    background-color: transparent;
+}
+
+table tr input,
+
+table tr textarea {
+    background-color: inherit;
+    border: 1px solid #999;
+}

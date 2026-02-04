@@ -7,6 +7,13 @@ namespace HRsystem.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<HREmployeeBasma>()
+            .HasIndex(x => new { x.EmployeeId, x.DayDate })
+            .IsUnique();
+        }
+
 
         public DbSet<HREmployee> HREmployees { get; set; }
         public DbSet<HREmployeeFile> HREmployeeFiles { get; set; }
@@ -19,6 +26,6 @@ namespace HRsystem.Data
         public DbSet<HREmployeeShift> HREmployeeShift { get; set; }
         public DbSet<HROffDayBalance> HROffDayBalances { get; set; }
         public DbSet<CheckInOut> CheckInOuts { get; set; }
-        
+        public DbSet<DailyBasmaFlag> DailyBasmaFlags { get; set; }
     }
 }

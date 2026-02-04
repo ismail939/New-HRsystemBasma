@@ -21,6 +21,7 @@ document.getElementById("saveHoursShiftBtn").addEventListener("click", () => {
                             document.getElementById("hoursShiftNumber").innerText = shift.shift.RequiredHours;
                             showDiv("hoursShiftDiv");
                             hideDiv("fixedShiftDiv")
+                            hideDiv("variableShiftDiv");
                         } else if (shift.shift.ShiftMode == 2) {
                             // Assuming shift.shift.StartTime and EndTime are Date objects or ISO strings
                             const startTime = new Date(shift.shift.StartTime);
@@ -33,12 +34,14 @@ document.getElementById("saveHoursShiftBtn").addEventListener("click", () => {
                             document.getElementById("shiftEndTime").innerText = endTime.toLocaleTimeString('ar-EG', options);
                             showDiv("fixedShiftDiv");
                             hideDiv("hoursShiftDiv");
+                            hideDiv("variableShiftDiv");
                         }
                         else if(shift.shift.ShiftMode == 0){
                             hideDiv("fixedShiftDiv");
                             hideDiv("hoursShiftDiv");
                             showDiv("variableShiftDiv");
                         }
+                        hideDiv("noShift");
                         showDiv("thereIsShift");
                     }
                 })
@@ -66,6 +69,7 @@ document.getElementById("saveVariableShiftBtn").addEventListener("click", () => 
                         if (shift.shift.ShiftMode == 1) {
                             document.getElementById("hoursShiftNumber").innerText = shift.shift.RequiredHours;
                             showDiv("hoursShiftDiv");
+                            hideDiv("variableShiftDiv");
                             hideDiv("fixedShiftDiv")
                         } else if (shift.shift.ShiftMode == 2) {
                             // Assuming shift.shift.StartTime and EndTime are Date objects or ISO strings
@@ -79,12 +83,14 @@ document.getElementById("saveVariableShiftBtn").addEventListener("click", () => 
                             document.getElementById("shiftEndTime").innerText = endTime.toLocaleTimeString('ar-EG', options);
                             showDiv("fixedShiftDiv");
                             hideDiv("hoursShiftDiv");
+                            hideDiv("variableShiftDiv");
                         }
                         else if(shift.shift.ShiftMode == 0){
                             hideDiv("fixedShiftDiv");
                             hideDiv("hoursShiftDiv");
                             showDiv("variableShiftDiv");
                         }
+                        hideDiv("noShift");
                         showDiv("thereIsShift");
                     }
                 })
@@ -145,6 +151,7 @@ document.getElementById("saveFixedShiftBtn").addEventListener("click", () => {
                             document.getElementById("hoursShiftNumber").innerText = shift.shift.RequiredHours;
                             showDiv("hoursShiftDiv");
                             hideDiv("fixedShiftDiv");
+                            hideDiv("variableShiftDiv");
                         } else if (shift.shift.ShiftMode == 2) {
                             // Assuming shift.shift.StartTime and EndTime are Date objects or ISO strings
                             const startTime = new Date(shift.shift.StartTime);
@@ -157,12 +164,14 @@ document.getElementById("saveFixedShiftBtn").addEventListener("click", () => {
                             document.getElementById("shiftEndTime").innerText = endTime.toLocaleTimeString('ar-EG', options);
                             showDiv("fixedShiftDiv");
                             hideDiv("hoursShiftDiv");
+                            hideDiv("variableShiftDiv");
                         }
                         else if(shift.shift.ShiftMode == 0){
                             hideDiv("fixedShiftDiv");
                             hideDiv("hoursShiftDiv");
                             showDiv("variableShiftDiv");
                         }
+                        hideDiv("noShift");
                         showDiv("thereIsShift");
                     }
                 })

@@ -8,8 +8,10 @@ public class BasmaList
     public DateTime DayDate { get; set; }
     public DateTime? ArrivalTime { get; set; }
     public DateTime? DepartureTime { get; set; }
-    public int? TotalHours { get; set; }
+    public float? TotalHours { get; set; }
     public int? LateMinutes { get; set; }
-    public string? Status { get; set; }
+    public int? EarlyLeaveMinutes {get; set;}
+    public bool Ok {get; set;}
+    public int Status { get; set; }
     public string? Notes { get; set; }
 }

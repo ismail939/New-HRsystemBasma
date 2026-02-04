@@ -4,6 +4,7 @@ using HRsystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRsystem.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260131120346_basmaTableModifications")]
+    partial class basmaTableModifications
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,19 +42,6 @@ namespace HRsystem.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CheckInOuts");
-                });
-
-            modelBuilder.Entity("HRsystem.Models.DailyBasmaFlag", b =>
-                {
-                    b.Property<DateTime>("Day")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("Taken")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Day");
-
-                    b.ToTable("DailyBasmaFlags");
                 });
 
             modelBuilder.Entity("HRsystem.Models.HRApplier", b =>
@@ -197,16 +187,15 @@ namespace HRsystem.Migrations
                     b.Property<bool>("Ok")
                         .HasColumnType("bit");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<float?>("TotalHours")
                         .HasColumnType("real");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeId", "DayDate")
-                        .IsUnique();
+                    b.HasIndex("EmployeeId");
 
                     b.ToTable("HREmployeeBasmas");
                 });

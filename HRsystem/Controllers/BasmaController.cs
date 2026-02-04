@@ -3,194 +3,431 @@ using HRsystem.Models;
 using HRsystem.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Windows.Forms;
+
 // using ZkFingerprintBridge;
 
 namespace HRsystem.Controllers
 {
-   public class BasmaController : Controller
-   {
-       private readonly ILogger<BasmaController> _logger;
-       private readonly AppDbContext _context;
-       public BasmaController(ILogger<BasmaController> logger, AppDbContext context)
-       {
-           _logger = logger;
-           _context = context;
-       }
-       [HttpGet]
-       [Route("/basma")]
-       public IActionResult Basma()
-       {
-           var list = _context.HREmployeeBasmas.ToList();
-           var employees = _context.HREmployees.ToList();
-           List<BasmaList> basmaList=[];
-           foreach(var basma in list)
-           {
-               var emp = employees.FirstOrDefault(e => e.Id == basma.EmployeeId);
-               if (emp != null)
-               {
-                   basmaList.Add(new BasmaList
-                   {
-                       Id = basma.Id,
-                       EmployeeName = emp.Name,
-                       DayDate = basma.DayDate,
-                       ArrivalTime = basma.ArrivalTime,
-                       DepartureTime = basma.DepartureTime,
-                       TotalHours = basma.TotalHours,
-                       LateMinutes = basma.LateMinutes,
-                       Status = basma.Status,
-                       Notes = basma.Notes
-                   });
-               }
-           };
-           return View(basmaList);
-       }
-       [HttpGet]
-       [Route("/basmaJson")]
-       public IActionResult BasmaJson()
-       {
-           var list = _context.HREmployeeBasmas.ToList();
-           var employees = _context.HREmployees.ToList();
-           List<BasmaList> basmaList = [];
-           foreach (var basma in list)
-           {
-               var emp = employees.FirstOrDefault(e => e.Id == basma.EmployeeId);
-               if (emp != null)
-               {
-                   basmaList.Add(new BasmaList
-                   {
-                       Id = basma.Id,
-                       EmployeeName = emp.Name,
-                       DayDate = basma.DayDate,
-                       ArrivalTime = basma.ArrivalTime,
-                       DepartureTime = basma.DepartureTime,
-                       TotalHours = basma.TotalHours,
-                       LateMinutes = basma.LateMinutes,
-                       Status = basma.Status,
-                       Notes = basma.Notes
-                   });
-               }
-           }
-           ;
-           return Json(basmaList);
-       }
-       [HttpGet]
-       public IActionResult SearchEmployees(string query)
-       {
-           query = query?.Trim() ?? "";
+    public class BasmaController : Controller
+    {
+        private readonly ILogger<BasmaController> _logger;
+        private readonly AppDbContext _context;
+        public BasmaController(ILogger<BasmaController> logger, AppDbContext context)
+        {
+            _logger = logger;
+            _context = context;
+        }
+        public class LatencyResult
+        {
+            public int LateMinutes { get; set; }
+            public int EarlyLeaveMinutes { get; set; }
+            public float TotalHours { get; set; }
+        }
 
-           var list = _context.HREmployeeBasmas.ToList();
-           var employees = _context.HREmployees.ToList();
+        [HttpGet]
+        [Route("/basma")]
+        public IActionResult Basma()
+        {
+            return View("basma");
+        }
 
-           List<BasmaList> basmaList = new List<BasmaList>();
+        [HttpGet]
+        [Route("/basmaData")]
+        public IActionResult BasmaData(DateTime Day)
+        {
+            Console.WriteLine("🟢 Entered BasmaData");
+            bool hasAnyBasma =
+                _context.HREmployeeBasmas.Any(b => b.DayDate == Day.Date);
 
-           foreach (var basma in list)
-           {
-               var emp = employees.FirstOrDefault(e => e.Id == basma.EmployeeId);
+            if (!hasAnyBasma)
+            {
+                return RedirectToAction("TakeDayFromFingerPrint", "Basma", new { Day = Day.Date });
+            }
+            else if (hasAnyBasma)
+            {
+                return RedirectToAction("GetDayBasma", "Basma", new { Day = Day.Date });
+            }
+            return Json(null);
+        }
+        public IActionResult GetDayBasma(DateTime Day)
+        {
+            Console.WriteLine("🟢 Entered taken");
+            var list = _context.HREmployeeBasmas.Where(basma => basma.DayDate.Date == Day.Date).ToList();
+            var employees = _context.HREmployees.ToList();
+            List<BasmaList> basmaList = [];
+            foreach (var basma in list)
+            {
+                var emp = employees.FirstOrDefault(e => e.Id == basma.EmployeeId);
+                if (emp != null)
+                {
+                    basmaList.Add(new BasmaList
+                    {
+                        Id = basma.Id,
+                        EmployeeName = emp.Name,
+                        DayDate = basma.DayDate,
+                        ArrivalTime = basma.ArrivalTime,
+                        DepartureTime = basma.DepartureTime,
+                        TotalHours = basma.TotalHours,
+                        LateMinutes = basma.LateMinutes,
+                        EarlyLeaveMinutes = basma.EarlyLeaveMinutes,
+                        Ok = basma.Ok,
+                        Status = basma.Status,
+                        Notes = basma.Notes
+                    });
+                }
+            }
+            ;
+            basmaList = basmaList.OrderBy(b => b.EmployeeName).ToList();
+            basmaList.ForEach(p => Console.WriteLine($"🟢 Basma List Entry: {p.EmployeeName}, {p.DayDate}, {p.ArrivalTime}, {p.DepartureTime}, {p.TotalHours}, {p.LateMinutes}, {p.EarlyLeaveMinutes}, {p.Status}, {p.Notes}"));
+            return Json(basmaList);
+        }
+        public IActionResult TakeDayFromFingerPrint(DateTime Day)
+        {
+            var existingEmployeeIds = _context.HREmployeeBasmas
+            .Where(b => b.DayDate == Day.Date)
+            .Select(b => b.EmployeeId)
+            .ToHashSet();
 
-               if (emp != null && emp.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
-               {
-                   basmaList.Add(new BasmaList
-                   {
-                       Id = basma.Id,
-                       EmployeeName = emp.Name,
-                       DayDate = basma.DayDate,
-                       ArrivalTime = basma.ArrivalTime,
-                       DepartureTime = basma.DepartureTime,
-                       TotalHours = basma.TotalHours,
-                       LateMinutes = basma.LateMinutes,
-                       Status = basma.Status,
-                       Notes = basma.Notes
-                   });
-               }
-           }
+            if (Day.Date > DateTime.Now.Date)
+            {
+                Console.WriteLine("🟢 Entered future date");
+                return RedirectToAction("GetDayBasma", "Basma", new { Day = Day.Date });
+            }
+            using var transaction = _context.Database.BeginTransaction();
+            var employeeShifts = _context.HREmployeeShift.Where(emp => emp.ToDate == null || emp.ToDate >= Day.Date).ToList();
+            Console.WriteLine("🟢 Entered not taken");
+            // go get the data from CheckInouts table that have the date of today
+            var checkInOutsGrouped = _context.CheckInOuts
+                .Where(cio => cio.CheckTime.Date == Day.Date)
+                .GroupBy(cio => cio.UserId)
+                .ToList();
+            if (checkInOutsGrouped.Count != 0)
+            {
+                Console.WriteLine($"🟢Here is the checks grouped {checkInOutsGrouped[0]}");
+            }
 
-           return Json(basmaList);
-       }
+            // go iterate over the list as ids and create basma entries u will see (
+            // 1 check so it is arrival and departure the same time
+            // more than 1 check so get min as arrival and max as departure
+            //)
+            foreach (var userGroup in checkInOutsGrouped)
+            {
+                var userId = userGroup.Key;          // UserId
+                var checkTimes = userGroup.ToList(); // All CheckInOut records for that user
+                foreach (var ct in checkTimes)
+                {
+                    Console.WriteLine($"🟢Here are the check times for user {userId}: {ct.CheckTime}");
+                }
+                var employee = _context.HREmployees.FirstOrDefault(e => e.BasmaId == userId);
 
-    //    [HttpGet]
-    //    [Route("/getBasmaUsers")]
-    //    public IActionResult BasmaUsers()
-    //    {
-    //        Console.WriteLine("\n========================================");
-    //        Console.WriteLine("Testing ZKTeco Fingerprint Device...");
-    //        Console.WriteLine("========================================\n");
+                if (employee == null)
+                {
+                    continue; // Skip if no matching employee found
+                }
 
-    //        ZKTecoConnection zkConnection = new ZKTecoConnection();
-    //        string deviceIP = "192.168.1.21"; // Change to YOUR device IP
-    //        int port = 4370;
-    //        if (zkConnection.ConnectToDevice(deviceIP, port))
-    //        {
-    //            Console.WriteLine("? Connection successful!\n");
+                if (existingEmployeeIds.Contains(employee.Id))
+                {
+                    continue;
+                }
 
-    //            //// Get device information
-    //            //zkConnection.GetDeviceInfo();
+                if (checkTimes.Count == 1)
+                {
+                    // Only one record, treat it as ArrivalTime
+                    HREmployeeBasma basmaEntry = new HREmployeeBasma
+                    {
+                        EmployeeId = employee.Id,
+                        DayDate = Day.Date,
+                        ArrivalTime = checkTimes[0].CheckTime,
+                        DepartureTime = checkTimes[0].CheckTime,
+                        Ok = false,
+                        Status = 1,
+                    };
+                    Console.WriteLine($"🟢Here count1 is the basma Entry {basmaEntry}");
+                    _context.HREmployeeBasmas.Add(basmaEntry);
+                    existingEmployeeIds.Add(employee.Id);
 
-    //            //// Test beep
-    //            //Console.WriteLine("\nTesting device beep...");
+                }
+                else if (checkTimes.Count > 1)
+                {
+                    DateTime arrivalTime = checkTimes.Min(ct => ct.CheckTime);
+                    DateTime departureTime = checkTimes.Max(ct => ct.CheckTime);
 
-    //            var users = zkConnection.GetAllUsers();
-    //            //if (users[1].)
-    //            //// Get device status
-    //            //zkConnection.GetDeviceStatus();
+                    LatencyResult latency =
+                        LatencyForEmployee(employeeShifts, employee.Id, arrivalTime, departureTime);
 
-    //            // Get all users
-    //            zkConnection.DisconnectDevice();
-    //            return Json(users);
-    //            //// Get attendance logs
-    //            //zkConnection.GetAttendanceLogs();
+                    HREmployeeBasma basmaEntry = new HREmployeeBasma
+                    {
+                        EmployeeId = employee.Id,
+                        DayDate = Day.Date,
+                        ArrivalTime = arrivalTime,
+                        DepartureTime = departureTime,
+                        LateMinutes = latency.LateMinutes,
+                        EarlyLeaveMinutes = latency.EarlyLeaveMinutes,
+                        TotalHours = latency.TotalHours,
+                        Ok = true,
+                        Status = 1,
+                    };
+                    Console.WriteLine($"🟢Here count2");
+                    _context.HREmployeeBasmas.Add(basmaEntry);
+                    existingEmployeeIds.Add(employee.Id);
 
-    //            // Disconnect
+                }
+            }
+            // now we wantt to add basmas for ppl who have 0 checks 
+            // if offday then status 2
+            // if not offday then status 3
+            var allEmployees = _context.HREmployees.ToList();
+            foreach (var emp in allEmployees)
+            {
+                bool hasBasmaEntry = existingEmployeeIds.Contains(emp.Id);
+                if (!hasBasmaEntry)
+                {
+                    // Check if employee has an off day on that date
+                    bool isOffDay = _context.HREmployeeOffDays
+                        .Any(od => od.EmployeeId == emp.Id && od.OffDayDate.Date == Day.Date);
+                    if (isOffDay)
+                    {
+                        HREmployeeBasma basmaEntry = new HREmployeeBasma
+                        {
+                            EmployeeId = emp.Id,
+                            DayDate = Day.Date,
+                            ArrivalTime = null,
+                            DepartureTime = null,
+                            Ok = true,
+                            Status = 2, // 2 for off day, 3 for offday|absent
+                        };
+                        _context.HREmployeeBasmas.Add(basmaEntry);
+                        existingEmployeeIds.Add(emp.Id);
+                    }
+                    else
+                    {
+                        HREmployeeBasma basmaEntry = new HREmployeeBasma
+                        {
+                            EmployeeId = emp.Id,
+                            DayDate = Day.Date,
+                            ArrivalTime = null,
+                            DepartureTime = null,
+                            Ok = false,
+                            Status = 3, // 2 for off day, 3 for offday|absent
+                        };
+                        _context.HREmployeeBasmas.Add(basmaEntry);
+                        existingEmployeeIds.Add(emp.Id);
+                    }
+                }
+            }
 
-    //        }
-    //        else
-    //        {
-    //            Console.WriteLine("? Failed to connect to fingerprint device!");
-    //            Console.WriteLine("Please check:");
-    //            Console.WriteLine("  1. Device IP address is correct: " + deviceIP);
-    //            Console.WriteLine("  2. Device is powered on and connected to network");
-    //            Console.WriteLine("  3. Port 4370 is not blocked by firewall");
-    //            Console.WriteLine("  4. Platform target is set to x86");
-    //        }
+            Console.WriteLine($"🟢 DayFlag before update: {Day.Date}");
+            try
+            {
+                _context.SaveChanges();
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                Console.WriteLine($"🔴 Error occurred while saving Basma entries.{ex}");
+            }
+            return RedirectToAction("BasmaData", new { Day = Day.Date });
+        }
 
-    //        Console.WriteLine("\n========================================");
-    //        Console.WriteLine("Fingerprint test completed.");
-    //        Console.WriteLine("========================================\n");
-    //        return Json(new {success=false});
+        private LatencyResult LatencyForEmployee(List<HREmployeeShift> employeeShifts, int employeeId, DateTime checkIn, DateTime checkOut)
+        {
+            var shift = employeeShifts.FirstOrDefault(es => es.EmployeeId == employeeId);
+            if (shift == null)
+            {
+                return new LatencyResult
+                {
+                    LateMinutes = 0,
+                    EarlyLeaveMinutes = 0,
+                    TotalHours = 0
+                };
+            }
 
-    //    }
-    //    [HttpGet]
-    //    [Route("/basmaDailyEntries")]
-    //    public IActionResult BasmaDailyEntries()
-    //    {
-    //        ZKTecoConnection zkConnection = new ZKTecoConnection();
-    //        string deviceIP = "192.168.1.21"; // Change to YOUR device IP
-    //        int port = 4370;
-    //        if (zkConnection.ConnectToDevice(deviceIP, port))
-    //        {
-    //            Console.WriteLine("? Connection successful!\n");
+            if (shift.ShiftMode == 0)
+            {
+                return new LatencyResult
+                {
+                    LateMinutes = 0,
+                    EarlyLeaveMinutes = 0,
+                    TotalHours = checkOut.Subtract(checkIn).Hours
+                };
+            }
+            else if (shift.ShiftMode == 1)
+            {
+                double workedHours = Math.Round((checkOut - checkIn).TotalMinutes / 60.0, 1);
 
-    //            //// Get device information
-    //            //zkConnection.GetDeviceInfo();
+                var requiredTimeSpan = TimeSpan.FromHours(shift.RequiredHours ?? 0);
+                double missingHours = Math.Round(
+                    Math.Max(0, (requiredTimeSpan - (checkOut - checkIn)).TotalMinutes) / 60.0,
+                    1
+                );
+                Console.WriteLine("🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢");
+                Console.WriteLine("🟢" + checkOut.Subtract(checkIn).TotalMinutes / 60.0f);
+                return new LatencyResult
+                {
+                    LateMinutes = 0,
+                    EarlyLeaveMinutes = (int)requiredTimeSpan.Subtract(checkOut.Subtract(checkIn)).TotalMinutes,
+                    TotalHours = (float)checkOut.Subtract(checkIn).TotalMinutes / 60.0f
+                };
+            }
+            else if (shift.ShiftMode == 2)
+            {
+                double workedHours = Math.Round((checkOut - checkIn).TotalMinutes / 60.0, 1);
 
-    //            //// Test beep
-    //            //Console.WriteLine("\nTesting device beep...");
+                var requiredTimeSpan = TimeSpan.FromHours(shift.RequiredHours ?? 0);
+                double missingHours = Math.Round(
+                    Math.Max(0, (requiredTimeSpan - (checkOut - checkIn)).TotalMinutes) / 60.0,
+                    1
+                );
+                var checkInTime = checkIn.TimeOfDay;
+                var shiftStartTime = (shift.StartTime ?? checkIn).TimeOfDay;
 
-    //            var basmaEntries = zkConnection.GetAttendanceLogs();
-    //            //if (users[1].)
-    //            //// Get device status
-    //            //zkConnection.GetDeviceStatus();
+                var lateMinutes = (int)Math.Max(
+                    0,
+                    (checkInTime - shiftStartTime).TotalMinutes
+                );
+                var earlyLeaveMinutes = (int)Math.Max(
+                    0,
+                    ((shift.EndTime ?? checkOut).TimeOfDay - checkOut.TimeOfDay).TotalMinutes
+                );
 
-    //            // Get all users
-    //            zkConnection.DisconnectDevice();
-    //            return Json(basmaEntries);
-    //            //// Get attendance logs
-    //            //zkConnection.GetAttendanceLogs();
+                Console.WriteLine("🟢🟢🟢🟢🟢🟢");
+                Console.WriteLine("🟢" + checkOut.Subtract(checkIn).TotalMinutes / 60.0f);
+                return new LatencyResult
+                {
+                    LateMinutes = lateMinutes,
+                    EarlyLeaveMinutes = earlyLeaveMinutes,
+                    TotalHours = (float)checkOut.Subtract(checkIn).TotalMinutes / 60.0f
+                };
+            }
+            return new LatencyResult
+            {
+                LateMinutes = 0,
+                EarlyLeaveMinutes = 0,
+                TotalHours = 0
+            };
+        }
 
-    //            // Disconnect
+        [HttpGet]
+        public IActionResult SearchEmployees(string query)
+        {
+            query = query?.Trim() ?? "";
 
-    //        }
-    //        return Json(new { success = false });
-    //    }
+            var list = _context.HREmployeeBasmas.ToList();
+            var employees = _context.HREmployees.ToList();
 
-   }
+            List<BasmaList> basmaList = new List<BasmaList>();
+
+            foreach (var basma in list)
+            {
+                var emp = employees.FirstOrDefault(e => e.Id == basma.EmployeeId);
+
+                if (emp != null && emp.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
+                {
+                    basmaList.Add(new BasmaList
+                    {
+                        Id = basma.Id,
+                        EmployeeName = emp.Name,
+                        DayDate = basma.DayDate,
+                        ArrivalTime = basma.ArrivalTime,
+                        DepartureTime = basma.DepartureTime,
+                        TotalHours = basma.TotalHours,
+                        LateMinutes = basma.LateMinutes,
+                        EarlyLeaveMinutes = basma.EarlyLeaveMinutes,
+                        Status = basma.Status,
+                        Notes = basma.Notes
+                    });
+                }
+            }
+            basmaList = basmaList.OrderBy(b => b.EmployeeName).ToList();
+            return Json(basmaList);
+        }
+
+        //    [HttpGet]
+        //    [Route("/getBasmaUsers")]
+        //    public IActionResult BasmaUsers()
+        //    {
+        //        Console.WriteLine("\n========================================");
+        //        Console.WriteLine("Testing ZKTeco Fingerprint Device...");
+        //        Console.WriteLine("========================================\n");
+
+        //        ZKTecoConnection zkConnection = new ZKTecoConnection();
+        //        string deviceIP = "192.168.1.21"; // Change to YOUR device IP
+        //        int port = 4370;
+        //        if (zkConnection.ConnectToDevice(deviceIP, port))
+        //        {
+        //            Console.WriteLine("? Connection successful!\n");
+
+        //            //// Get device information
+        //            //zkConnection.GetDeviceInfo();
+
+        //            //// Test beep
+        //            //Console.WriteLine("\nTesting device beep...");
+
+        //            var users = zkConnection.GetAllUsers();
+        //            //if (users[1].)
+        //            //// Get device status
+        //            //zkConnection.GetDeviceStatus();
+
+        //            // Get all users
+        //            zkConnection.DisconnectDevice();
+        //            return Json(users);
+        //            //// Get attendance logs
+        //            //zkConnection.GetAttendanceLogs();
+
+        //            // Disconnect
+
+        //        }
+        //        else
+        //        {
+        //            Console.WriteLine("? Failed to connect to fingerprint device!");
+        //            Console.WriteLine("Please check:");
+        //            Console.WriteLine("  1. Device IP address is correct: " + deviceIP);
+        //            Console.WriteLine("  2. Device is powered on and connected to network");
+        //            Console.WriteLine("  3. Port 4370 is not blocked by firewall");
+        //            Console.WriteLine("  4. Platform target is set to x86");
+        //        }
+
+        //        Console.WriteLine("\n========================================");
+        //        Console.WriteLine("Fingerprint test completed.");
+        //        Console.WriteLine("========================================\n");
+        //        return Json(new {success=false});
+
+        //    }
+        //    [HttpGet]
+        //    [Route("/basmaDailyEntries")]
+        //    public IActionResult BasmaDailyEntries()
+        //    {
+        //        ZKTecoConnection zkConnection = new ZKTecoConnection();
+        //        string deviceIP = "192.168.1.21"; // Change to YOUR device IP
+        //        int port = 4370;
+        //        if (zkConnection.ConnectToDevice(deviceIP, port))
+        //        {
+        //            Console.WriteLine("? Connection successful!\n");
+
+        //            //// Get device information
+        //            //zkConnection.GetDeviceInfo();
+
+        //            //// Test beep
+        //            //Console.WriteLine("\nTesting device beep...");
+
+        //            var basmaEntries = zkConnection.GetAttendanceLogs();
+        //            //if (users[1].)
+        //            //// Get device status
+        //            //zkConnection.GetDeviceStatus();
+
+        //            // Get all users
+        //            zkConnection.DisconnectDevice();
+        //            return Json(basmaEntries);
+        //            //// Get attendance logs
+        //            //zkConnection.GetAttendanceLogs();
+
+        //            // Disconnect
+
+        //        }
+        //        return Json(new { success = false });
+        //    }
+
+    }
 }

@@ -1,15 +1,13 @@
-@model IEnumerable<HRsystem.ViewModels.BasmaList>
+
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "البصمة";
 }
 
-<div class="flex flex-row flex-start gap-2 mb-1">
+<div class="flex flex-row flex-start gap-2 mb-1 relative">
 
-    <input type="date" id="datePicker" placeholder="تاريخ البداية"
+    <input type="date" id="datePicker" placeholder="تاريخ اليوم"
         class="border border-gray-300 rounded-md py-2 focus:ring focus:ring-color2 focus:outline-none text-center text-color5" />
-    <input type="date" id="datePicker" onchange="filterByDate()" placeholder="تاريخ النهاية"
-        class="border border-gray-300 rounded-md py-2 focus:ring focus:ring-color2 focus:outline-none text-center text-color5" disabled />
     <div x-data="{
         showSearch: false,
         toggleSearch() {
@@ -40,7 +38,7 @@
             </div>
         </template>
     </div>
-
+    <button class="col-button-light absolute left-2">حفظ الملاحظات</button>
 </div>
 
 
@@ -52,98 +50,68 @@
                 <th>وقت الحضور</th>
                 <th>وقت الانصراف</th>
                 <th>عدد ساعات العمل</th>
-                <th>مدة التأخير</th>
+                <th>دقائق التأخير</th>
+                <th>دقائق الخروج المبكر</th>
                 <th>الحالة</th>
+                <th>تأكيد</th>
+                <th>ملاحظات</th>
             </tr>
         </thead>
         <tbody id="employeesBody" class="mt-3">
-            
+           
+            @* <tr>
+                <td>ابراهيم محمد حسن</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                    <select class="border p-2 rounded focus:outline-none focus:ring focus:ring-[#7B9669]">
+                        <option>غياب</option>
+                        <option>إجازة</option>
+                    </select>
+                </td>
+                <td>
+                    <button class="col-button-dark flex items-center justify-center gap-1">
+                        <i class="bi bi-check-square-fill text-lg"></i>
+                    </button>
+                </td>
+                
+                <td class="border !p-0">
+                    <input type="text" class="w-full rounded focus:outline-none focus:ring focus:ring-[#7B9669] h-full border-0">
+                </td>
+                
+            </tr>
+            <tr>
+                <td>احمد محمد حسن</td>
+                <td>7:30</td>
+                <td>15:45</td>
+                <td>8.25</td>
+                <td>30</td>
+                <td>15</td>
+                <td>
+                    حضور
+                </td>
+                <td>
+
+                </td>
+                
+                <td class="border !p-0">
+                    <input type="text" class="w-full rounded focus:outline-none focus:ring focus:ring-[#7B9669] h-full border-0">
+                </td>
+                
+            </tr> *@
 
         </tbody>
     </table>
+    <div class="hidden" id="noDataMessage">
+        <p class="text-center text-[40px] text-gray-500 mt-4">لا توجد بيانات لعرضها.</p>
+    </div>
 </div>
 
 
 @section Scripts {
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            showBasmaListForDay();
-            setTimeout(() =>
-            {
-            document.getElementById('tableResponsive').classList.remove('hidden');
-            }, 120);
-        });
-        function filterByDate() {
-            const dateInput = document.getElementById('datePicker').value;
-            const table = document.getElementById('employeesTable');
-            const rows = table.getElementsByTagName('tr');
-
-            for (let i = 1; i < rows.length; i++) {
-                const dateCell = rows[i].getElementsByTagName('td')[1];
-                if (dateCell) {
-                    const cellDate = dateCell.textContent || dateCell.innerText;
-                    if (dateInput === "" || cellDate === dateInput) {
-                        rows[i].style.display = "";
-                    } else {
-                        rows[i].style.display = "none";
-                    }
-                }
-            }
-        }
-        async function showBasmaListForDay() {
-            const dateInput = document.getElementById('datePicker').value;
-            const tableBody = document.getElementById('employeesBody');
-            const response = await fetch(`/basmaJson`);
-
-            const list = await response.json();
-            console.log(list + "🟠");
-            var html = "";
-            list.forEach(basma => {
-                html += `
-               <tr id="row-${basma.Id}" class="snap-start">
-                <td>${basma.EmployeeName ?? ""}</td>
-                <td>${basma.ArrivalTime ? new Date(basma.ArrivalTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}</td>
-                <td>${basma.DepartureTime ? new Date(basma.DepartureTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}</td>
-                <td>${basma.TotalHours ? basma.TotalHours: ""}</td>
-                <td>${basma.LateMinutes ? basma.LateMinutes: ""}</td>
-                <td>${basma.Status ?? ""}</td>
-                </tr>
-                                            `;
-            })
-            tableBody.innerHTML = html;
-        }
-        async function searchForEmployee() {
-            const input = document.getElementById('searchInput').value.trim();
-            const tableBody = document.getElementById('employeesBody');
-
-            @* tableBody.innerHTML = `
-            <tr><td colspan="8" style="text-align:center;">Loading...</td></tr>
-        `; *@
-
-            const response = await fetch(`/Basma/SearchEmployees?query=${encodeURIComponent(input)}`);
-
-            const list = await response.json();
-            console.log(list + "🟠");
-            var html = "";
-            list.forEach(basma => {
-                html += `
-                <tr id="row-${basma.Id}" class="snap-start">
-                <td>${basma.EmployeeName ?? ""}</td>
-                <td>${basma.ArrivalTime ? new Date(basma.ArrivalTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}</td>
-                <td>${basma.DepartureTime ? new Date(basma.DepartureTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}</td>
-                <td>${basma.TotalHours ? basma.TotalHours: ""}</td>
-                <td>${basma.LateMinutes ? basma.LateMinutes: ""}</td>
-                <td>${basma.Status ?? ""}</td>
-                </tr>
-
-
-                                            `;
-            })
-            tableBody.innerHTML = html;
-        }
-
-
-
-
+    <script src="~/js/Basma/BasmaTable.js">
     </script>
 }
