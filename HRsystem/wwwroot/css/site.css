@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .index_body {
-  background: linear-gradient(to right, #497c5e, #5ea680);
+  background-image: url("/images/background.jpg");
   background-size: cover;
   /* تخلي الصورة تغطي الصفحة */
   background-repeat: no-repeat;
@@ -156,7 +156,7 @@
 }
 
 .col-button-dark:hover {
-  @apply bg-gray-400  shadow-sm border-color3 !important;
+  @apply bg-gray-400 shadow-sm border-color3 !important;
   transform: scale(1.02);
 }
 
@@ -165,7 +165,7 @@
 }
 
 .col-button-light:hover {
-  @apply bg-gray-400  shadow-lg border-color3 !important;
+  @apply bg-gray-400 shadow-lg border-color3 !important;
   transform: scale(1.02);
 }
 
@@ -203,8 +203,8 @@
 .table-base th {
   @apply bg-gray-100 text-gray-700 border;
   white-space: normal;
-    text-align: center;
-    vertical-align: middle;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .table-base td {
@@ -433,9 +433,9 @@ th {
   @apply text-gray-500 bg-gray-200 !important;
 }
 
-.outlineActive{
-  outline: 2px solid white !important;  
-  outline-offset: 2px !important;        
+.outlineActive {
+  outline: 2px solid white !important;
+  outline-offset: 2px !important;
 
 }
 
@@ -477,46 +477,46 @@ th {
 
 
 .tabs-container {
-    background: #c9d6be;
-    border-radius: 14px;
-    padding: 16px;
+  background: #c9d6be;
+  border-radius: 14px;
+  padding: 16px;
 }
 
 .tabs {
-    display: flex;
-    gap: 8px;
-    background: #b6c4a4;
-    padding: 6px;
-    border-radius: 12px;
+  display: flex;
+  gap: 8px;
+  background: #b6c4a4;
+  padding: 6px;
+  border-radius: 12px;
 }
 
 .tab {
-    flex: 1;
-    padding: 10px 0;
-    border-radius: 10px;
-    background: transparent;
-    border: none;
-    font-weight: 600;
-    color: #2f3e2f;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 10px;
+  background: transparent;
+  border: none;
+  font-weight: 600;
+  color: #2f3e2f;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .tab:hover {
-    background: rgba(255,255,255,0.35);
+  background: rgba(255, 255, 255, 0.35);
 }
 
 .tab.active {
-    @apply bg-color3;
-    color: white;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  @apply bg-color3;
+  color: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .tab-content {
-    margin-top: 16px;
-    background: #eef3e8;
-    border-radius: 12px;
-    padding: 16px;
+  margin-top: 16px;
+  background: #eef3e8;
+  border-radius: 12px;
+  padding: 16px;
 }
 
 
@@ -526,7 +526,7 @@ th {
   border-radius: 16px;
   padding: 5px;
   text-align: center;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
@@ -558,12 +558,12 @@ th {
 }
 
 tr:hover input {
-    background-color: transparent;
+  background-color: transparent;
 }
 
 table tr input,
 
 table tr textarea {
-    background-color: inherit;
-    border: 1px solid #999;
+  background-color: inherit;
+  border: 1px solid #999;
 }

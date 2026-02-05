@@ -64,11 +64,14 @@ function makeOffDay() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const fromInput = document.getElementById("from");
+    const fromInput = document.getElementById("from");
 
-  if (fromInput && fromInput._flatpickr) {
-    fromInput._flatpickr.set("minDate", "today");
-  }
+    if (fromInput && fromInput._flatpickr) {
+        const now = new Date();
+        const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        fromInput._flatpickr.set("minDate", firstDayOfMonth);
+
+    }
 });
 
 const fromInput = document.getElementById("from");
@@ -243,7 +246,7 @@ editModal.addEventListener('click', function (e) {
 });
 
 
-document.getElementById("editBalancesBtn").addEventListener("click", function() {
+document.getElementById("editBalancesBtn").addEventListener("click", function () {
     document.getElementById("annualBalance").removeAttribute("disabled");
     document.getElementById("casualBalance").removeAttribute("disabled");
     document.getElementById("offBalance").removeAttribute("disabled");
@@ -252,7 +255,7 @@ document.getElementById("editBalancesBtn").addEventListener("click", function() 
     showDiv("saveBalancesBtn");
 });
 
-document.getElementById("saveBalancesBtn").addEventListener("click", function() {
+document.getElementById("saveBalancesBtn").addEventListener("click", function () {
     document.getElementById("annualBalance").setAttribute("disabled", "disabled");
     document.getElementById("casualBalance").setAttribute("disabled", "disabled");
     document.getElementById("offBalance").setAttribute("disabled", "disabled");
@@ -280,13 +283,13 @@ document.getElementById("saveBalancesBtn").addEventListener("click", function() 
             Off: parseInt(offBalanceInput.value),
             Instead: parseInt(insteadBalanceInput.value)
         })
-    }).then(res=>res.json()).then(data => {
+    }).then(res => res.json()).then(data => {
         if (data.success) {
             console.log("Balances saved successfully");
             annualBalanceInput.value = res.annualBalance;
-            casualBalanceInput.value =  res.casualBalance;
-            offBalanceInput.value =  res.offBalance;
-            insteadBalanceInput.value =  res.insteadBalance;
+            casualBalanceInput.value = res.casualBalance;
+            offBalanceInput.value = res.offBalance;
+            insteadBalanceInput.value = res.insteadBalance;
         } else {
             console.log("حدث خطأ أثناء الحفظ ❌");
         }

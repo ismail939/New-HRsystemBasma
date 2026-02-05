@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using FastReport;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HRsystem.Controllers
 {
@@ -20,6 +21,8 @@ namespace HRsystem.Controllers
             _context = context;
         }
 
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/getEmployee")]
         public IActionResult GetEmployee(int employeeId)
@@ -31,6 +34,8 @@ namespace HRsystem.Controllers
             }
             return Json(new { success = false });
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/employees")]
         public IActionResult ListEmployees()
@@ -38,6 +43,8 @@ namespace HRsystem.Controllers
             var employees = _context.HREmployees.ToList();
             return View(employees);
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpPost]
         [Route("/employees/edit")]
         public IActionResult EditEmployee(HREmployee updatedEmployee)
@@ -52,6 +59,7 @@ namespace HRsystem.Controllers
             return Json(new { success = true });
         }
 
+        [Authorize(Roles = "Admin,HR")]
         [HttpPost]
         [Route("/employees/add")]
         public IActionResult AddEmployee(HREmployee newEmployee, List<IFormFile> imageFiles)
@@ -91,6 +99,8 @@ namespace HRsystem.Controllers
             }
             return Json(newEmployee);
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpPost]
         [Route("/employees/uploadImage")]
         public IActionResult UploadImage(List<IFormFile> imageFiles, int EmployeeId)
@@ -136,6 +146,8 @@ namespace HRsystem.Controllers
             _context.SaveChanges();
             return Json(new { success = true, Urls = Urls });
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/employees/files/{employeeId}")]
         public IActionResult GetEmployeeFiles(int employeeId)
@@ -146,6 +158,8 @@ namespace HRsystem.Controllers
                 .ToList();
             return Json(files);
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpPost]
         [Route("/employees/deleteFile/{fileId}")]
         public IActionResult DeleteEmployeeFile(int fileId)
@@ -165,6 +179,8 @@ namespace HRsystem.Controllers
             }
             return Json(new { success = true });
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/downloadFile/{*filePath}")]
         public IActionResult DownloadFile(string filePath)
@@ -226,6 +242,8 @@ namespace HRsystem.Controllers
                 _ => "application/octet-stream"
             };
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/getRate")]
         public IActionResult GetRate(int idForCurEmp, int month, int year)
@@ -243,7 +261,7 @@ namespace HRsystem.Controllers
         }
 
 
-
+        [Authorize(Roles = "Admin,HR")]
         [HttpPost]
         [Route("/addRate")]
         public IActionResult AddRate(decimal rate, int employeeId, int month, int year)
@@ -285,6 +303,7 @@ namespace HRsystem.Controllers
             });
         }
 
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/getShift")]
         public IActionResult GetShift(int employeeId)
@@ -301,6 +320,7 @@ namespace HRsystem.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin,HR")]
         [HttpPost]
         [Route("/addShiftVariable")]
         public IActionResult AddShiftVariable(int EmployeeId)
@@ -322,6 +342,8 @@ namespace HRsystem.Controllers
             _context.SaveChanges();
             return Json(new { success = true });
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpPost]
         [Route("/addShiftHours")]
         public IActionResult AddShift(int EmployeeId, int Hours)
@@ -344,6 +366,8 @@ namespace HRsystem.Controllers
             _context.SaveChanges();
             return Json(new { success = true });
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpPost]
         [Route("/addShiftFixed")]
         public IActionResult AddShiftFixed(int EmployeeId, DateTime StartTime, DateTime EndTime)

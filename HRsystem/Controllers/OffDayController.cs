@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using HRsystem.Data;
 using HRsystem.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HRsystem.Controllers
@@ -14,6 +15,8 @@ namespace HRsystem.Controllers
             _logger = logger;
             _context = context;
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/OffDays")]
         public IActionResult OffDay()
@@ -21,6 +24,8 @@ namespace HRsystem.Controllers
             var list = _context.HREmployees.ToList();
             return View(list);
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet("employees/offdays/{employeeId}")]
         public IActionResult GetOffDays(
             int employeeId,
@@ -34,6 +39,8 @@ namespace HRsystem.Controllers
             ).OrderBy(x => x.OffDayDate).ToList();
             return Json(list);
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpPost]
         [Route("/employees/offdays/edit")]
         public IActionResult Edit([FromBody] EditOffDaysRequest request)
@@ -76,6 +83,8 @@ namespace HRsystem.Controllers
 
             return Ok("Done");
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/offdays/balance/add")]
         public IActionResult AddOffDayBalance(int employeeId)
@@ -113,6 +122,8 @@ namespace HRsystem.Controllers
                 insteadBalance = balance.CompensatoryOfNationalHoliday
             });
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/offdays/balance/notes")]
         public IActionResult GetOffDayBalanceNotes(int employeeId)
@@ -125,6 +136,8 @@ namespace HRsystem.Controllers
             }
             return Json(new { notes = "" });
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpPost]
         [Route("/offdays/balance/edit")]
         public IActionResult EditOffDayBalance([FromBody] BalanceEditRequest request)
@@ -167,6 +180,8 @@ namespace HRsystem.Controllers
                 insteadBalance = balance.CompensatoryOfNationalHoliday
             });
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpPost]
         [Route("/offdays/balance/notes/edit")]
         public IActionResult EditOffDayBalanceNotes(int employeeId, [FromBody] OffNotesRequest request)

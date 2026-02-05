@@ -4,6 +4,7 @@ using HRsystem.Models;
 using Microsoft.AspNetCore.Mvc;
 using QuestPDF.Fluent;
 using HRsystem.Reports;
+using Microsoft.AspNetCore.Authorization;
 namespace HRsystem.Controllers
 {
     public class ReportController : Controller
@@ -15,24 +16,32 @@ namespace HRsystem.Controllers
             _logger = logger;
             _context = context;
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/reports")]
         public IActionResult ReportsPanel()
         {
             return View("ReportsPanel");
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/PDFReports")]
         public IActionResult PDFReports()
         {
             return View("PDFReports");
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/allInfoReport")]
         public IActionResult AllInfoReport()
         {
             return View("AllInfoReport");
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/employeesList")]
         public IActionResult EmployeesList()
@@ -41,6 +50,7 @@ namespace HRsystem.Controllers
             return Json(list);
         }
         
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/getData")]
         public IActionResult GetData(int employeeId, DateTime startDate, DateTime endDate)
@@ -53,6 +63,7 @@ namespace HRsystem.Controllers
             return Json(new{arrivalsNumber=arrivalsNumber, absencesNumber=absencesNumber, offdays=offdays, offs=offs, penalties=penalties}); 
         }
 
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/allInfoReport/getOffDays")]
         public IActionResult GetOffDays(int employeeId, DateTime startDate, DateTime endDate)
@@ -74,6 +85,7 @@ namespace HRsystem.Controllers
             return Json(offDays);
         }
 
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/allInfoReport/getOffs")]
         public IActionResult GetOffs(int employeeId, DateTime startDate, DateTime endDate)
@@ -94,6 +106,8 @@ namespace HRsystem.Controllers
 
             return Json(offDays);
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/allInfoReport/getAbsences")]
         public IActionResult GetAbsences(int employeeId, DateTime startDate, DateTime endDate)
@@ -114,6 +128,8 @@ namespace HRsystem.Controllers
 
             return Json(absences);
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/allInfoReport/getArrivals")]
         public IActionResult GetArrivals(int employeeId, DateTime startDate, DateTime endDate)
@@ -135,6 +151,7 @@ namespace HRsystem.Controllers
             return Json(arrivals);
         }
 
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/getRates")]
         public IActionResult GetRates(int employeeId, int startMonth, int endMonth, int startYear, int endYear)
@@ -178,6 +195,7 @@ namespace HRsystem.Controllers
             return Json(o);
         }
 
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/allInfoReport/getPenalties")]
         public IActionResult GetPenalties(int employeeId, DateTime startDate, DateTime endDate)
@@ -200,6 +218,8 @@ namespace HRsystem.Controllers
 
             return Json(penalties);
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/reports/employees")]
         public IActionResult GenerateReport()
@@ -217,6 +237,8 @@ namespace HRsystem.Controllers
         {
             return View("Test");
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/reports/employeesDH/{id}")]
         public IActionResult PrintDailyReport(int id)

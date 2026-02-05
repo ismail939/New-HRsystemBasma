@@ -1,4 +1,6 @@
 using HRsystem.Data;
+using Microsoft.AspNetCore.Authentication.Cookies;
+
 //using HRsystem.Services;
 using Microsoft.EntityFrameworkCore;
 using QuestPDF.Infrastructure;
@@ -28,6 +30,20 @@ builder.Services.AddControllersWithViews()
         options.JsonSerializerOptions.PropertyNamingPolicy = null;
     });
 
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/";
+        options.AccessDeniedPath = "/accessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        options.SlidingExpiration = true;
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireRole("Admin"));
+});
 // Connection string (from appsettings.json)
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
@@ -52,6 +68,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();

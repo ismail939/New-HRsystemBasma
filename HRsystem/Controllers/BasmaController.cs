@@ -1,6 +1,7 @@
 using HRsystem.Data;
 using HRsystem.Models;
 using HRsystem.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Windows.Forms;
@@ -25,6 +26,7 @@ namespace HRsystem.Controllers
             public float TotalHours { get; set; }
         }
 
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/basma")]
         public IActionResult Basma()
@@ -32,6 +34,7 @@ namespace HRsystem.Controllers
             return View("basma");
         }
 
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/basmaData")]
         public IActionResult BasmaData(DateTime Day)
@@ -50,6 +53,8 @@ namespace HRsystem.Controllers
             }
             return Json(null);
         }
+
+        [Authorize(Roles = "Admin,HR")]
         public IActionResult GetDayBasma(DateTime Day)
         {
             Console.WriteLine("🟢 Entered taken");
@@ -82,6 +87,8 @@ namespace HRsystem.Controllers
             basmaList.ForEach(p => Console.WriteLine($"🟢 Basma List Entry: {p.EmployeeName}, {p.DayDate}, {p.ArrivalTime}, {p.DepartureTime}, {p.TotalHours}, {p.LateMinutes}, {p.EarlyLeaveMinutes}, {p.Status}, {p.Notes}"));
             return Json(basmaList);
         }
+
+        [Authorize(Roles = "Admin,HR")]
         public IActionResult TakeDayFromFingerPrint(DateTime Day)
         {
             var existingEmployeeIds = _context.HREmployeeBasmas
@@ -231,6 +238,7 @@ namespace HRsystem.Controllers
             return RedirectToAction("BasmaData", new { Day = Day.Date });
         }
 
+        [Authorize(Roles = "Admin,HR")]
         private LatencyResult LatencyForEmployee(List<HREmployeeShift> employeeShifts, int employeeId, DateTime checkIn, DateTime checkOut)
         {
             var shift = employeeShifts.FirstOrDefault(es => es.EmployeeId == employeeId);
@@ -309,6 +317,68 @@ namespace HRsystem.Controllers
             };
         }
 
+
+        [Authorize(Roles = "Admin,HR")]
+        [HttpPost]
+        [Route("/confirmBasma")]
+        public IActionResult ConfirmBasma(int id, int type)
+        {
+            var basmaEntry = _context.HREmployeeBasmas.FirstOrDefault(b => b.Id == id);
+            if (basmaEntry != null)
+            {
+                basmaEntry.Ok = true;
+                if (type == 2)
+                {
+                    // ask whether there is an offday
+                    var isOffDay = _context.HREmployeeOffDays
+                        .Any(od => od.EmployeeId == basmaEntry.EmployeeId && od.OffDayDate.Date == basmaEntry.DayDate.Date);
+                    if (isOffDay)
+                    {
+                        basmaEntry.Status = 2; // offday
+                        _context.SaveChanges();
+                        return Json(new { code = 1 });
+                    }
+                    return Json(new { code = 2, message = "No off day found for the employee on that date." });
+                }
+                else if (type == 0)
+                {
+                    basmaEntry.Status = 0; // absent
+                    _context.SaveChanges();
+                    return Json(new { code = 1 });
+                }
+            }
+            return Json(new { success = false, message = "Basma entry not found." });
+        }
+
+        [Authorize(Roles = "Admin,HR")]
+        [HttpPost]
+        [Route("/saveBasmaNotes")]
+        public IActionResult SaveBasmaNotes([FromBody] List<BasmaNote> basmaNotes)
+        {
+            foreach(var basma in basmaNotes)
+            {
+                Console.WriteLine($"🟢 Received BasmaNote: BasmaId={basma.BasmaId}, Notes={basma.Notes}");
+            }
+            if (basmaNotes == null || !basmaNotes.Any())
+            {
+                return Json(new { success = false, message = "No basma notes provided." });
+            }
+
+            foreach (var note in basmaNotes)
+            {
+                var basmaEntry = _context.HREmployeeBasmas.FirstOrDefault(b => b.Id == note.BasmaId);
+                if (basmaEntry != null)
+                {
+                    basmaEntry.Notes = note.Notes;
+                    Console.WriteLine($"🟢 Saving note for BasmaId {note.BasmaId}: {note.Notes}");
+                }
+            }
+
+            _context.SaveChanges();
+            return Json(new { success = true });
+        }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         public IActionResult SearchEmployees(string query)
         {

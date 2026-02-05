@@ -1,34 +1,24 @@
-﻿@{
+﻿@model LoginViewModel
+
+@{
     ViewData["Title"] = "الموارد البشرية";
     Layout = "";
 }
 
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 
 <head>
     <title>@ViewData["Title"]</title>
     <link href="~/css/output.css" rel="stylesheet" />
     <link rel="icon" href="~/images/logo2.png" sizes="96x96" type="image/png">
-    <style>
-        body.index_body {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            background:
-                rgb(94, 125, 96);
-            background-size: 260px 100%;
-        }
-    </style>
-
+    
 
 </head>
 
 <body class="index_body">
 
-    <div class="group border-2 border-color3 relative rounded-3xl p-6 w-1/4 h-1/2
+    <div class="group  relative rounded-3xl p-6 w-1/2 h-4/6
          flex flex-col items-center justify-center gap-6
          bg-white/30 backdrop-blur-md
          shadow-lg shadow-black/10
@@ -44,8 +34,28 @@
             إدارة الموارد البشرية
         </p>
 
-        <!-- Button -->
-        <a href="/dashboard" class="mt-2 inline-flex items-center gap-2
+        <form asp-action="Login" method="post" class="gap-3 w-full flex flex-col justify-center items-center">
+
+
+            <div class="w-full flex justify-center flex-col">
+                <label class="block text-sm font-medium self-center mb-1">اسم المستخدم</label>
+                <input asp-for="Username" class="text-center w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]"
+                    placeholder="اسم المستخدم" />
+                <span asp-validation-for="Username" class="text-red-500 text-sm text-center"></span>
+            </div>
+
+            <div class="w-full flex justify-center flex-col">
+                <label class="block text-sm self-center font-medium mb-1">كلمة المرور</label>
+                <input asp-for="Password" type="password"
+                    class=" w-full border rounded p-2 text-center focus:outline-none focus:ring focus:ring-[#7B9669]" placeholder="كلمة المرور" />
+                <span asp-validation-for="Password" class="text-red-500 text-sm text-center"></span>
+            </div>
+
+
+            
+
+            <!-- Button -->
+            <button type="submit" class="cursor-pointer mt-1 inline-flex items-center gap-2
            bg-color3 text-white
            px-8 py-3 rounded-full
            shadow-md shadow-color3/40
@@ -53,12 +63,14 @@
            hover:-translate-y-1
            transition-all duration-300">
 
-            الدخول
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-        </a>
+                الدخول
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
+        </form>
+
     </div>
 
     @* <!-- ✅ Your normal image -->
@@ -76,20 +88,7 @@
 
 
 <script>
-    function openImage(src) {
-        const lightbox = document.getElementById('imageLightbox');
-        const img = document.getElementById('lightboxImage');
-
-        img.src = src;
-        lightbox.classList.remove('hidden');
-        setTimeout(() => img.classList.add('scale-100'), 10); // smooth zoom-in
-    }
-
-    document.getElementById('imageLightbox').addEventListener('click', function () {
-        const img = document.getElementById('lightboxImage');
-        img.classList.remove('scale-100');
-        setTimeout(() => this.classList.add('hidden'), 200); // fade out
-    });
+    
 
 
 </script>

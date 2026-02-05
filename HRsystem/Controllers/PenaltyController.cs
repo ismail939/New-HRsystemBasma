@@ -2,6 +2,7 @@ using System.Diagnostics;
 using HRsystem.Data;
 using HRsystem.Models;
 using HRsystem.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HRsystem.Controllers
@@ -15,6 +16,8 @@ namespace HRsystem.Controllers
             _logger = logger;
             _context = context;
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/penalties")]
         public IActionResult Penalties()
@@ -34,6 +37,8 @@ namespace HRsystem.Controllers
 
             return View(list);
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpPost]
         [Route("/employee/addPenalty")]
         public IActionResult AddPenalty(string penalty, DateTime dayDate, string reason, int employeeId, int PenaltyPoints)
@@ -56,6 +61,8 @@ namespace HRsystem.Controllers
             _context.SaveChanges();
             return Ok("Penalty added successfully.");
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/employee/penalties/{employeeId}")]
         public IActionResult GetEmployeePenalties(int employeeId)
@@ -65,6 +72,8 @@ namespace HRsystem.Controllers
                 .ToList();
             return Json(penalties);
         }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpPost]
         [Route("/employee/togglePenaltyActive")]
         public IActionResult TogglePenaltyActive([FromBody] PenaltyToggleRequest RequestBody)

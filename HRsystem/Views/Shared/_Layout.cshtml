@@ -9,9 +9,9 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" /> 
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.css" />
     <link href="~/css/output.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/HRsystem.styles.css" asp-append-version="true" />
@@ -31,7 +31,7 @@
             <div class="w-full flex flex-row items-center justify-start h-full mx-2">
                 <div class="flex items-center justify-center border-l-2 border-white h-full p-4">
                     <img src="/images/logo2.png" alt="" class="w-16 h-16">
-                    <span class="fs-4  p-2 font-bold">الموارد البشرية</span>
+                    <span class="fs-4 whitespace-nowrap p-2 font-bold">الموارد البشرية</span>
                 </div>
 
                 <ul class="flex flex-row gap-1 w-4/6 mx-4 h-full">
@@ -48,6 +48,13 @@
                     <li><a href="/reports"
                             class="nav-link  @(currentController == "Report" ? "active" : "")">التقارير</a></li>
                 </ul>
+                <div class="bg-color1 text-color5 font-bold m-2 p-2 rounded-lg">@User.Identity?.Name</div>
+                <form method="post" action="/logout" class="inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="col-button-dark m-2 p-1 text-center whitespace-nowrap text-[12px]">
+                        تسجيل الخروج
+                    </button>
+                </form>
             </div>
             @* <img src="/images/logo2.png" alt="HR Logo" class="w-14 h-14"> *@
 
@@ -89,7 +96,3 @@
 </body>
 
 </html>
-
-
-
-    

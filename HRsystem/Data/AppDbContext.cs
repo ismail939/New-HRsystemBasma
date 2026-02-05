@@ -27,5 +27,6 @@ namespace HRsystem.Data
         public DbSet<HROffDayBalance> HROffDayBalances { get; set; }
         public DbSet<CheckInOut> CheckInOuts { get; set; }
         public DbSet<DailyBasmaFlag> DailyBasmaFlags { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }

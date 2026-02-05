@@ -73,23 +73,23 @@ async function showBasmaListForDay() {
                     ? `
                     <select class="h-full border p-1 rounded focus:outline-none focus:ring focus:ring-[#7B9669]"
                             data-id="${basma.Id}">
-                        <option value="Absent">غياب</option>
-                        <option value="Leave">إجازة</option>
+                        <option value="0">غياب</option>
+                        <option value="2">إجازة</option>
                     </select>
                     `
                     : basma.Status === 2
                         ? `<span>إجازة</span>`
-                        : ""}
+                        :  `<span>غياب</span>`}
         </td>
         <td>
         ${basma.Ok
                 ? "منتهي"
-                : `<button class="col-button-dark" onclick="confirm(${basma.id})">تأكيد</button>`
+                : `<button class="col-button-dark" onclick="confirm(${basma.Id})">تأكيد</button>`
             }
 
         </td>
         <td class="border !p-0">
-            <input type="text" class="w-full -z-50 text-color3 rounded-sm focus:outline-none focus:ring focus:ring-[#7B9669] h-12 border-0">
+            <input type="text" value="${basma.Notes ? basma.Notes : ''}" class="w-full -z-50 text-color3 rounded-sm focus:outline-none focus:ring focus:ring-[#7B9669] h-12 border-0">
         </td>
 
     </tr>
@@ -133,23 +133,23 @@ async function searchForEmployee() {
                     ? `
                     <select class="h-full border p-1 rounded focus:outline-none focus:ring focus:ring-[#7B9669]"
                             data-id="${basma.Id}">
-                        <option value="Absent">غياب</option>
-                        <option value="Leave">إجازة</option>
+                        <option value="0">غياب</option>
+                        <option value="2">إجازة</option>
                     </select>
                     `
                     : basma.Status === 2
                         ? `<span>إجازة</span>`
-                        : ""}
+                        : `<span>غياب</span>`}
         </td>
         <td>
         ${basma.Ok
                 ? "منتهي"
-                : `<button class="col-button-dark" onclick="takeBasma(${basma.id})">تأكيد</button>`
+                : `<button class="col-button-dark" onclick="takeBasma(${basma.Id})">تأكيد</button>`
             }
 
         </td>
         <td class="border !p-0">
-            <input type="text" class="w-full -z-50 text-color3 rounded-sm focus:outline-none focus:ring focus:ring-[#7B9669] h-12 border-0">
+            <input type="text" value="${basma.Notes ? basma.Notes : ''}" class="w-full -z-50 text-color3 rounded-sm focus:outline-none focus:ring focus:ring-[#7B9669] h-12 border-0">
         </td>
 
     </tr>
@@ -162,20 +162,51 @@ function confirm(basmaId) {
     console.log("Confirming basma with ID:", basmaId);
     // eb3t elbasma ll backend hena w e3ml Ok b true lw hya 8yab 
     // bs lw agaza et2kd mn elbackend eno fe agaza hna.
-    fetch(`/confirmBasma?id=${basmaId}`, {
+    const type = document.querySelector(`select[data-id='${basmaId}']`)?.value;
+    fetch(`/confirmBasma?id=${basmaId}&type=${type}`, {
         method: 'POST'
-    }).then(response => {
-        if (response.ok) {
-            console.log(`Basma with ID: ${basmaId} confirmed successfully.`);
-            // Update the button text to "منتهي"
+    }).then(res=>res.json()).then(response => {
+        // edit two things 1. from select to the value, 2. button text to "منتهي"
+        if (response.code==1) {
+            
             const row = document.getElementById(`row-${basmaId}`);
             const buttonCell = row.cells[7]; // Assuming the button is in the 8th cell (index 7)
             buttonCell.innerHTML = "منتهي";
-        } else {
-            console.error(`Failed to confirm basma with ID: ${basmaId}.`);
+            row.cells[6].innerHTML = type === "2" ? "إجازة" : "غياب";
+        } else if(response.code==2){
+            alert("قم بتسجيل هذا اليوم كإجازة عارضة اولا");
+            return;
         }
     }).catch(error => {
         console.error('Error confirming basma:', error);
     });
 }
 
+function saveNotes() {
+    const notes = [];
+    const tableBody = document.getElementById('employeesBody');
+    const rows = tableBody.getElementsByTagName('tr');
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const basmaId = globalBasmaList[i].Id;
+        const noteInput = row.cells[8].querySelector('input');
+        const note = noteInput.value.trim();
+        notes.push({ BasmaId: basmaId, Notes: note });
+    }
+    console.log("Saving notes:", notes);
+    fetch('/saveBasmaNotes', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(notes) 
+    }).then(res => res.json()).then(response => {
+        if (response.success) {
+            alert('تم حفظ الملاحظات بنجاح!');
+        } else {
+            alert('حدث خطأ أثناء حفظ الملاحظات.');
+        }
+    }).catch(error => {
+        console.error('Error saving notes:', error);
+    });
+}
