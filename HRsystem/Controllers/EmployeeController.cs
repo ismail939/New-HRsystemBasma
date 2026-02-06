@@ -8,6 +8,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using FastReport;
 using Microsoft.AspNetCore.Authorization;
+using System.IO.Compression;
 
 namespace HRsystem.Controllers
 {
@@ -58,7 +59,6 @@ namespace HRsystem.Controllers
             _context.SaveChanges();
             return Json(new { success = true });
         }
-
         [Authorize(Roles = "Admin,HR")]
         [HttpPost]
         [Route("/employees/add")]
@@ -75,16 +75,16 @@ namespace HRsystem.Controllers
             {
                 foreach (var file in imageFiles)
                 {
-                    string uniqueNumber = DateTime.Now.ToString("T"); // Example: 
+                    string uniqueNumber = DateTime.Now.ToString("yyyyMMddHHmmssfff"); // Example: 20251026123545012
                     string extension = Path.GetExtension(file.FileName);
-                    string fileName = $"{uniqueNumber}{file.FileName}{extension}";
+                    string fileName = $"{uniqueNumber}{extension}";
                     _context.HREmployeeFiles.Add(new HREmployeeFile
                     {
                         EmployeeId = newEmployee.Id,
                         FileName = file.FileName,
-                        Url = $"/Uploads/{newEmployee.Name}" + fileName
+                        Url = "/images/" + fileName
                     });
-                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Uploads", $"{newEmployee.Name}");
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
                     if (!Directory.Exists(uploadsFolder))
                     {
                         Directory.CreateDirectory(uploadsFolder);
@@ -98,6 +98,56 @@ namespace HRsystem.Controllers
                 _context.SaveChanges();
             }
             return Json(newEmployee);
+        }
+        [HttpGet]
+        [Route("employees/files/zip/{empId}")]
+        public IActionResult DownloadZip(int empId)
+        {
+            // Fetch files for the employee
+            var files = _context.HREmployeeFiles
+                .Where(f => f.EmployeeId == empId)
+                .ToList();
+
+            if (!files.Any())
+                return NotFound("No files found for this employee.");
+
+            // Get employee name
+            var emp = _context.HREmployees
+                .FirstOrDefault(e => e.Id == empId);
+
+            string empName = emp != null ? emp.Name : $"employee_{empId}";
+
+            // Clean the name (remove spaces/special chars for filename)
+            string cleanName = string.Concat(empName.Split(Path.GetInvalidFileNameChars())).Replace(" ", "_");
+
+            Console.WriteLine(cleanName+"❎");
+            // Create ZIP in memory
+            using var ms = new MemoryStream();
+            using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, true))
+            {
+                foreach (var file in files)
+                {
+                    var filePath = Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "wwwroot",
+                        file.Url.TrimStart('/')
+                    );
+
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        var entry = zip.CreateEntry(file.FileName);
+                        using var entryStream = entry.Open();
+                        using var fileStream = System.IO.File.OpenRead(filePath);
+                        fileStream.CopyTo(entryStream);
+                    }
+                }
+            }
+
+            return File(
+                ms.ToArray(),
+                "application/zip",
+                $"{cleanName}_files.zip"  // <-- Employee name in filename
+            );
         }
 
         [Authorize(Roles = "Admin,HR")]
@@ -118,35 +168,30 @@ namespace HRsystem.Controllers
             List<string> Urls = [];
             foreach (var file in imageFiles)
             {
-                string safeName = Path.GetFileName(file.FileName);
-                string fileName = $"{Guid.NewGuid()}_{safeName}";
-                Console.WriteLine($"❎/Uploads/{emp.Name}/" + fileName);
-
+                string uniqueNumber = DateTime.Now.ToString("yyyyMMddHHmmssfff"); // Example: 20251026123545012
+                string extension = Path.GetExtension(file.FileName);
+                string fileName = $"{uniqueNumber}{extension}";
                 _context.HREmployeeFiles.Add(new HREmployeeFile
                 {
-                    EmployeeId = emp.Id,
+                    EmployeeId = EmployeeId,
                     FileName = file.FileName,
-                    Url = $"/Uploads/{emp.Name}/" + fileName
+                    Url = "/images/" + fileName
                 });
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Uploads", $"{emp.Name}");
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);
                 }
-                Console.WriteLine(uploadsFolder + "👈uploadsFolder");
                 var filePath = Path.Combine(uploadsFolder, fileName);
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     file.CopyTo(stream);
                 }
-                Console.WriteLine(filePath + "👈filePath");
-                Console.WriteLine($"/Uploads/{emp.Name}/" + fileName + "👈file url");
-                Urls.Add($"/Uploads/{emp.Name}/" + fileName);
+                Urls.Add("/images/" + fileName);
             }
             _context.SaveChanges();
             return Json(new { success = true, Urls = Urls });
         }
-
         [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/employees/files/{employeeId}")]
@@ -158,8 +203,6 @@ namespace HRsystem.Controllers
                 .ToList();
             return Json(files);
         }
-
-        [Authorize(Roles = "Admin,HR")]
         [HttpPost]
         [Route("/employees/deleteFile/{fileId}")]
         public IActionResult DeleteEmployeeFile(int fileId)
@@ -172,7 +215,7 @@ namespace HRsystem.Controllers
             _context.HREmployeeFiles.Remove(file);
             _context.SaveChanges();
             // Optionally delete the file from the server
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads", file.Url.TrimStart('/'));
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", file.Url.TrimStart('/'));
             if (System.IO.File.Exists(filePath))
             {
                 System.IO.File.Delete(filePath);

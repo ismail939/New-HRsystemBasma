@@ -16,7 +16,7 @@ namespace ZkFingerprintBridge
         private bool bIsConnected = false;
         private int iMachineNumber = 1;
         private readonly string _connectionString =
-             "Server=DESKTOP-G59QIOO\\SQLEXPRESS;Database=HR_DB;User Id=production2000;Password=ismail939;TrustServerCertificate=True;";
+             "Server=localhost\\SQLEXPRESS;Database=HR_DB;User Id=production2000;Password=ismail939;TrustServerCertificate=True;";
 
         private static readonly string LogFile =
             @"C:\ZkemTask\log.txt";
@@ -217,7 +217,6 @@ namespace ZkFingerprintBridge
             {
                 Log("Device not connected!");
                 return new List<BasmaEntry>();
-                ;
             }
 
             Log("Reading attendance logs...");
@@ -248,7 +247,7 @@ namespace ZkFingerprintBridge
                         InOutMode = inOutMode % 2 == 0 // Even codes for Check In, odd for Check Out
                     };
                     basmaEntries.Add(basmaEntry);
-                    Log($"User ID: {enrollNumber} | Time: {logTime:yyyy-MM-dd HH:mm:ss} | Verify: {verifyModeStr} | InOut: {inOutModeStr}");
+                    //Log($"User ID: {enrollNumber} | Time: {logTime:yyyy-MM-dd HH:mm:ss} | Verify: {verifyModeStr} | InOut: {inOutModeStr}");
                     logCount++;
                 }
 

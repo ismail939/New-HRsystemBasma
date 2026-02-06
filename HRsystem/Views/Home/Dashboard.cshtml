@@ -12,25 +12,90 @@
     <p class="mb-6 fs-4 bg-white rounded-lg p-1 w-1/5  text-center" id="dateDiv"></p>
 </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div class="bg-white p-4 rounded-lg shadow-md">
-            <h2 class="text-xl font-semibold mb-2">إجمالي الموظفين</h2>
-            <p class="text-3xl font-bold text-blue-600">150</p>
-        </div>
-        <div class="bg-white p-4 rounded-lg shadow-md">
-            <h2 class="text-xl font-semibold mb-2">الموظفين الحاضرين </h2>
-            <p class="text-3xl font-bold text-green-600">120</p>
-        </div>
-        <div class="bg-white p-4 rounded-lg shadow-md">
-            <h2 class="text-xl font-semibold mb-2">الموظفين الغائبين </h2>
-            <p class="text-3xl font-bold text-red-600">3</p>
-        </div>
-        <div class="bg-white p-4 rounded-lg shadow-md">
-            <h2 class="text-xl font-semibold mb-2">الموظفين الاجازة </h2>
-            <p class="text-3xl font-bold text-gray-600">27</p>
-        </div>
-        
-    </div>
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+
+  <!-- إجمالي الموظفين -->
+  <div class="bg-white p-4 rounded-lg shadow-md">
+    <h2 class="text-lg font-semibold mb-4">إجمالي الموظفين</h2>
+
+    <svg class="mx-auto" width="120" height="120" viewBox="0 0 42 42">
+      <circle
+        cx="21" cy="21" r="15.915"
+        fill="transparent"
+        stroke="#e5e7eb"
+        stroke-width="3"
+      />
+      <circle
+        cx="21" cy="21" r="15.915"
+        fill="transparent"
+        stroke="#2563eb"
+        stroke-width="3"
+        stroke-dasharray="100 0"
+      />
+      <text x="21" y="23" text-anchor="middle" class="fill-blue-600 text-[12px] font-bold">
+        150
+      </text>
+    </svg>
+  </div>
+
+  <!-- الحاضرين -->
+  <div class="bg-white p-4 rounded-lg shadow-md">
+    <h2 class="text-lg font-semibold mb-4">الموظفين الحاضرين</h2>
+
+    <svg class="mx-auto" width="120" height="120" viewBox="0 0 42 42">
+      <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#e5e7eb" stroke-width="3"/>
+      <circle
+        cx="21" cy="21" r="15.915"
+        fill="transparent"
+        stroke="#16a34a"
+        stroke-width="3"
+        stroke-dasharray="80 20"
+      />
+      <text x="21" y="23" text-anchor="middle" class="fill-green-600 text-[12px] font-bold">
+        120
+      </text>
+    </svg>
+  </div>
+
+  <!-- الغائبين -->
+  <div class="bg-white p-4 rounded-lg shadow-md">
+    <h2 class="text-lg font-semibold mb-4">الموظفين الغائبين</h2>
+
+    <svg class="mx-auto" width="120" height="120" viewBox="0 0 42 42">
+      <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#e5e7eb" stroke-width="3"/>
+      <circle
+        cx="21" cy="21" r="15.915"
+        fill="transparent"
+        stroke="#dc2626"
+        stroke-width="3"
+        stroke-dasharray="2 98"
+      />
+      <text x="21" y="23" text-anchor="middle" class="fill-red-600 text-[12px] font-bold">
+        3
+      </text>
+    </svg>
+  </div>
+
+  <!-- إجازة -->
+  <div class="bg-white p-4 rounded-lg shadow-md">
+    <h2 class="text-lg font-semibold mb-4">الموظفين إجازة</h2>
+
+    <svg class="mx-auto" width="120" height="120" viewBox="0 0 42 42">
+      <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#e5e7eb" stroke-width="3"/>
+      <circle
+        cx="21" cy="21" r="15.915"
+        fill="transparent"
+        stroke="#6b7280"
+        stroke-width="3"
+        stroke-dasharray="18 82"
+      />
+      <text x="21" y="23" text-anchor="middle" class="fill-gray-600 text-[12px] font-bold">
+        27
+      </text>
+    </svg>
+  </div>
+
+</div>
 </div>
 
 

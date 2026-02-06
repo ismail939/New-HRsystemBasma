@@ -78,7 +78,9 @@
                     <td>@employee.DateOfBirth.ToString("yyyy-MM-dd")</td>
                     <td>@employee.InsuranceNumber</td>
                     <td>@employee.HireDate.ToString("yyyy-MM-dd")</td>
-                    <td><a class="underline cursor-pointer" onclick="openLeaveReasonModal('@employee.LeaveReason', '@employee.EndDate')">@employee.EndDate?.ToString("yyyy-MM-dd")</a></td>
+                    <td><a class="underline cursor-pointer"
+                            onclick="openLeaveReasonModal('@employee.LeaveReason', '@employee.EndDate')">@employee.EndDate?.ToString("yyyy-MM-dd")</a>
+                    </td>
                     <td>@employee.Department</td>
                     <td>@employee.JobName</td>
                     <td>@employee.ContractType</td>
@@ -119,8 +121,8 @@
             <i class="bi bi-x-square-fill"></i>
         </button>
 
-        <h3 id="LeaveReasonDateText" class="text-xl font-bold mb-3"></h3> 
-        <h3 id="reasonLabel" class="text-lg font-bold mb-3">سبب انتهاء العقد</h3> 
+        <h3 id="LeaveReasonDateText" class="text-xl font-bold mb-3"></h3>
+        <h3 id="reasonLabel" class="text-lg font-bold mb-3">سبب انتهاء العقد</h3>
         <h3 id="LeaveReasonModalDescription" class="text-lg font-bold text-color5 mb-3"></h3>
     </div>
 </div>
@@ -495,6 +497,7 @@
             <!-- Employee files -->
             <div class="space-y-3">
                 <h3 class="font-semibold text-gray-700">📎 ملفات الموظف</h3>
+                <button class="col-button-light" onclick="downloadAllFiles()">تنزيل الملفات مجمعة</button>
                 <ul class="flex flex-row flex-wrap gap-10">
 
                 </ul>
@@ -511,7 +514,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 

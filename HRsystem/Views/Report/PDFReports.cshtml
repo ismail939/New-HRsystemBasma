@@ -8,45 +8,21 @@
 
 <div class="w-full rounded-lg shadow-lg flex items-center justify-start gap-3 m-2 p-2">
     <label for="">من</label>
-    <input type="date" placeholder="البداية" class="border text-center border-gray-400 rounded px-2 py-2">
+    <input id="pdfStartDate" type="date" placeholder="البداية" class="border text-center border-gray-400 rounded px-2 py-2">
     <label for="">إلي</label>
-    <input type="date" placeholder="النهاية" class="border text-center border-gray-400 rounded px-2 py-2">
+    <input id="pdfEndDate" type="date" placeholder="النهاية" class="border text-center border-gray-400 rounded px-2 py-2">
 </div>
 
 <div class="grid grid-cols-3 rounded-lg gap-2">
     <a href="/reports/employees" class=" reportCard">
-        تقرير عن كل موظفين
+        كشف بجميع الموظفين   
     </a>
     <a href="/reports/employeesDH/2" class="reportCard">
         تقرير عن حضور الموظفين 
     </a>
-    <a href="/reports/employeesDH/2" class="reportCard">
-        تقرير عن حضور الموظف 
-    </a>
    
 </div>
 
-<!-- SMALL DROPDOWN POPUP -->
-<div id="modal1" class="hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-50
-              items-center justify-center">
-
-    <form id="typePopup" class="bg-white p-6 rounded-2xl shadow-xl w-64 text-center">
-        <h3 class="text-lg font-bold mb-3">اختر الفترة الزمنية</h3>
-
-        <select id="popupSelect" class="w-full border rounded-lg p-2 text-right">
-            <option class="dropdown-item" value="">اختر نوع الإجازة</option>
-            <option class="dropdown-item" value="راحة">راحة</option>
-            <option class="dropdown-item" value="سنوي">سنوي</option>
-            <option class="dropdown-item" value="عارضة">عارضة</option>
-            <option class="dropdown-item" value="مرضي">مرضي</option>
-            <option class="dropdown-item" value="أخرى">أخرى</option>
-        </select>
-        <input id="otherInput" type="text"
-            class="hidden mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]"
-            name="OffDayType" required placeholder="اكتب السبب هنا" />
-        <div class="hidden bg-red-300 text-bold rounded-lg p-2 m-2" id="error">من فضلك ادخل السبب</div>
-        <button type="button" onclick="makeOffDay()" class="mt-4  py-2 px-4 rounded-lg col-button-dark">
-            تأكيد
-        </button>
-    </form>
-</div>
+@section Scripts{
+    <script src="~/js/PDFReport/Search.js"></script>
+}
