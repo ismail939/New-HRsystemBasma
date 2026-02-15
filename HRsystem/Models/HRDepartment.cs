@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using HRsystem.Models;
+namespace HRsystem.Models;
 
 public class HRDepartment
 {
