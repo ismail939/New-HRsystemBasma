@@ -152,7 +152,7 @@
 }
 
 .col-button-dark {
-  @apply bg-color3 text-white font-bold py-1 px-2 rounded transition-all duration-500 border border-transparent !important;
+  @apply bg-color3 text-white font-bold py-1 px-2 rounded transition-all duration-300 border border-transparent !important;
 }
 
 .col-button-dark:hover {
@@ -161,7 +161,7 @@
 }
 
 .col-button-light {
-  @apply bg-color2 text-white font-bold py-1 px-2 rounded transition-all duration-500 border-transparent border !important;
+  @apply bg-color2 text-white font-bold py-1 px-2 rounded transition-all duration-300 border-transparent border !important;
 }
 
 .col-button-light:hover {

@@ -28,5 +28,6 @@ namespace HRsystem.Data
         public DbSet<CheckInOut> CheckInOuts { get; set; }
         public DbSet<DailyBasmaFlag> DailyBasmaFlags { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<HRDepartment> HRDepartments {get; set;}
     }
 }
