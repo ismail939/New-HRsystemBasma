@@ -29,7 +29,7 @@
                         <td>@department.ManagerName</td>
                         <td>
                             <!-- Button to open modal -->
-                            <button class="openModal col-button-dark  text-[19px] rounded">
+                            <button onclick="openModal()" class="col-button-dark  text-[19px] rounded">
                                 تعديل
                             </button>
                         </td>
@@ -43,3 +43,90 @@
     </div>
 
 </div>
+
+
+<!-- Modal Background -->
+<div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50
+            transition-all duration-100  ">
+    <!-- Modal Box -->
+    <div class="col-modal !w-1/4  p-6 relative overflow-y-auto" dir="rtl">
+        <button onclick="closeModal()" class="absolute top-2 left-2 text-[25px]">
+            <i class="bi bi-x-square-fill"></i>
+        </button>
+
+        <div id="tab-content-info">
+            <h2 class="text-2xl font-semibold mb-4 text-blue-700 text-center">تعديل بيانات القسم</h2>
+            <form id="departmentForm" method="post" class="flex flex-col gap-2 w-full h-full">
+
+                <input type="hidden" name="Id" />
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">اسم القسم</label>
+                    <input type="text" name="Name"
+                        class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">الكود</label>
+                    <input type="text" name="Code"
+                        class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">الوصف</label>
+                    <textarea name="Description"
+                        class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" ></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">القسم العام</label>
+                    <select id="departmentIdSelect" name="parentDepartmentId" class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]">
+                        
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">مدير القسم</label>
+                    <select name="managerId" id="managerIdSelect" class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]">
+
+                    </select>
+                </div>
+
+                
+
+                <!-- Submit Button -->
+                <div class="col-span-3 text-center mt-4">
+                    <button type="submit" class=" px-8 py-2 rounded col-button-dark">
+                        💾 حفظ التعديلات
+                    </button>
+                    @* <button class="bg-gray-600 text-white px-8 py-2 rounded hover:bg-gray-300 transition">
+                            الملفات
+                        </button> *@
+
+                </div>
+
+            </form>
+        </div>
+        
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function(){
+            const editModal = document.getElementById("editModal");
+            function closeModal(){
+                editModal.classList.add("hidden");
+            }
+            function openModal(){
+                editModal.classList.remove("hidden");
+                editModal.classList.add("flex");
+            }
+            window.closeModal = closeModal;
+            window.openModal = openModal;
+            editModal.addEventListener('click', function (e) {
+            if (e.target === this) closeModal();
+            });
+        })
+    </script>
+}
