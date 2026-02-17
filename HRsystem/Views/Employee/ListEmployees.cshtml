@@ -86,21 +86,21 @@
                     <td>@employee.ContractType</td>
                     <td>
                         <!-- SHIFT -->
-                        <button class="col-button-dark text-[9px] rounded" onclick="openShiftModal('@employee.Name', @employee.Id)"
+                        <button class="col-button-dark text-[19px] rounded" onclick="openShiftModal('@employee.Name', @employee.Id)"
                             index="@employee.Id">
                             الشفت
                         </button>
                     </td>
                     <td>
                         <!-- Button to open modal -->
-                        <button class="col-button-light  text-[9px] rounded" onclick="openRateModal('@employee.Name', @employee.Id)"
+                        <button class="col-button-light  text-[19px] rounded" onclick="openRateModal('@employee.Name', @employee.Id)"
                             index="@employee.Id">
                             تقييم
                         </button>
                     </td>
                     <td>
                         <!-- Button to open modal -->
-                        <button class="openModal col-button-dark  text-[9px] rounded" index="@employee.Id">
+                        <button class="openModal col-button-dark text-[19px] rounded" index="@employee.Id">
                             تعديل
                         </button>
                     </td>
@@ -253,7 +253,7 @@
 
 <!-- Modal Background -->
 <div id="createModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50
-            transition-all duration-300 ease-out opacity-0 scale-95">
+            transition-all duration-100  ">
     <!-- Modal Box -->
     <div class="col-modal w-full md:w-11/12 h-full md:h-[90%] p-6 relative" dir="rtl">
         <button onclick="closeModalCreate()" class="absolute top-2 left-2 text-[25px]">
@@ -371,7 +371,7 @@
 
 <!-- Modal Background -->
 <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50
-            transition-all duration-300 ease-out opacity-0 scale-95">
+            transition-all duration-100  ">
     <!-- Modal Box -->
     <div class="col-modal w-full md:w-11/12 h-full md:h-[90%] p-6 relative overflow-y-auto" dir="rtl">
         <button onclick="closeModal()" class="absolute top-2 left-2 text-[25px]">

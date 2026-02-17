@@ -13,7 +13,7 @@ public class HRDepartment
     [StringLength(100)]
     public string Name { get; set; }
 
-    [StringLength(10)]
+    
     public string Code { get; set; }   // e.g., HR, IT, FIN
 
     [StringLength(250)]

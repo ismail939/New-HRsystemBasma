@@ -3,13 +3,8 @@ let createModal;
 
 function closeModalCreate() {
     const modal = document.getElementById('createModal');
-    modal.classList.add("opacity-0", "scale-95");
-    modal.classList.remove("opacity-100", "scale-100");
-
-    // wait for transition to finish
-    setTimeout(() => {
-        modal.classList.add("hidden");
-    }, 300);
+    modal.classList.add("hidden");
+    
     document.getElementById('tableResponsive').classList.remove('hidden');
 }
 
@@ -24,10 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
         document.getElementById('tableResponsive').classList.add('hidden');
         createModal.classList.remove('hidden');
-        requestAnimationFrame(() => {
-            createModal.classList.remove("opacity-0", "scale-95");
-            createModal.classList.add("opacity-100", "scale-100", "flex");
-        });
+        createModal.classList.add("flex")
     });
 
     document.getElementById('employeeFormCreate').addEventListener('submit', async function (e) {

@@ -12,10 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const index = parseInt(btn.getAttribute("index"), 10);
         sessionStorage.setItem("editIndex", index);
         modal.classList.remove('hidden');
-        requestAnimationFrame(() => {
-            modal.classList.remove("opacity-0", "scale-95");
-            modal.classList.add("opacity-100", "scale-100", "flex");
-        });
+        modal.classList.add("flex");
         const emp = employees.find(e => e.Id === index);
         if (!emp) return;
         document.getElementById("uploadFileForm").querySelector('input[name="EmployeeId"]').value = emp.Id ?? "";
@@ -43,13 +40,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function closeModal() {
     const modal = document.getElementById("editModal");
-    modal.classList.add("opacity-0", "scale-95");
-    modal.classList.remove("opacity-100", "scale-100");
-
-    // wait for transition to finish
-    setTimeout(() => {
-        modal.classList.add("hidden");
-    }, 300);
+    
+    modal.classList.add("hidden");
     document.getElementById('tableResponsive').classList.remove('hidden');
     switchTab('info');
     sessionStorage.removeItem("editIndex");

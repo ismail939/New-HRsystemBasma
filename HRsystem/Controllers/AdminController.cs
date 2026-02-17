@@ -10,6 +10,7 @@ using FastReport;
 using Microsoft.AspNetCore.Authorization;
 using System.IO.Compression;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Specialized;
 
 namespace HRsystem.Controllers
 {
@@ -29,36 +30,37 @@ namespace HRsystem.Controllers
         {
             return View();
         }
+
         [HttpGet]
         [Route("/admin/dashboard/departments")]
         public IActionResult Departments()
         {
-            return View("Departments");
-        }
-        [HttpGet]
-        [Route("/createDepartment")]
-        public IActionResult Create()
-        {
-            var model = new DepartmentPostRequest
+            var listD = _context.HRDepartments.ToList();
+            List<DepartmentViewModel> list = [];
+            foreach(var department in listD)
             {
-                Departments = _context.HRDepartments
-                    .Select(d => new SelectListItem
-                    {
-                        Value = d.Id.ToString(),
-                        Text = d.Name
-                    })
-                    .ToList(), // ✅ IMPORTANT
-
-                Managers = _context.HREmployees
-                    .Select(e => new SelectListItem
-                    {
-                        Value = e.Id.ToString(),
-                        Text = e.Name
-                    })
-                    .ToList() // ✅ IMPORTANT
-            };
-
-            return View("CreateDepartment", model);
+                // get managerName
+                var emp = _context.HREmployees.FirstOrDefault(e=>e.Id == department.ManagerId);
+                if(emp == null)
+                {
+                    return Json(new {success= false, Message = "No employee with this id was found"});
+                }
+                var ManagerName = emp.Name;
+                // get parentDepartmentName
+                var parentDepartment = _context.HRDepartments.FirstOrDefault(d=>d.Id == department.ParentDepartmentId);
+               
+                var ParentDepartmentName = (parentDepartment!=null)?parentDepartment.Name: "";
+                DepartmentViewModel depVM = new DepartmentViewModel
+                {
+                  Name = department.Name,
+                  Code = department.Code,
+                  Description = department.Description?? "",
+                  ManagerName = ManagerName,
+                  ParentDepartmentName = ParentDepartmentName
+                };
+                list.Add(depVM);
+            }
+            return View("Departments", list);
         }
 
 
@@ -66,6 +68,7 @@ namespace HRsystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(DepartmentPostRequest request)
         {
+            Console.WriteLine("I am in Create Post action");
             if (!ModelState.IsValid)
             {
                 request.Departments = _context.HRDepartments
@@ -99,7 +102,32 @@ namespace HRsystem.Controllers
             _context.HRDepartments.Add(department);
             await _context.SaveChangesAsync();
 
-            return Json(new { success = true });
+            return RedirectToAction("CreateForm");
+        }
+        [HttpGet]
+        [Route("/createDepartment")]
+        public IActionResult CreateForm()
+        {
+            var model = new DepartmentPostRequest
+            {
+                Departments = _context.HRDepartments
+                    .Select(d => new SelectListItem
+                    {
+                        Value = d.Id.ToString(),
+                        Text = d.Name
+                    })
+                    .ToList(), // ✅ IMPORTANT
+
+                Managers = _context.HREmployees
+                    .Select(e => new SelectListItem
+                    {
+                        Value = e.Id.ToString(),
+                        Text = e.Name
+                    })
+                    .ToList() // ✅ IMPORTANT
+            };
+
+            return View("CreateDepartment", model);
         }
 
 

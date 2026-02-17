@@ -47,6 +47,9 @@
                             class="nav-link  @(currentController == "Penalty" ? "active" : "")">الجزاءات</a></li>
                     <li><a href="/reports"
                             class="nav-link  @(currentController == "Report" ? "active" : "")">التقارير</a></li>
+                    <li><a href="/admin/dashboard"
+                            class="nav-link  @(currentController == "Admin" ? "active" : "")">الادمن</a></li>
+                            
                 </ul>
                 <div class="bg-color1 text-color5 font-bold m-2 p-2 rounded-lg">@User.Identity?.Name</div>
                 <form method="post" action="/logout" class="inline">
