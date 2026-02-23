@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using QuestPDF.Fluent;
 using HRsystem.Reports;
 using Microsoft.AspNetCore.Authorization;
+using HRsystem.ViewModels;
 namespace HRsystem.Controllers
 {
     public class ReportController : Controller
@@ -226,7 +227,26 @@ namespace HRsystem.Controllers
         {
             var Employees = _context.HREmployees
                 .ToList();
-            var report = new EmployeeReport(Employees);
+            var employeeVMs = Employees.Select(e => new EmployeeViewModel
+            {
+                Id = e.Id,
+                Name = e.Name,
+                NationalId = e.NationalId,
+                PhoneNumber = e.PhoneNumber,
+                MarriageStatus = e.MarriageStatus,
+                Religion = e.Religion,
+                DateOfBirth = e.DateOfBirth,
+                InsuranceNumber = e.InsuranceNumber,
+                HireDate = e.HireDate,
+                EndDate = e.EndDate,
+                JobName = e.JobName,
+                ContractType = e.ContractType,
+                LeaveReason = e.LeaveReason,
+                BasmaId = e.BasmaId,
+                HRDepartmentId = e.HRDepartmentId,
+                Department = _context.HRDepartments.FirstOrDefault(d => d.Id == e.HRDepartmentId)?.Name
+            }).ToList();
+            var report = new EmployeeReport(employeeVMs);
             var pdf = report.GeneratePdf();
 
             return File(pdf, "application/pdf", "EmployeesReport.pdf");

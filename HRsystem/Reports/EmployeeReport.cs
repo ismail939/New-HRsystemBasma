@@ -4,15 +4,16 @@ using QuestPDF.Infrastructure;
 using HRsystem.Models;
 using System;
 using System.Collections.Generic;
+using HRsystem.ViewModels;
 
 
 namespace HRsystem.Reports
 {
     public class EmployeeReport : IDocument
     {
-        public List<HREmployee> Employees { get; set; }
+        public List<EmployeeViewModel> Employees { get; set; }
 
-        public EmployeeReport(List<HREmployee> employees)
+        public EmployeeReport(List<EmployeeViewModel> employees)
         {
             Employees = employees;
         }

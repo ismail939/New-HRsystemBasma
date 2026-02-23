@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 namespace HRsystem.Models;
 
 public class HREmployee
@@ -27,12 +28,15 @@ public class HREmployee
     [Required]
     public DateTime HireDate { get; set; }
     public DateTime? EndDate { get; set; }
-    [Required]
-    public string Department { get; set; }
+    
     [Required]
     public string JobName { get; set; }
     [Required]
     public string ContractType { get; set; }
     public string? LeaveReason {get; set;}
     public int? BasmaId { get; set; }
+    [ForeignKey("HRDepartment")]
+     public int HRDepartmentId { get; set; }   // Foreign Key
+
+    public virtual HRDepartment HRDepartment { get; set; }
 }

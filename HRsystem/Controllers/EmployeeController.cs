@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using FastReport;
 using Microsoft.AspNetCore.Authorization;
 using System.IO.Compression;
+using HRsystem.ViewModels;
 
 namespace HRsystem.Controllers
 {
@@ -42,7 +43,32 @@ namespace HRsystem.Controllers
         public IActionResult ListEmployees()
         {
             var employees = _context.HREmployees.ToList();
-            return View(employees);
+            var employeeVMs = new List<EmployeeViewModel>();
+            foreach (var emp in employees)
+            {
+                var dep = _context.HRDepartments.FirstOrDefault(d => d.Id == emp.HRDepartmentId);
+                string depName = dep != null ? dep.Name : "";
+                employeeVMs.Add(new EmployeeViewModel
+                {
+                    Id = emp.Id,
+                    Name = emp.Name,
+                    NationalId = emp.NationalId,
+                    PhoneNumber = emp.PhoneNumber,
+                    MarriageStatus = emp.MarriageStatus,
+                    Religion = emp.Religion,
+                    DateOfBirth = emp.DateOfBirth,
+                    InsuranceNumber = emp.InsuranceNumber,
+                    HireDate = emp.HireDate,
+                    EndDate = emp.EndDate,
+                    JobName = emp.JobName,
+                    ContractType = emp.ContractType,
+                    LeaveReason = emp.LeaveReason,
+                    BasmaId = emp.BasmaId,
+                    HRDepartmentId = emp.HRDepartmentId,
+                    Department = depName==""?"": depName
+                });
+            }
+            return View(employeeVMs);
         }
 
         [Authorize(Roles = "Admin,HR")]

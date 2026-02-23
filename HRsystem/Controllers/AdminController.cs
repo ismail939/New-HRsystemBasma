@@ -56,13 +56,26 @@ namespace HRsystem.Controllers
                   Code = department.Code,
                   Description = department.Description?? "",
                   ManagerName = ManagerName,
-                  ParentDepartmentName = ParentDepartmentName
+                  ParentDepartmentName = ParentDepartmentName,
+                  ManagerId = department.ManagerId,
+                  ParentDepartmentId = department.ParentDepartmentId,
                 };
                 list.Add(depVM);
             }
             return View("Departments", list);
         }
 
+        // [HttpGet]
+        // [Route("/admin/GetDepartmentEmployees")]
+        // public IActionResult GetDepartmentEmployees(int departmentId)
+        // {
+        //     var employees = _context.HREmployees
+        //         .Where(e => e.DepartmentId == departmentId)
+        //         .Select(e => new { Id = e.Id, Name = e.Name })
+        //         .ToList();
+
+        //     return Json(employees);
+        // }
 
         [HttpPost]
         [ValidateAntiForgeryToken]

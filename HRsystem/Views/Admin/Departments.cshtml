@@ -29,7 +29,7 @@
                         <td>@department.ManagerName</td>
                         <td>
                             <!-- Button to open modal -->
-                            <button onclick="openModal()" class="col-button-dark  text-[19px] rounded">
+                            <button onclick="openModal(@department.Id)" class="col-button-dark  text-[19px] rounded">
                                 تعديل
                             </button>
                         </td>
@@ -114,11 +114,39 @@
 @section Scripts {
     <script>
         document.addEventListener("DOMContentLoaded", function(){
+            let departments = @Html.Raw(Json.Serialize(Model));
             const editModal = document.getElementById("editModal");
             function closeModal(){
                 editModal.classList.add("hidden");
             }
-            function openModal(){
+            function openModal(id){
+                let department = departments.find(d => d.Id === id);
+                document.querySelector("#departmentForm [name='Id']").value = department.Id;
+                document.querySelector("#departmentForm [name='Name']").value = department.Name;
+                document.querySelector("#departmentForm [name='Code']").value = department.Code;
+                document.querySelector("#departmentForm [name='Description']").value = department.Description;
+                    // Populate parent department select
+                let parentSelect = document.getElementById("departmentIdSelect");
+                parentSelect.innerHTML = '<option value="">بدون قسم عام</option>';
+
+                departments.forEach(d => {
+                    if (d.Id !== department.Id) {
+                        parentSelect.innerHTML += `<option value="${d.Id}">${d.Name}</option>`;
+                    }
+                });
+                parentSelect.value = department.ParentDepartmentId || "";
+                    // Populate manager select
+                let managerSelect = document.getElementById("managerIdSelect");
+                managerSelect.innerHTML = '<option value="">بدون مدير</option>';
+                fetch('/Admin/GetDepartmentEmployees?departmentId=' + department.Id)
+                    .then(response => response.json())
+                    .then(employees => {
+                        employees.forEach(emp => {
+                            managerSelect.innerHTML += `<option value="${emp.Id}">${emp.Name}</option>`;
+                        });
+                        managerSelect.value = department.ManagerId || "";
+                    })
+                    .catch(error => console.error('Error fetching employees:', error));
                 editModal.classList.remove("hidden");
                 editModal.classList.add("flex");
             }
@@ -127,6 +155,7 @@
             editModal.addEventListener('click', function (e) {
             if (e.target === this) closeModal();
             });
+
         })
     </script>
 }
