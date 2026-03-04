@@ -120,9 +120,6 @@ namespace HRsystem.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<int?>("HRDepartmentId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -141,8 +138,6 @@ namespace HRsystem.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("HRDepartmentId");
 
                     b.HasIndex("ManagerId");
 
@@ -168,10 +163,6 @@ namespace HRsystem.Migrations
 
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Department")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
@@ -492,16 +483,12 @@ namespace HRsystem.Migrations
 
             modelBuilder.Entity("HRsystem.Models.HRDepartment", b =>
                 {
-                    b.HasOne("HRsystem.Models.HRDepartment", null)
-                        .WithMany("SubDepartments")
-                        .HasForeignKey("HRDepartmentId");
-
                     b.HasOne("HRsystem.Models.HREmployee", "Manager")
                         .WithMany()
                         .HasForeignKey("ManagerId");
 
-                    b.HasOne("HRsystem.Models.HREmployee", "ParentDepartment")
-                        .WithMany()
+                    b.HasOne("HRsystem.Models.HRDepartment", "ParentDepartment")
+                        .WithMany("SubDepartments")
                         .HasForeignKey("ParentDepartmentId");
 
                     b.Navigation("Manager");
@@ -511,9 +498,11 @@ namespace HRsystem.Migrations
 
             modelBuilder.Entity("HRsystem.Models.HREmployee", b =>
                 {
-                    b.HasOne("HRsystem.Models.HRDepartment", null)
+                    b.HasOne("HRsystem.Models.HRDepartment", "HRDepartment")
                         .WithMany("Employees")
                         .HasForeignKey("HRDepartmentId");
+
+                    b.Navigation("HRDepartment");
                 });
 
             modelBuilder.Entity("HRsystem.Models.HREmployeeBasma", b =>

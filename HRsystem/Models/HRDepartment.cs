@@ -24,7 +24,7 @@ public class HRDepartment
     public int? ParentDepartmentId { get; set; }
 
     [ForeignKey("ParentDepartmentId")]
-    public virtual HREmployee ParentDepartment { get; set; }
+    public virtual HRDepartment ParentDepartment { get; set; }
 
     public virtual ICollection<HRDepartment> SubDepartments { get; set; }
 

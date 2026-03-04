@@ -42,10 +42,17 @@ namespace HRsystem.Controllers
         [Route("/employees")]
         public IActionResult ListEmployees()
         {
+            Console.WriteLine("Entered ListEmployees action");
             var employees = _context.HREmployees.ToList();
+            Console.WriteLine("here is the number of the items: " + employees.Count);
+            foreach (var emp in employees)
+            {
+                Console.WriteLine(emp.Name + " - " + emp.HRDepartmentId);
+            }
             var employeeVMs = new List<EmployeeViewModel>();
             foreach (var emp in employees)
             {
+                Console.WriteLine($"Processing employee: {emp.Name} with department ID: {emp.HRDepartmentId}");
                 var dep = _context.HRDepartments.FirstOrDefault(d => d.Id == emp.HRDepartmentId);
                 string depName = dep != null ? dep.Name : "";
                 employeeVMs.Add(new EmployeeViewModel
@@ -67,6 +74,10 @@ namespace HRsystem.Controllers
                     HRDepartmentId = emp.HRDepartmentId,
                     Department = depName==""?"": depName
                 });
+            }
+            foreach (var emp in employeeVMs)
+            {
+                Console.WriteLine(emp.Name + " - " + emp.Department);
             }
             return View(employeeVMs);
         }

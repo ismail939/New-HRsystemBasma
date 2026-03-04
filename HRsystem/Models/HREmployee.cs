@@ -36,7 +36,7 @@ public class HREmployee
     public string? LeaveReason {get; set;}
     public int? BasmaId { get; set; }
     [ForeignKey("HRDepartment")]
-     public int HRDepartmentId { get; set; }   // Foreign Key
+    public int? HRDepartmentId { get; set; }   // Foreign Key
 
-    public virtual HRDepartment HRDepartment { get; set; }
+    public virtual HRDepartment? HRDepartment { get; set; }
 }

@@ -12,7 +12,17 @@ namespace HRsystem.Data
             modelBuilder.Entity<HREmployeeBasma>()
             .HasIndex(x => new { x.EmployeeId, x.DayDate })
             .IsUnique();
+
+            // Self reference
+            
+
+            modelBuilder.Entity<HREmployee>()
+               .HasOne(e => e.HRDepartment)
+               .WithMany(d => d.Employees)
+               .HasForeignKey(e => e.HRDepartmentId);
         }
+
+
 
 
         public DbSet<HREmployee> HREmployees { get; set; }
@@ -28,6 +38,6 @@ namespace HRsystem.Data
         public DbSet<CheckInOut> CheckInOuts { get; set; }
         public DbSet<DailyBasmaFlag> DailyBasmaFlags { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<HRDepartment> HRDepartments {get; set;}
+        public DbSet<HRDepartment> HRDepartments { get; set; }
     }
 }

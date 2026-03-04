@@ -66,7 +66,7 @@ namespace HRsystem.Controllers
         }
 
         // [HttpGet]
-        // [Route("/admin/GetDepartmentEmployees")]
+        // [Route("/Admin/GetDepartmentEmployees")]
         // public IActionResult GetDepartmentEmployees(int departmentId)
         // {
         //     var employees = _context.HREmployees
