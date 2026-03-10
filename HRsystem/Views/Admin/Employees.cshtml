@@ -1,0 +1,72 @@
+@model List<HRsystem.ViewModels.EmployeeViewModel>
+
+<div id="tableResponsive" class="tableContainer ">
+    @if(Model.Count==0){
+        <div id="noDataDiv" class="text-center shadow-lg p-4 m-2 text-[40px]">لا يوجد موظفين</div>
+    }else{
+        <table class="table-base min-w-full border-separate border-spacing-0" id="employeesTable">
+        <thead class="table-dark listEmpTableThead col-table-header sticky top-0 z-10">
+            <tr>
+                <th>الاسم</th>
+                <th>الرقم القومي</th>
+                <th>رقم الهاتف</th>
+                <th>الحالة الاجتماعية</th>
+                <th>الديانة</th>
+                <th>تاريخ الميلاد</th>
+                <th>رقم التأمين</th>
+                <th>تاريخ التعيين</th>
+                <th>تاريخ الانتهاء</th>
+                <th>القسم</th>
+                <th>المسمى الوظيفي</th>
+                <th>نوع العقد</th>
+                <th>الشفت</th>
+                <th>تقييم</th>
+                <th>تعديل بيانات</th>
+            </tr>
+        </thead>
+        <tbody id="employeesBody" class="listEmpTableTbody mt-3">
+            @foreach (var employee in Model)
+            {
+                <tr id="row-@employee.Id" class="snap-start">
+                    <td>@employee.Name</td>
+                    <td>@employee.NationalId</td>
+                    <td>@employee.PhoneNumber</td>
+                    <td>@employee.MarriageStatus</td>
+                    <td>@employee.Religion</td>
+                    <td>@employee.DateOfBirth.ToString("yyyy-MM-dd")</td>
+                    <td>@employee.InsuranceNumber</td>
+                    <td>@employee.HireDate.ToString("yyyy-MM-dd")</td>
+                    <td><a class="underline cursor-pointer"
+                            onclick="openLeaveReasonModal('@employee.LeaveReason', '@employee.EndDate')">@employee.EndDate?.ToString("yyyy-MM-dd")</a>
+                    </td>
+                    <td>@employee.Department</td>
+                    <td>@employee.JobName</td>
+                    <td>@employee.ContractType</td>
+                    <td>
+                        <!-- SHIFT -->
+                        <button class="col-button-dark text-[19px] rounded" onclick="openShiftModal('@employee.Name', @employee.Id)"
+                            index="@employee.Id">
+                            الشفت
+                        </button>
+                    </td>
+                    <td>
+                        <!-- Button to open modal -->
+                        <button class="col-button-light  text-[19px] rounded" onclick="openRateModal('@employee.Name', @employee.Id)"
+                            index="@employee.Id">
+                            تقييم
+                        </button>
+                    </td>
+                    <td>
+                        <!-- Button to open modal -->
+                        <button class="openModal col-button-dark text-[19px] rounded" index="@employee.Id">
+                            تعديل
+                        </button>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+    }
+    
+</div>
