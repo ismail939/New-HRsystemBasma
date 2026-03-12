@@ -83,11 +83,11 @@ async function getEmployeeFiles(emp) {
     // ✅ Fetch employee files dynamically
     const filesList = document.querySelector("#tab-content-files ul");
     filesList.innerHTML = `
-                                                                                <div class="flex flex-col justify-center items-center py-4">
-                                                                                    <div class="loader border-4 border-blue-500 border-t-transparent rounded-full w-8 h-8 animate-spin mb-2"></div>
-                                                                                    <p class="text-gray-600 text-sm">جارٍ تحميل الملفات...</p>
-                                                                                </div>
-                                                                            `;
+            <div class="flex flex-col justify-center items-center py-4">
+                <div class="loader border-4 border-blue-500 border-t-transparent rounded-full w-8 h-8 animate-spin mb-2"></div>
+                <p class="text-gray-600 text-sm">جارٍ تحميل الملفات...</p>
+            </div>
+        `;
 
     try {
         const res = await fetch(`/employees/files/${emp.Id}`);

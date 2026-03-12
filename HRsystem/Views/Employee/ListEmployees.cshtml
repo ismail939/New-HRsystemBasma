@@ -301,6 +301,11 @@
                 <input type="tel" name="PhoneNumber"
                        class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
             </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">رقم البصمة</label>
+                <input type="number" name="BasmaId"
+                       class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+            </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700">الحالة الاجتماعية</label>
@@ -373,10 +378,7 @@
                 <button type="submit" class="px-8 py-2 rounded col-button-dark">
                     💾 حفظ
                 </button>
-                @* <button class="bg-gray-600 text-white px-8 py-2 rounded hover:bg-gray-300 transition">
-                            الملفات
-                        </button> *@
-
+               
             </div>
 
         </form>
@@ -482,8 +484,13 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700">القسم</label>
-                    <input type="text" name="Department"
-                           class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                    <select name="DepartmentSelected" id="" class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]">
+                    <option value="">بدون قسم</option>
+                    @foreach (var dept in Model.Departments)
+                    {
+                        <option value="@dept.Id">@dept.Name - (@dept.Code)</option>
+                    }
+                </select>
                 </div>
 
                 <div>

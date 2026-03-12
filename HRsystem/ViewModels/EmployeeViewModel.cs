@@ -24,7 +24,7 @@ public class EmployeeViewModel
     public DateTime HireDate { get; set; }
     public DateTime? EndDate { get; set; }
     
-   
+    
     public string? JobName { get; set; }
   
     public string? ContractType { get; set; }
