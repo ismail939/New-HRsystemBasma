@@ -75,11 +75,13 @@ namespace HRsystem.Controllers
                     Department = depName==""?"": depName
                 });
             }
-            foreach (var emp in employeeVMs)
+            var departments = _context.HRDepartments.ToList();
+            var employeesNdepartments = new ListEmployeesViewModel
             {
-                Console.WriteLine(emp.Name + " - " + emp.Department);
-            }
-            return View(employeeVMs);
+              Employees = employeeVMs,
+              Departments = departments  
+            };
+            return View(employeesNdepartments);
         }
 
         [Authorize(Roles = "Admin,HR")]
