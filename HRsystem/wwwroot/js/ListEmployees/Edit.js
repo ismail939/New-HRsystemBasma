@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
         form.querySelector('[name="HireDate"]').value = emp.HireDate?.split('T')[0] ?? "";
         form.querySelector('[name="EndDate"]').value = emp.EndDate?.split('T')[0] ?? "";
         form.querySelector('[name="LeaveReason"]').value = emp.LeaveReason ?? "";
-        form.querySelector('[name="Department"]').value = emp.Department ?? "";
+        form.querySelector('[name="HRDepartmentId"]').value = emp.HRDepartmentId ?? "";// hhhere🟡
         form.querySelector('[name="JobName"]').value = emp.JobName ?? "";
         form.querySelector('[name="ContractType"]').value = emp.ContractType ?? "";
         form.querySelector('[name="BasmaId"]').value = emp.BasmaId ?? "";

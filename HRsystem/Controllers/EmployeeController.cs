@@ -107,6 +107,7 @@ namespace HRsystem.Controllers
             {
                 return Json(new { success = false, message = "بيانات الموظف غير صالحة." });
             }
+            
             _context.HREmployees.Add(newEmployee);
             _context.SaveChanges();
             // Handle file uploads if any
