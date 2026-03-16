@@ -46,6 +46,7 @@ namespace HRsystem.Controllers
                 {
                     depVM = new DepartmentViewModel
                     {
+                        Id = department.Id,
                         Name = department.Name,
                         Code = department.Code,
                         Description = department.Description ?? "",
@@ -69,6 +70,7 @@ namespace HRsystem.Controllers
                     var ParentDepartmentName = (parentDepartment != null) ? parentDepartment.Name : "";
                     depVM = new DepartmentViewModel
                     {
+                        Id = department.Id,
                         Name = department.Name,
                         Code = department.Code,
                         Description = department.Description ?? "",
@@ -124,6 +126,7 @@ namespace HRsystem.Controllers
         [Route("/Admin/GetDepartmentEmployees")]
         public IActionResult GetDepartmentEmployees(int departmentId)
         {
+            Console.WriteLine($"the departmentId i got is = {departmentId}");
             var employees = _context.HREmployees
                 .Where(e => e.HRDepartmentId == departmentId)
                 .Select(e => new { Id = e.Id, Name = e.Name })
@@ -203,7 +206,7 @@ namespace HRsystem.Controllers
             string Name,
             string Code,
             string Description,
-            int parentDepartmentId,
+            int? parentDepartmentId, 
             int managerId)
         {
             // Console.WriteLine($"here are the values id: {Id} name: {Name} code: {Code} description: {Description} parentDepId: {parentDepartmentId} managerId: {managerId}");
@@ -213,6 +216,9 @@ namespace HRsystem.Controllers
             {
                 return NotFound(); 
             }
+            Console.WriteLine("***************");
+            Console.WriteLine(managerId);
+            Console.WriteLine("***************");
             department.Name = Name;
             department.Code = Code;
             department.Description = Description;
