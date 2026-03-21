@@ -1,12 +1,12 @@
 // ⭐ Open Modal 
 function openModal(empId) {
-    fetch(`/offdays/balance/add?employeeId=${empId}`).then(res => res.json()).then(data => {
-        console.log(data);
-        document.getElementById("annualBalance").value = data.annualBalance;
-        document.getElementById("casualBalance").value = data.casualBalance;
-        document.getElementById("offBalance").value = data.offBalance;
-        document.getElementById("insteadBalance").value = data.insteadBalance;
-    });
+    // fetch(`/offdays/balance/add?employeeId=${empId}`).then(res => res.json()).then(data => {
+    //     console.log(data);
+    //     document.getElementById("annualBalance").value = data.annualBalance;
+    //     document.getElementById("casualBalance").value = data.casualBalance;
+    //     document.getElementById("offBalance").value = data.offBalance;
+    //     document.getElementById("insteadBalance").value = data.insteadBalance;
+    // });
     const editModal = document.getElementById('editModal');
     document.getElementById('tableResponsive').classList.add('hidden');
     editModal.classList.remove('hidden');

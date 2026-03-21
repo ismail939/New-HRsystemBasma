@@ -131,7 +131,7 @@
 }
 
 .col-modal {
-  @apply bg-color1 backdrop-blur-md rounded-2xl shadow-2xl p-8 max-w-[90vw] max-h-[90vh] w-[90vw] h-[90vh];
+  @apply bg-color1 rounded-2xl shadow-2xl p-8 max-w-[90vw] max-h-[90vh] w-[90vw] h-[90vh];
   border-radius: 10px !important;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
   @apply text-color3 !important;
@@ -152,7 +152,7 @@
 }
 
 .col-button-dark {
-  @apply bg-color3 text-white font-bold py-1 px-2 rounded transition-all duration-300 border border-transparent !important;
+  @apply bg-color3 text-white font-bold py-1 px-2 rounded transition-all duration-100 border border-transparent !important;
 }
 
 .col-button-dark:hover {
@@ -161,7 +161,7 @@
 }
 
 .col-button-light {
-  @apply bg-color2 text-white font-bold py-1 px-2 rounded transition-all duration-300 border-transparent border !important;
+  @apply bg-color2 text-white font-bold py-1 px-2 rounded transition-all duration-100 border-transparent border !important;
 }
 
 .col-button-light:hover {

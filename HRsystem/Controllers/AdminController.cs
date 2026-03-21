@@ -31,7 +31,12 @@ namespace HRsystem.Controllers
         {
             return View();
         }
-
+        [HttpGet]
+        [Route("/admin/users")]
+        public IActionResult Users()
+        {
+            return View();
+        }
         [HttpGet]
         [Route("/admin/dashboard/departments")]
         public IActionResult Departments()
@@ -122,6 +127,102 @@ namespace HRsystem.Controllers
 
             return View("Employees", employeeVMs);
         }
+        [HttpPost]
+        [Route("/deleteEmployee")]
+        public async Task<IActionResult> DeleteEmployee(int employeeId)
+        {
+            var emp = _context.HREmployees.FirstOrDefault(e => e.Id == employeeId);
+            if (emp != null)
+            {
+                // delete all basmas
+                var basmasIds = _context.HREmployeeBasmas.Where(b => b.EmployeeId == emp.Id).Select(b => b.Id).ToList();
+                var items = _context.HREmployeeBasmas
+                    .Where(x => basmasIds.Contains(x.Id))
+                    .ToList();
+                _context.HREmployeeBasmas.RemoveRange(items);
+                _context.SaveChanges();
+                // delete all offdays
+                var offdaysIds = _context.HREmployeeOffDays.Where(b => b.EmployeeId == emp.Id).Select(b => b.Id).ToList();
+                var items2 = _context.HREmployeeOffDays
+                    .Where(x => offdaysIds.Contains(x.Id))
+                    .ToList();
+                _context.HREmployeeOffDays.RemoveRange(items2);
+                _context.SaveChanges();
+                // delete all penalties
+                var penaltiesIds = _context.HREmployeePenalties.Where(b => b.EmployeeId == emp.Id).Select(b => b.Id).ToList();
+                var items3 = _context.HREmployeePenalties
+                    .Where(x => penaltiesIds.Contains(x.Id))
+                    .ToList();
+                _context.HREmployeePenalties.RemoveRange(items3);
+                _context.SaveChanges();
+                // shift 
+                var shiftsId = _context.HREmployeeShift.Where(b => b.EmployeeId == emp.Id).Select(b => b.Id).ToList();
+                var items4 = _context.HREmployeeShift
+                    .Where(x => shiftsId.Contains(x.Id))
+                    .ToList();
+                _context.HREmployeeShift.RemoveRange(items4);
+                _context.SaveChanges();
+                // rate
+                var rateIds = _context.HREmployeeRates.Where(b => b.EmployeeId == emp.Id).Select(b => b.Id).ToList();
+                var items5 = _context.HREmployeeRates
+                    .Where(x => rateIds.Contains(x.Id))
+                    .ToList();
+                _context.HREmployeeRates.RemoveRange(items5);
+                _context.SaveChanges();
+                // files
+                using var transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    // 1. Get all files for this employee
+                    var files = await _context.HREmployeeFiles
+                        .Where(f => f.EmployeeId == employeeId)
+                        .ToListAsync();
+
+                    // 2. Delete files from storage
+                    foreach (var file in files)
+                    {
+                        if (!string.IsNullOrEmpty(file.Url))
+                        {
+                            // file.Url includes "images/filename.jpg"
+                            var relativePath = file.Url.TrimStart('/', '\\'); // remove starting slash if present
+
+                            var fullPath = Path.Combine(
+                                Directory.GetCurrentDirectory(),
+                                "wwwroot",
+                                relativePath
+                            );
+
+                            if (System.IO.File.Exists(fullPath))
+                            {
+                                System.IO.File.Delete(fullPath);
+                            }
+                        }
+                    }
+
+                    // 3. Delete from database
+                    _context.HREmployeeFiles.RemoveRange(files);
+                    await _context.SaveChangesAsync();
+
+                    // 4. Commit transaction
+                    await transaction.CommitAsync();
+                }
+                catch (Exception)
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+                var department = _context.HRDepartments.FirstOrDefault(d=>d.ManagerId==emp.Id);
+                if (department!=null)
+                {
+                    department.ManagerId=null;
+                    _context.HRDepartments.Update(department);
+                    _context.SaveChanges();
+                }
+                _context.HREmployees.Remove(emp);
+                _context.SaveChanges();
+            }
+            return Json(new {success=true});
+        }
         [HttpGet]
         [Route("/Admin/GetDepartmentEmployees")]
         public IActionResult GetDepartmentEmployees(int departmentId)
@@ -206,15 +307,15 @@ namespace HRsystem.Controllers
             string Name,
             string Code,
             string Description,
-            int? parentDepartmentId, 
+            int? parentDepartmentId,
             int managerId)
         {
             // Console.WriteLine($"here are the values id: {Id} name: {Name} code: {Code} description: {Description} parentDepId: {parentDepartmentId} managerId: {managerId}");
             // get the department
-            var department = _context.HRDepartments.FirstOrDefault(d=>d.Id==Id);
+            var department = _context.HRDepartments.FirstOrDefault(d => d.Id == Id);
             if (department == null)
             {
-                return NotFound(); 
+                return NotFound();
             }
             Console.WriteLine("***************");
             Console.WriteLine(managerId);
