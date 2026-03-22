@@ -35,7 +35,8 @@ namespace HRsystem.Controllers
         [Route("/admin/users")]
         public IActionResult Users()
         {
-            return View();
+            var users = _context.Users.ToList();
+            return View(users);
         }
         [HttpGet]
         [Route("/admin/dashboard/departments")]
