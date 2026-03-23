@@ -24,7 +24,7 @@
 
         <div class="flex flex-row min-h-screen relative">
 
-            <nav class="w-full h-16 col-nav text-white flex flex-row fixed inset-0 z-40 transform transition-transform duration-700 ease-in-out">
+            <nav class="w-full h-16 col-nav text-white flex fixed top-0 inset-x-0 z-40">
 
                 <div class="w-full flex flex-row items-center justify-start h-full mx-2">
 
@@ -64,53 +64,60 @@
                     </div>
 
                     <!-- Hamburger Button -->
-                    <button onclick="toggleMenu()" class="min-[1450px]:hidden text-2xl">
+                    <button onclick="toggleMenu()" class="min-[1450px]:hidden text-2xl mr-2">
                         ☰
                     </button>
 
                 </div>
 
-                <!-- Mobile Side Panel -->
+                
+
+            </nav>
+            <!-- Mobile Side Panel -->
                 <div id="mobileMenu"
-                     class="fixed top-0 right-0 h-full w-64 !bg-white text-black transform translate-x-full transition-transform duration-300 z-50 shadow-lg">
-
-                    <div class="p-4 flex justify-between items-center border-b">
+                     class="fixed top-0 right-0 h-full w-64 !bg-color1 text-color3 transform translate-x-full transition-transform duration-100 z-50 shadow-lg ">
+                    <div class="p-4 flex justify-between items-center border-b border-color3">
                         <span class="font-bold">القائمة</span>
-                        <button onclick="toggleMenu()">✕</button>
+                        <button onclick="toggleMenu()" class="text-[25px]">
+                            <i class="bi bi-x-square-fill"></i>
+                        </button>
                     </div>
+                    <div class="flex justify-center w-full">
+                        <img src="/images/logo2.png" class="w-32 h-32 self-center" />
+                    </div>
+                    <div class="text-center mt-3">اسم المستخدم</div>
+                    
+                    <div class="bg-color1 text-color5 font-bold m-2 text-center border-2 border-color3 p-2 rounded-lg">
+                        @User.Identity?.Name
+                    </div>
+                    <ul class="flex flex-col gap-1 p-4 !text-color3 !bg-color1 text-right border-y text-center border-color3">
 
-                    <ul class="flex flex-col gap-4 p-4 text-right">
-
-                        <li><a href="/dashboard">تقرير اليوم</a></li>
-                        <li><a href="/employees">الموظفين</a></li>
-                        <li><a href="/basma">البصمة</a></li>
-                        <li><a href="/OffDays">الاجازات</a></li>
-                        <li><a href="/penalties">الجزاءات</a></li>
-                        <li><a href="/reports">التقارير</a></li>
+                        <li><a href="/dashboard" class=" !font-bold nav-mobile-link">تقرير اليوم</a></li>
+                        <li><a href="/employees" class=" !font-bold nav-mobile-link">الموظفين</a></li>
+                        <li><a href="/basma" class=" !font-bold nav-mobile-link">البصمة</a></li>
+                        <li><a href="/OffDays" class=" !font-bold nav-mobile-link">الاجازات</a></li>
+                        <li><a href="/penalties" class=" !font-bold nav-mobile-link">الجزاءات</a></li>
+                        <li><a href="/reports" class="   !font-bold nav-mobile-link">التقارير</a></li>
 
                         @if (User.IsInRole("Admin"))
                         {
                             <li><a href="/admin/dashboard">الادمن</a></li>
                         }
 
-                        <hr />
 
-                        <li class="font-bold">@User.Identity?.Name</li>
+                        
 
                         <li>
                             <form method="post" action="/logout">
                                 @Html.AntiForgeryToken()
-                                <button class="col-button-dark w-full p-2">
+                                <button class="col-button-dark mt-5 w-full p-2">
                                     تسجيل الخروج
                                 </button>
                             </form>
                         </li>
-
                     </ul>
                 </div>
-
-            </nav>
-            <div id="overlay" onclick="toggleMenu()" class="fixed inset-0 bg-black/40 hidden z-40"></div>
+            <div id="overlay" onclick="toggleMenu()" class="fixed inset-0 bg-black/50 hidden z-40"></div>
             <!-- Main Content -->
             <div class="flex-1 p-6 transition-all duration-700 mt-16" id="main-content">
 
@@ -127,11 +134,6 @@
                     @RenderBody()
                 </main>
             </div>
-            <footer class="bg-color2   
-                w-full text-white text-[10px] italic absolute bottom-2 
-                flex justify-center items-center h-6 tracking-wide">
-                Developed By Ismail Salama (IT) ©2026
-            </footer>
         </div>
         <script>
                     function toggleMenu() {
@@ -140,7 +142,9 @@
 
                         menu.classList.toggle("translate-x-full");
                         overlay.classList.toggle("hidden");
-                    }
+
+                        document.body.classList.toggle("overflow-hidden"); // 🔥 important
+                }
         </script>
         <script src="~/lib/jquery/dist/jquery.min.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
