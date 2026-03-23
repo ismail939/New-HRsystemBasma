@@ -1,5 +1,10 @@
 @model IEnumerable<HRsystem.Models.User>
-<div id="tableResponsive" class="tableContainer ">
+<button>
+    <a onclick="openCreateUserModal()" class="col-button-dark m-2 text-[13px] rounded">
+        إضافة مستخدم
+    </a>
+</button>
+<div id="tableResponsive" class="tableContainer mt-2">
     @if (Model.Count() == 0)
     {
         <div class="shadow-lg flex justify-center items-center flex-col p-3">
@@ -37,7 +42,15 @@
     }
 </div>
 
-
+<div class="m-2 text-center p-2 shadow-lg" style="direction:ltr">
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="bg-red-50 border border-red-300 text-red-700 rounded p-3">
+            <strong dir="rtl">حدثت أخطاء:</strong>
+            @Html.ValidationSummary(true, "")
+        </div>
+    }
+</div>
 
 
 
@@ -46,7 +59,7 @@
     transition-all duration-100  ">
     <!-- Modal Box -->
     <div class="col-modal !w-1/3 !h-1/2 p-6 relative overflow-y-auto" dir="rtl">
-        <button onclick="closeModal()" class="absolute top-2 left-2 text-[25px]">
+        <button onclick="closeEditUserModal()" class="absolute top-2 left-2 text-[25px]">
             <i class="bi bi-x-square-fill"></i>
         </button>
 
@@ -87,6 +100,52 @@
 
     </div>
 </div>
+<!-- Modal Background -->
+<div id="createModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50
+    transition-all duration-100  ">
+    <!-- Modal Box -->
+    <div class="col-modal !w-1/3 !h-1/2 p-6 relative overflow-y-auto" dir="rtl">
+        <button onclick="closeCreateUserModal()" class="absolute top-2 left-2 text-[25px]">
+            <i class="bi bi-x-square-fill"></i>
+        </button>
+
+        <div id="tab-content-info">
+            <h2 class="text-2xl font-semibold mb-4 text-blue-700 text-center">إضافة مستخدم</h2>
+            <form id="addUserForm" asp-action="AddUser" method="post" class="flex flex-col gap-2 w-full h-full">
+
+                <input type="hidden" name="Id" />
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">اسم المستخدم</label>
+                    <input type="text" name="Username"
+                           class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">كلمة المرور</label>
+                    <input type="text" name="Password"
+                           class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">الدور</label>
+                    <input name="Role"
+                           class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]"></input>
+                </div>
+
+
+
+                <!-- Submit Button -->
+                <div class="col-span-3 text-center mt-4">
+                    <button type="submit" class=" px-8 py-2 rounded col-button-dark">
+                        إضافة
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+</div>
 
 
 @section Scripts {
@@ -110,7 +169,21 @@
             }
             document.getElementById("editModal").addEventListener("click", function (e) {
                 if (e.target == this) {
-                    closeModal();
+                    closeEditUserModal();
+                }
+            })
+            window.openCreateUserModal = function (id) {
+                console.log(typeof(id))
+                let user = users.find(d => d.Id === Number(id));
+                console.log(user);
+                showDivFlex("createModal");
+            }
+            window.closeCreateUserModal = function () {
+                hideDivFlex("createModal");
+            }
+            document.getElementById("createModal").addEventListener("click", function (e) {
+                if (e.target == this) {
+                    closeCreateUserModal();
                 }
             })
         })

@@ -37,7 +37,7 @@ namespace HRsystem.Controllers
             return Json(new { success = false });
         }
 
-        [Authorize(Roles = "Admin,HR")]
+        [Authorize(Roles = "Admin,HR,Officer")]
         [HttpGet]
         [Route("/employees")]
         public IActionResult ListEmployees()

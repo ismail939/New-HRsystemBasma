@@ -16,86 +16,141 @@
     <link href="~/css/output.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/HRsystem.styles.css" asp-append-version="true" />
     <link rel="icon" href="~/images/logo2.png" sizes="96x96" type="image/png">
-</head>
+    </head>
 
-<body id="" class="h-full min-h-screen bg-color1">
+    <body id="" class="h-full min-h-screen bg-color1">
 
 
 
-    <div class="flex flex-row min-h-screen relative">
+        <div class="flex flex-row min-h-screen relative">
 
-        <!-- Sidebar -->
-        <navbar id="" class="w-full h-16 col-nav text-white flex flex-row 
-                      fixed inset-0 z-40 transform transition-transform duration-700 ease-in-out">
+            <nav class="w-full h-16 col-nav text-white flex flex-row fixed inset-0 z-40 transform transition-transform duration-700 ease-in-out">
 
-            <div class="w-full flex flex-row items-center justify-start h-full mx-2">
-                <div class="flex items-center justify-center border-l-2 border-white h-full p-4">
-                    <img src="/images/logo2.png" alt="" class="w-16 h-16">
-                    <span class="fs-4 whitespace-nowrap p-2 font-bold">الموارد البشرية</span>
+                <div class="w-full flex flex-row items-center justify-start h-full mx-2">
+
+                    <!-- Logo -->
+                    <div class="flex items-center border-l-2 border-white h-full p-2">
+                        <img src="/images/logo2.png" class="w-12 h-12" />
+                        <span class="font-bold px-2 whitespace-nowrap">الموارد البشرية</span>
+                    </div>
+
+                    <!-- Desktop Menu -->
+                    <ul class="hidden min-[1450px]:flex flex-row gap-1 w-4/6 mx-4 h-full">
+                        <li><a href="/dashboard" class="nav-link">تقرير اليوم</a></li>
+                        <li><a href="/employees" class="nav-link">الموظفين</a></li>
+                        <li><a href="/basma" class="nav-link">البصمة</a></li>
+                        <li><a href="/OffDays" class="nav-link">الاجازات</a></li>
+                        <li><a href="/penalties" class="nav-link">الجزاءات</a></li>
+                        <li><a href="/reports" class="nav-link">التقارير</a></li>
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li><a href="/admin/dashboard" class="nav-link">الادمن</a></li>
+                        }
+                    </ul>
+
+                    <!-- Right Side Info -->
+                    <div class="hidden min-[1450px]:flex items-center">
+                        <div class="bg-color1 text-color5 font-bold m-2 p-2 rounded-lg">
+                            @User.Identity?.Name
+                        </div>
+
+                        <form method="post" action="/logout">
+                            @Html.AntiForgeryToken()
+                            <button class="col-button-dark m-2 p-1 text-[12px]">
+                                تسجيل الخروج
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Hamburger Button -->
+                    <button onclick="toggleMenu()" class="min-[1450px]:hidden text-2xl">
+                        ☰
+                    </button>
+
                 </div>
 
-                <ul class="flex flex-row gap-1 w-4/6 mx-4 h-full">
-                    <li><a href="/dashboard" class="nav-link  @(currentController == "Home" ? "active" : "")">تقرير
-                            اليوم</a></li>
-                    <li><a href="/employees"
-                            class="nav-link  @(currentController == "Employee" ? "active" : "")">الموظفين</a></li>
-                    <li><a href="/basma" class="nav-link  @(currentController == "Basma" ? "active" : "")">البصمة</a>
-                    </li>
-                    <li><a href="/OffDays" class="nav-link  @(currentController == "OffDay" ? "active" : "")">الاجازات
-                        </a></li>
-                    <li><a href="/penalties"
-                            class="nav-link  @(currentController == "Penalty" ? "active" : "")">الجزاءات</a></li>
-                    <li><a href="/reports"
-                            class="nav-link  @(currentController == "Report" ? "active" : "")">التقارير</a></li>
-                    <li><a href="/admin/dashboard"
-                            class="nav-link  @(currentController == "Admin" ? "active" : "")">الادمن</a></li>
-                            
-                </ul>
-                <div class="bg-color1 text-color5 font-bold m-2 p-2 rounded-lg">@User.Identity?.Name</div>
-                <form method="post" action="/logout" class="inline">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="col-button-dark m-2 p-1 text-center whitespace-nowrap text-[12px]">
-                        تسجيل الخروج
-                    </button>
-                </form>
-            </div>
-            @* <img src="/images/logo2.png" alt="HR Logo" class="w-14 h-14"> *@
+                <!-- Mobile Side Panel -->
+                <div id="mobileMenu"
+                     class="fixed top-0 right-0 h-full w-64 !bg-white text-black transform translate-x-full transition-transform duration-300 z-50 shadow-lg">
 
+                    <div class="p-4 flex justify-between items-center border-b">
+                        <span class="font-bold">القائمة</span>
+                        <button onclick="toggleMenu()">✕</button>
+                    </div>
 
-        </navbar>
+                    <ul class="flex flex-col gap-4 p-4 text-right">
 
-        <!-- Main Content -->
-        <div class="flex-1 p-6 transition-all duration-700 mt-16" id="main-content">
+                        <li><a href="/dashboard">تقرير اليوم</a></li>
+                        <li><a href="/employees">الموظفين</a></li>
+                        <li><a href="/basma">البصمة</a></li>
+                        <li><a href="/OffDays">الاجازات</a></li>
+                        <li><a href="/penalties">الجزاءات</a></li>
+                        <li><a href="/reports">التقارير</a></li>
 
-            @* <!-- زر فتح/إغلاق الـ sidebar -->
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li><a href="/admin/dashboard">الادمن</a></li>
+                        }
+
+                        <hr />
+
+                        <li class="font-bold">@User.Identity?.Name</li>
+
+                        <li>
+                            <form method="post" action="/logout">
+                                @Html.AntiForgeryToken()
+                                <button class="col-button-dark w-full p-2">
+                                    تسجيل الخروج
+                                </button>
+                            </form>
+                        </li>
+
+                    </ul>
+                </div>
+
+            </nav>
+            <div id="overlay" onclick="toggleMenu()" class="fixed inset-0 bg-black/40 hidden z-40"></div>
+            <!-- Main Content -->
+            <div class="flex-1 p-6 transition-all duration-700 mt-16" id="main-content">
+
+                @* <!-- زر فتح/إغلاق الـ sidebar -->
             <button class="bg-blue-600 text-white px-4 py-2 rounded mb-4" onclick="toggleSidebar()">
                 ☰ القائمة
             </button> *@
 
-            <main role="main" class="pb-3 h-full">
-                <div id="loadingOverlay" class="loading-overlay hidden">
-                    <div class="spinner"></div>
-                </div>
+                <main role="main" class="pb-3 h-full">
+                    <div id="loadingOverlay" class="loading-overlay hidden">
+                        <div class="spinner"></div>
+                    </div>
 
-                @RenderBody()
-            </main>
+                    @RenderBody()
+                </main>
+            </div>
+            <footer class="bg-color2   
+                w-full text-white text-[10px] italic absolute bottom-2 
+                flex justify-center items-center h-6 tracking-wide">
+                Developed By Ismail Salama (IT) ©2026
+            </footer>
         </div>
-        <footer class="bg-color2   
-        w-full text-white text-[10px] italic absolute bottom-2 
-        flex justify-center items-center h-6 tracking-wide">
-            Developed By Ismail Salama (IT) ©2026
-        </footer>
-    </div>
+        <script>
+                    function toggleMenu() {
+                        const menu = document.getElementById("mobileMenu");
+                        const overlay = document.getElementById("overlay");
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    <link href="~/lib/flatpickr/dist/flatpickr.min.css" rel="stylesheet" />
-    <script src="~/lib/flatpickr/dist/flatpickr.min.js"></script>
-    <script src="~/lib/flatpickr/dist/l10n/ar.js"></script>
-    <script src="~/lib/alpinejs/dist/cdn.min.js" defer></script>
+                        menu.classList.toggle("translate-x-full");
+                        overlay.classList.toggle("hidden");
+                    }
+        </script>
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+        <link href="~/lib/flatpickr/dist/flatpickr.min.css" rel="stylesheet" />
+        <script src="~/lib/flatpickr/dist/flatpickr.min.js"></script>
+        <script src="~/lib/flatpickr/dist/l10n/ar.js"></script>
+        <script src="~/lib/alpinejs/dist/cdn.min.js" defer></script>
 
-    @await RenderSectionAsync("Scripts", required: false)
-</body>
+        @await RenderSectionAsync("Scripts", required: false)
+    </body>
 
 </html>

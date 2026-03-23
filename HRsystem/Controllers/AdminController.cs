@@ -331,5 +331,50 @@ namespace HRsystem.Controllers
             return RedirectToAction("Departments");
         }
 
+        [HttpPost]
+        public IActionResult EditUser(int Id,
+            string Username,
+            string Password,
+            string Role)
+        {            
+            var user = _context.Users.FirstOrDefault(u => u.Id == Id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            var existingUser = _context.Users.FirstOrDefault(u => u.Username == Username && u.Id != Id);
+            if (existingUser != null)            {
+                ModelState.AddModelError("", "This username is already taken.");
+                var users = _context.Users.ToList();
+                return View("Users", users);
+            }
+            user.Username = Username;
+            user.Password = Password;
+            user.Role = Role;
+            _context.Users.Update(user);
+            _context.SaveChanges();
+            return RedirectToAction("Users");
+        }
+
+        [HttpPost]
+        public IActionResult AddUser(string Username, string Password, string Role)
+        {
+            var existingUser = _context.Users.FirstOrDefault(u => u.Username == Username);
+            if (existingUser != null)
+            {
+                ModelState.AddModelError("", "This username is already taken.");
+                var users = _context.Users.ToList();
+                return View("Users", users);
+            }
+            var user = new User
+            {
+                Username = Username,
+                Password = Password,
+                Role = Role
+            };
+            _context.Users.Add(user);
+            _context.SaveChanges();
+            return RedirectToAction("Users");
+        }
     }
 }
