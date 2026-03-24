@@ -123,12 +123,15 @@
   direction: rtl;
 }
 
+.active-mobile{
+  @apply !bg-color3 !text-white block px-4 py-2 rounded-lg;
+}
 .nav-mobile-link {
   @apply block px-4 py-2 !text-color3 rounded-lg transition-all duration-100 ease-in-out transform;
 }
 
 .nav-mobile-link:hover {
-  @apply bg-color3 !text-white translate-x-1;
+  @apply !bg-color3 !text-white translate-x-1;
 }
 
 /* Colors Palette 1*/
