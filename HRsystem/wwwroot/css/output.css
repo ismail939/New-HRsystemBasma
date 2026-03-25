@@ -722,11 +722,6 @@ video {
   margin-right: 0.25rem;
 }
 
-.mx-2 {
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
-}
-
 .mx-4 {
   margin-left: 1rem;
   margin-right: 1rem;
@@ -1481,6 +1476,10 @@ video {
   padding: 0px !important;
 }
 
+.\!p-5 {
+  padding: 1.25rem !important;
+}
+
 .p-1 {
   padding: 0.25rem;
 }
@@ -1507,6 +1506,10 @@ video {
 
 .p-6 {
   padding: 1.5rem;
+}
+
+.\!p-2 {
+  padding: 0.5rem !important;
 }
 
 .px-2 {
@@ -2083,9 +2086,7 @@ video {
 
 .col-modal {
   height: 90vh;
-  max-height: 90vh;
   width: 90vw;
-  max-width: 90vw;
   border-radius: 1rem;
   --tw-bg-opacity: 1;
   background-color: rgb(186 200 177 / var(--tw-bg-opacity, 1));
@@ -2224,13 +2225,22 @@ video {
   padding: 7px !important;
 }
 
+* {
+  outline: 1px solid red !important;
+}
+
 .col-nav {
   --tw-bg-opacity: 1 !important;
   background-color: rgb(123 150 105 / var(--tw-bg-opacity, 1)) !important;
 }
 
 .tableContainer {
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+  display: flex;
   max-height: 75vh;
+  justify-content: center;
+  overflow-x: auto;
   overflow-y: auto;
   border-radius: 0.5rem;
   --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -2240,6 +2250,7 @@ video {
 
 .table-base {
   width: 100%;
+  align-self: center;
   text-align: right;
   --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
@@ -2255,6 +2266,7 @@ video {
   white-space: normal;
   text-align: center;
   vertical-align: middle;
+  text-wrap: nowrap;
 }
 
 .table-base td {
@@ -2263,6 +2275,7 @@ video {
   border-color: rgb(64 78 59 / var(--tw-border-opacity, 1));
   padding-left: 0.5rem;
   padding-right: 0.5rem;
+  text-wrap: nowrap;
 }
 
 .table-base tr:hover {
