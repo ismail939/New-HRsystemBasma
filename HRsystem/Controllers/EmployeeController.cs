@@ -205,7 +205,7 @@ namespace HRsystem.Controllers
             {
                 return Json(new { success = false, message = "الموظف غير موجود." });
             }
-            List<string> Urls = [];
+            var Urls = new List<string>();
             foreach (var file in imageFiles)
             {
                 string uniqueNumber = DateTime.Now.ToString("yyyyMMddHHmmssfff"); // Example: 20251026123545012

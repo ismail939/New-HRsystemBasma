@@ -7,13 +7,9 @@ function openModal(empId) {
     //     document.getElementById("offBalance").value = data.offBalance;
     //     document.getElementById("insteadBalance").value = data.insteadBalance;
     // });
-    const editModal = document.getElementById('editModal');
     document.getElementById('tableResponsive').classList.add('hidden');
-    editModal.classList.remove('hidden');
-    requestAnimationFrame(() => {
-        editModal.classList.remove("opacity-0", "scale-95");
-        editModal.classList.add("opacity-100", "scale-100", "flex");
-    });
+    showDivFlex("editModal");
+    
     document.getElementById("empId").value = empId;
 }
 
@@ -24,13 +20,10 @@ function closeModal() {
     document.getElementById('to').value = "";
     clearFlatpickrInModal('dateInputs');
     const modal = document.getElementById('editModal');
-    modal.classList.add("opacity-0", "scale-95");
-    modal.classList.remove("opacity-100", "scale-100");
+   
 
-    // wait for transition to finish
-    setTimeout(() => {
-        modal.classList.add("hidden");
-    }, 300);
+    modal.classList.add("hidden");
+    
     document.getElementById('tableResponsive').classList.remove('hidden');
     document.getElementById("daysContainer").innerHTML = "";
     document.getElementById("daysContainer").classList.add("hidden");

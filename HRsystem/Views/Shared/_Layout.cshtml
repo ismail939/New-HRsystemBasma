@@ -36,8 +36,8 @@
 
                     <!-- Desktop Menu -->
                     <ul class="hidden min-[1450px]:flex flex-row gap-1 w-4/6 mx-4 h-full">
-                        @* <li><a href="/dashboard" class="nav-link  @(currentController == "Home" ? "active" : "")">تقرير
-                            اليوم</a></li> *@
+                        <li><a href="/dashboard" class="nav-link  @(currentController == "Home" ? "active" : "")">تقرير
+                            اليوم</a></li>
                             <li><a href="/employees"
                                        class="nav-link  @(currentController == "Employee" ? "active" : "")">الموظفين</a></li>
                                 <li><a href="/basma" class="nav-link  @(currentController == "Basma" ? "active" : "")">البصمة</a>
@@ -97,8 +97,8 @@
                                 </div> 
                                 <ul class="flex flex-col gap-1 p-4 !text-color3 !bg-color1 border-y text-center border-color3">
 
-                                    @* <li><a href="/dashboard" class="!font-bold nav-mobile-link  @(currentController == "Home" ? "active-mobile" : "")">تقرير
-                            اليوم</a></li> *@
+                                    <li><a href="/dashboard" class="!font-bold  @(currentController == "Home" ? "active-mobile" : "nav-mobile-link")">تقرير
+                            اليوم</a></li>
                             <li><a href="/employees"
                                        class="!font-bold   @(currentController == "Employee" ? "active-mobile" : "nav-mobile-link")">الموظفين</a></li>
                                 <li><a href="/basma" class="!font-bold   @(currentController == "Basma" ? "active-mobile" : "nav-mobile-link")">البصمة</a>
@@ -120,7 +120,7 @@
                                     <li>
                                         <form method="post" action="/logout">
                                             @Html.AntiForgeryToken()
-                                            <button class="col-button-dark mt-5 w-full p-2">
+                                            <button class="col-button-dark mt-2 w-full p-2">
                                                 تسجيل الخروج
                                             </button>
                                         </form>

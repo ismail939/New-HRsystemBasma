@@ -118,9 +118,24 @@ document.getElementById('submitBtn').addEventListener('click', async function up
     event.preventDefault();
     event.stopPropagation(); // 🧱 stop the event from closing the modal
     console.log('Uploading files...');
+    console.log("********************* this is file upload submit action")
     const form = document.getElementById('uploadFileForm');
     const formData = new FormData(form); // mfesh form data ezaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaay!
     const files = form.querySelector('#fileUpload').files;
+    Array.from(files).forEach(
+        (f)=>{
+            if(f.name.length > 100){
+                f.name = f.name.substring(0, 50);
+                console.log(`File name truncated to 100 chars: ${f.name}`);
+            }
+        }
+    );
+    Array.from(files).forEach(
+        (f)=>{
+            console.log(`File name: ${f.name}`);
+            
+        }
+    );
     if (!files || files.length === 0) {
         alert('⚠️ الرجاء اختيار ملف قبل الرفع.');
         return;
