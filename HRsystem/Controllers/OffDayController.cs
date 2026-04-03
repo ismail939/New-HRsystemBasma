@@ -85,7 +85,6 @@ namespace HRsystem.Controllers
             foreach (var d in request.Days)
             {
                 var date = DateTime.Parse(d.OffDayDate);
-
                 if (d.IsOffDay)
                 {
                     // check if there is an entry on the same day
@@ -115,7 +114,10 @@ namespace HRsystem.Controllers
                         _context.HREmployeeOffDays.Remove(existing);
                 }
             }
-
+            _context.HRLogs.Add(new HRLog
+            {
+                Action = $"User ({User.Identity.Name}) edited off days for employeeId ({request.EmployeeId}) for {request.Days.Count} days"
+            });
             _context.SaveChanges();
 
             return Ok("Done");

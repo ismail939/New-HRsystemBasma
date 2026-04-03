@@ -88,6 +88,26 @@ namespace HRsystem.Controllers
             return Json(basmaList);
         }
 
+        [HttpPost]
+        [Route("/cancelBasma")]
+        public IActionResult ToggleBasmaStatus(int id)
+        {
+            var basmaEntry = _context.HREmployeeBasmas.FirstOrDefault(b => b.Id == id);
+            if (basmaEntry == null)
+            {
+                return NotFound("Basma entry not found.");
+            }
+            basmaEntry.Ok = false;
+             _context.HRLogs.Add(new HRLog
+            {
+                Action = $"User ({User.Identity.Name}) canceled basma ID ({id})"
+            });
+
+            _context.SaveChanges();
+            return Ok("Basma status updated.");
+        }
+
+
         [Authorize(Roles = "Admin,HR")]
         public IActionResult TakeDayFromFingerPrint(DateTime Day)
         {

@@ -31,7 +31,7 @@
                     <td>@e.Department</td>
                     <td>@e.JobName</td>
                     <td>
-                        <button class="col-button-dark m-1" onclick="openModal('@e.Id')">
+                        <button class="col-button-dark m-1" onclick="openModal('@e.Id', '@e.Name')">
                             تعديل
                         </button>
                     </td>
@@ -55,7 +55,7 @@
             <i class="bi bi-x-square-fill"></i>
         </button>
 
-        <h2 class="text-xl font-semibold text-center mb-6">تعديل الاجازات</h2>
+        <h2 class="text-xl font-semibold text-center mb-6">تعديل الاجازات للموظف <span id="empName"></span></h2>
 
         <input type="hidden" id="empId">
 

@@ -1,5 +1,6 @@
 // ⭐ Open Modal 
-function openModal(empId) {
+function openModal(empId, empName) {
+    document.getElementById("empName").textContent = empName;
     // fetch(`/offdays/balance/add?employeeId=${empId}`).then(res => res.json()).then(data => {
     //     console.log(data);
     //     document.getElementById("annualBalance").value = data.annualBalance;

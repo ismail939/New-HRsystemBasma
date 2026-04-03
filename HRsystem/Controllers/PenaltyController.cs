@@ -91,6 +91,10 @@ namespace HRsystem.Controllers
                 EmployeeId = employeeId
             };
             _context.HREmployeePenalties.Add(newPenalty);
+            _context.HRLogs.Add(new HRLog
+            {
+                Action = $"User ({User.Identity.Name}) added penalty ({penalty}) for employeeId ({employeeId}) with reason ({reason}) and points ({PenaltyPoints})"
+            });
             _context.SaveChanges();
             return Ok("Penalty added successfully.");
         }
@@ -121,6 +125,10 @@ namespace HRsystem.Controllers
                 return NotFound("Penalty not found.");
             }
             penalty.IsActive = isActive;
+            _context.HRLogs.Add(new HRLog
+            {
+                Action = $"User ({User.Identity.Name}) toggled penalty ID ({penaltyId}) active status to ({isActive}) for employeeId ({penalty.EmployeeId})"
+            });
             _context.SaveChanges();
             return Ok("Penalty active status updated.");
         }
