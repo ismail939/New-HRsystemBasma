@@ -376,5 +376,17 @@ namespace HRsystem.Controllers
             _context.SaveChanges();
             return RedirectToAction("Users");
         }
+
+        [HttpGet]
+        [Route("/logs")]
+        public IActionResult Logs()
+        {
+            var logs = _context.HRLogs
+                .OrderByDescending(l => l.CreatedAt)
+                .ToList();
+
+            return View("Logs", logs);
+        }
     }
+
 }

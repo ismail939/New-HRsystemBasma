@@ -95,6 +95,10 @@ namespace HRsystem.Controllers
                 return Json(new { success = false, message = "بيانات الموظف غير صالحة." });
             }
             _context.HREmployees.Update(updatedEmployee);
+            _context.HRLogs.Add(new HRLog
+            {
+                Action = $"User ({User.Identity.Name}) edited employee ({updatedEmployee.Name})"
+            });
             _context.SaveChanges();
             return Json(new { success = true });
         }
@@ -109,6 +113,10 @@ namespace HRsystem.Controllers
             }
             
             _context.HREmployees.Add(newEmployee);
+            _context.HRLogs.Add(new HRLog
+            {
+                Action = $"User ({User.Identity.Name}) added employee ({newEmployee.Name})"
+            });
             _context.SaveChanges();
             // Handle file uploads if any
             if (imageFiles != null && imageFiles.Count > 0)
@@ -229,6 +237,10 @@ namespace HRsystem.Controllers
                 }
                 Urls.Add("/images/" + fileName);
             }
+            _context.HRLogs.Add(new HRLog
+            {
+                Action = $"User ({User.Identity.Name}) uploaded files for employee ({emp.Name})"
+            });
             _context.SaveChanges();
             return Json(new { success = true, Urls = Urls });
         }
@@ -377,6 +389,10 @@ namespace HRsystem.Controllers
             };
 
             _context.HREmployeeRates.Add(employeeRate);
+            _context.HRLogs.Add(new HRLog
+            {
+                Action = $"User ({User.Identity.Name}) added rate for employeeId ({employeeRate.EmployeeId}) for month ({employeeRate.Month}/{employeeRate.Year}) with rate ({employeeRate.Rate})"
+            });
             _context.SaveChanges();
 
             return Json(new
@@ -422,6 +438,10 @@ namespace HRsystem.Controllers
                 EmployeeId = EmployeeId
             };
             _context.HREmployeeShift.Add(employeeShift);
+            _context.HRLogs.Add(new HRLog
+            {
+                Action = $"User ({User.Identity.Name}) added shift for employee ({employeeShift.EmployeeId}) with mode ({employeeShift.ShiftMode})"
+            });
             _context.SaveChanges();
             return Json(new { success = true });
         }
@@ -446,6 +466,10 @@ namespace HRsystem.Controllers
                 EmployeeId = EmployeeId
             };
             _context.HREmployeeShift.Add(employeeShift);
+            _context.HRLogs.Add(new HRLog
+            {
+                Action = $"User ({User.Identity.Name}) added shift for employee ({employeeShift.EmployeeId}) with mode ({employeeShift.ShiftMode}) and hours ({employeeShift.RequiredHours})"
+            });
             _context.SaveChanges();
             return Json(new { success = true });
         }
@@ -471,6 +495,10 @@ namespace HRsystem.Controllers
                 EmployeeId = EmployeeId
             };
             _context.HREmployeeShift.Add(employeeShift);
+            _context.HRLogs.Add(new HRLog
+            {
+                Action = $"User ({User.Identity.Name}) added shift for employee ({employeeShift.EmployeeId}) with mode ({employeeShift.ShiftMode}), start time ({employeeShift.StartTime}) and end time ({employeeShift.EndTime})"
+            });
             _context.SaveChanges();
             return Json(new { success = true });
         }

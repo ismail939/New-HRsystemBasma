@@ -39,5 +39,6 @@ namespace HRsystem.Data
         public DbSet<DailyBasmaFlag> DailyBasmaFlags { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<HRDepartment> HRDepartments { get; set; }
+        public DbSet<HRLog> HRLogs { get; set; }
     }
 }
