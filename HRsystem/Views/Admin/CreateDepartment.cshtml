@@ -22,7 +22,7 @@
     </div>
 
     <div class="form-group w-full">
-        <label asp-for="ParentDepartmentId"></label>
+        <label asp-for="ParentDepartmentId">القسم العام</label>
         <select asp-for="ParentDepartmentId" 
                 asp-items="Model.Departments" 
                 class="form-control">
@@ -30,14 +30,14 @@
         </select>
     </div>
 
-    <div class="form-group w-full">
+    @* <div class="form-group w-full">
         <label asp-for="ManagerId"></label>
         <select asp-for="ManagerId" 
                 asp-items="Model.Managers" 
                 class="form-control">
             <option value="">-- Select Manager --</option>
         </select>
-    </div>
+    </div> *@
 
     <button type="submit" class="col-button-light m-3 ">إضافة</button>
 
