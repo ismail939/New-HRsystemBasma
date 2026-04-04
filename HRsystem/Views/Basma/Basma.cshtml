@@ -3,6 +3,9 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "البصمة";
 }
+<h2 class="fs-3 text-center p-4 m-2 text-color3 shadow-lg">إدارة البصمة</h2>
+
+
 
 <div class="flex flex-row flex-start gap-2 mb-1 relative">
 
@@ -110,6 +113,26 @@
     </div>
 </div>
 
+<!-- SMALL DROPDOWN POPUP -->
+<div id="showBasmaModal" class="hidden fixed inset-0 bg-black/30 z-50
+              items-center justify-center">
+
+    <div id="" class="col-modal relative p-6 rounded-2xl shadow-xl !h-1/4 !w-1/2 text-center">
+        <h3 class="text-lg font-bold mb-3">هل انت متأكد من إعداد الشيفتات لهذا اليوم؟</h3>
+
+        
+        <div class="flex flex-row gap-2 justify-center items-center w-full mt-2">
+            <button type="button" onclick="proceedShowingBasma()"
+                class="py-4 w-full px-4 rounded-lg col-button-dark">
+                نعم
+            </button>
+            <button type="button" onclick="goToEmployees()"
+                class="py-4 px-4 w-full rounded-lg col-button-dark">
+                لا
+            </button>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script src="~/js/Basma/BasmaTable.js">

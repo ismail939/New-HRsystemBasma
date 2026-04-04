@@ -124,7 +124,7 @@ namespace HRsystem.Controllers
                     .Where(emp => emp.ToDate == null || emp.ToDate >= Day.Date)
                     .ToList();
 
-                var start = Day.Date;
+                var start = Day.Date.AddHours(3); // to include late check-ins after midnight (e.g. 1-2 AM)
                 var end = Day.Date.AddDays(1).AddHours(3);
 
                 var checkInOutsGrouped = _context.CheckInOuts
