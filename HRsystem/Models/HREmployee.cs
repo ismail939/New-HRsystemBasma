@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 namespace HRsystem.Models;
 
 public class HREmployee
@@ -37,6 +38,6 @@ public class HREmployee
     public int? BasmaId { get; set; }
     [ForeignKey("HRDepartment")]
     public int? HRDepartmentId { get; set; }   // Foreign Key
-
+    [JsonIgnore]
     public virtual HRDepartment? HRDepartment { get; set; }
 }

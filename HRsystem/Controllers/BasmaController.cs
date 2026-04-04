@@ -39,19 +39,7 @@ namespace HRsystem.Controllers
         [Route("/basmaData")]
         public IActionResult BasmaData(DateTime Day)
         {
-            Console.WriteLine("🟢 Entered BasmaData");
-            bool hasAnyBasma =
-                _context.HREmployeeBasmas.Any(b => b.DayDate == Day.Date);
-
-            if (!hasAnyBasma)
-            {
-                return RedirectToAction("TakeDayFromFingerPrint", "Basma", new { Day = Day.Date });
-            }
-            else if (hasAnyBasma)
-            {
-                return RedirectToAction("GetDayBasma", "Basma", new { Day = Day.Date });
-            }
-            return Json(null);
+            return RedirectToAction("TakeDayFromFingerPrint", "Basma", new { Day = Day.Date });
         }
 
         [Authorize(Roles = "Admin,HR")]
@@ -98,164 +86,162 @@ namespace HRsystem.Controllers
                 return NotFound("Basma entry not found.");
             }
             basmaEntry.Ok = false;
-             _context.HRLogs.Add(new HRLog
+            basmaEntry.Status = 3; // either offday or absent, HR will decide
+            _context.HRLogs.Add(new HRLog
             {
-                Action = $"User ({User.Identity.Name}) canceled basma ID ({id})"
+                Action = $"User ({User.Identity.Name}) canceled basma on day  ({basmaEntry.DayDate.ToShortDateString()}) for employee ID ({basmaEntry.EmployeeId})"
             });
 
             _context.SaveChanges();
-            return Ok("Basma status updated.");
+            return Ok(new { success = true });
         }
 
 
         [Authorize(Roles = "Admin,HR")]
         public IActionResult TakeDayFromFingerPrint(DateTime Day)
         {
-            var existingEmployeeIds = _context.HREmployeeBasmas
-            .Where(b => b.DayDate == Day.Date)
-            .Select(b => b.EmployeeId)
-            .ToHashSet();
-
             if (Day.Date > DateTime.Now.Date)
             {
                 Console.WriteLine("🟢 Entered future date");
                 return RedirectToAction("GetDayBasma", "Basma", new { Day = Day.Date });
             }
+
             using var transaction = _context.Database.BeginTransaction();
-            var employeeShifts = _context.HREmployeeShift.Where(emp => emp.ToDate == null || emp.ToDate >= Day.Date).ToList();
-            Console.WriteLine("🟢 Entered not taken");
-            // go get the data from CheckInouts table that have the date of today
-            var checkInOutsGrouped = _context.CheckInOuts
-                .Where(cio => cio.CheckTime.Date == Day.Date)
-                .GroupBy(cio => cio.UserId)
-                .ToList();
-            if (checkInOutsGrouped.Count != 0)
+
+            try
             {
-                Console.WriteLine($"🟢Here is the checks grouped {checkInOutsGrouped[0]}");
-            }
+                Console.WriteLine("🟢 Start Sync Basma");
 
-            // go iterate over the list as ids and create basma entries u will see (
-            // 1 check so it is arrival and departure the same time
-            // more than 1 check so get min as arrival and max as departure
-            //)
-            foreach (var userGroup in checkInOutsGrouped)
-            {
-                var userId = userGroup.Key;          // UserId
-                var checkTimes = userGroup.ToList(); // All CheckInOut records for that user
-                foreach (var ct in checkTimes)
-                {
-                    Console.WriteLine($"🟢Here are the check times for user {userId}: {ct.CheckTime}");
-                }
-                var employee = _context.HREmployees.FirstOrDefault(e => e.BasmaId == userId);
+                // 🟢 Load existing basmas once
+                var existingBasmas = _context.HREmployeeBasmas
+                    .Where(b => b.DayDate == Day.Date)
+                    .ToList();
 
-                if (employee == null)
-                {
-                    continue; // Skip if no matching employee found
-                }
+                var basmaDict = existingBasmas.ToDictionary(b => b.EmployeeId);
 
-                if (existingEmployeeIds.Contains(employee.Id))
-                {
-                    continue;
-                }
+                // 🟢 Load shifts once
+                var employeeShifts = _context.HREmployeeShift
+                    .Where(emp => emp.ToDate == null || emp.ToDate >= Day.Date)
+                    .ToList();
 
-                if (checkTimes.Count == 1)
+                var start = Day.Date;
+                var end = Day.Date.AddDays(1).AddHours(3);
+
+                var checkInOutsGrouped = _context.CheckInOuts
+                    .Where(cio => cio.CheckTime >= start && cio.CheckTime <= end)
+                    .GroupBy(cio => cio.UserId)
+                    .ToList();
+
+                // 🟢 PROCESS employees WITH fingerprints
+                foreach (var userGroup in checkInOutsGrouped)
                 {
-                    // Only one record, treat it as ArrivalTime
-                    HREmployeeBasma basmaEntry = new HREmployeeBasma
+                    var userId = userGroup.Key;
+                    var checkTimes = userGroup.ToList();
+                    var employee = _context.HREmployees
+                        .FirstOrDefault(e => e.BasmaId == userId);
+
+                    if (employee == null)
+                        continue;
+
+                    if (basmaDict.ContainsKey(employee.Id) && basmaDict[employee.Id].Ok)
                     {
-                        EmployeeId = employee.Id,
-                        DayDate = Day.Date,
-                        ArrivalTime = checkTimes[0].CheckTime,
-                        DepartureTime = checkTimes[0].CheckTime,
-                        Ok = false,
-                        Status = 1,
-                    };
-                    Console.WriteLine($"🟢Here count1 is the basma Entry {basmaEntry}");
-                    _context.HREmployeeBasmas.Add(basmaEntry);
-                    existingEmployeeIds.Add(employee.Id);
-
-                }
-                else if (checkTimes.Count > 1)
-                {
+                        continue; // already processed with fingerprint data
+                    }
                     DateTime arrivalTime = checkTimes.Min(ct => ct.CheckTime);
                     DateTime departureTime = checkTimes.Max(ct => ct.CheckTime);
 
-                    LatencyResult latency =
-                        LatencyForEmployee(employeeShifts, employee.Id, arrivalTime, departureTime);
-
-                    HREmployeeBasma basmaEntry = new HREmployeeBasma
+                    LatencyResult latency;
+                    if (checkTimes.Count == 1)
                     {
-                        EmployeeId = employee.Id,
-                        DayDate = Day.Date,
-                        ArrivalTime = arrivalTime,
-                        DepartureTime = departureTime,
-                        LateMinutes = latency.LateMinutes,
-                        EarlyLeaveMinutes = latency.EarlyLeaveMinutes,
-                        TotalHours = latency.TotalHours,
-                        Ok = true,
-                        Status = 1,
-                    };
-                    Console.WriteLine($"🟢Here count2");
-                    _context.HREmployeeBasmas.Add(basmaEntry);
-                    existingEmployeeIds.Add(employee.Id);
-
-                }
-            }
-            // now we wantt to add basmas for ppl who have 0 checks 
-            // if offday then status 2
-            // if not offday then status 3
-            var allEmployees = _context.HREmployees.ToList();
-            foreach (var emp in allEmployees)
-            {
-                bool hasBasmaEntry = existingEmployeeIds.Contains(emp.Id);
-                if (!hasBasmaEntry)
-                {
-                    // Check if employee has an off day on that date
-                    bool isOffDay = _context.HREmployeeOffDays
-                        .Any(od => od.EmployeeId == emp.Id && od.OffDayDate.Date == Day.Date);
-                    if (isOffDay)
-                    {
-                        HREmployeeBasma basmaEntry = new HREmployeeBasma
+                        latency = new LatencyResult
                         {
-                            EmployeeId = emp.Id,
-                            DayDate = Day.Date,
-                            ArrivalTime = null,
-                            DepartureTime = null,
-                            Ok = true,
-                            Status = 2, // 2 for off day, 3 for offday|absent
+                            LateMinutes = 0,
+                            EarlyLeaveMinutes = 0,
+                            TotalHours = 0
                         };
-                        _context.HREmployeeBasmas.Add(basmaEntry);
-                        existingEmployeeIds.Add(emp.Id);
                     }
                     else
                     {
-                        HREmployeeBasma basmaEntry = new HREmployeeBasma
-                        {
-                            EmployeeId = emp.Id,
-                            DayDate = Day.Date,
-                            ArrivalTime = null,
-                            DepartureTime = null,
-                            Ok = false,
-                            Status = 3, // 2 for off day, 3 for offday|absent
-                        };
-                        _context.HREmployeeBasmas.Add(basmaEntry);
-                        existingEmployeeIds.Add(emp.Id);
-                    }
-                }
-            }
+                        latency =
+                            LatencyForEmployee(employeeShifts, employee.Id, arrivalTime, departureTime);
 
-            Console.WriteLine($"🟢 DayFlag before update: {Day.Date}");
-            try
-            {
+                    }
+
+                    if (!basmaDict.TryGetValue(employee.Id, out var basma))
+                    {
+                        // 🟢 CREATE
+                        basma = new HREmployeeBasma
+                        {
+                            EmployeeId = employee.Id,
+                            DayDate = Day.Date
+                        };
+
+                        _context.HREmployeeBasmas.Add(basma);
+                        basmaDict[employee.Id] = basma;
+                    }
+
+                    // 🟡 UPDATE (always)
+                    basma.ArrivalTime = arrivalTime;
+                    basma.DepartureTime = departureTime;
+                    basma.LateMinutes = latency.LateMinutes;
+                    basma.EarlyLeaveMinutes = latency.EarlyLeaveMinutes;
+                    basma.TotalHours = latency.TotalHours;
+                    basma.Ok = checkTimes.Count >= 1;
+                    basma.Status = 1;
+                }
+
+                // 🟢 PROCESS employees WITHOUT fingerprints
+                var allEmployees = _context.HREmployees.ToList();
+
+                foreach (var emp in allEmployees)
+                {
+                    if (basmaDict.ContainsKey(emp.Id) && basmaDict[emp.Id].Ok)
+                    {
+                        continue; // already processed with fingerprint data
+                    }
+                    if (basmaDict.ContainsKey(emp.Id))
+                    {
+                        bool isOffDaY = _context.HREmployeeOffDays
+                        .Any(od => od.EmployeeId == emp.Id && od.OffDayDate.Date == Day.Date);
+                        if (isOffDaY)
+                        {
+                            var existingBasma = basmaDict[emp.Id];
+                            existingBasma.Ok = true;
+                            existingBasma.Status = 2; // off day
+                            _context.SaveChanges();
+                        }
+                        continue;
+                    }
+
+                    bool isOffDay = _context.HREmployeeOffDays
+                        .Any(od => od.EmployeeId == emp.Id && od.OffDayDate.Date == Day.Date);
+
+                    var basma = new HREmployeeBasma
+                    {
+                        EmployeeId = emp.Id,
+                        DayDate = Day.Date,
+                        ArrivalTime = null,
+                        DepartureTime = null,
+                        Ok = isOffDay,
+                        Status = isOffDay ? 2 : 3 // 2 = off day, 3 = absent
+                    };
+
+                    _context.HREmployeeBasmas.Add(basma);
+                    basmaDict[emp.Id] = basma;
+                }
+
                 _context.SaveChanges();
                 transaction.Commit();
+
+                Console.WriteLine("🟢 Basma Sync Completed");
             }
             catch (Exception ex)
             {
                 transaction.Rollback();
-                Console.WriteLine($"🔴 Error occurred while saving Basma entries.{ex}");
+                Console.WriteLine($"🔴 Error: {ex}");
             }
-            return RedirectToAction("BasmaData", new { Day = Day.Date });
+
+            return RedirectToAction("GetDayBasma", new { Day = Day.Date });
         }
 
         [Authorize(Roles = "Admin,HR")]
@@ -352,6 +338,7 @@ namespace HRsystem.Controllers
                     // ask whether there is an offday
                     var isOffDay = _context.HREmployeeOffDays
                         .Any(od => od.EmployeeId == basmaEntry.EmployeeId && od.OffDayDate.Date == basmaEntry.DayDate.Date);
+                    Console.WriteLine($"🟢 Checking off day for EmployeeId {basmaEntry.Id} on {basmaEntry.DayDate.Date}: {isOffDay}");
                     if (isOffDay)
                     {
                         basmaEntry.Status = 2; // offday
@@ -366,6 +353,12 @@ namespace HRsystem.Controllers
                     _context.SaveChanges();
                     return Json(new { code = 1 });
                 }
+                else if (type == 1)
+                {
+                    basmaEntry.Status = 1; // present
+                    _context.SaveChanges();
+                    return Json(new { code = 1 });
+                }
             }
             return Json(new { success = false, message = "Basma entry not found." });
         }
@@ -375,7 +368,7 @@ namespace HRsystem.Controllers
         [Route("/saveBasmaNotes")]
         public IActionResult SaveBasmaNotes([FromBody] List<BasmaNote> basmaNotes)
         {
-            foreach(var basma in basmaNotes)
+            foreach (var basma in basmaNotes)
             {
                 Console.WriteLine($"🟢 Received BasmaNote: BasmaId={basma.BasmaId}, Notes={basma.Notes}");
             }

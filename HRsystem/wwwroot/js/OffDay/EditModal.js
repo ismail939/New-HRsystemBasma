@@ -142,14 +142,14 @@ function renderDays(existingDays, from, to) {
     // loop each day
     for (let index = 1; currentDate <= end; index++) {
         console.log(`currentdate: ${currentDate.getDate()} and end is : ${end.getDate()}`);
-        let iso = currentDate.toISOString().split("T")[0]; // yyyy-mm-dd
+        let iso = toLocalISODate(currentDate); // yyyy-mm-dd
         console.log(iso + "after getting the current date 😢")
 
         // check if this day exists in backend list
         let match = existingDays.find(d => d.OffDayDate.split("T")[0] === iso);
         console.log(`match value is : ${JSON.stringify(match)} 🟢`)
         let dayName = currentDate.toLocaleDateString("ar-EG", { weekday: "long" });
-        let dayDateText = currentDate.toLocaleDateString("ar-EG");
+        let dayDateText = currentDate.toLocaleDateString("ar-EG", { day: "numeric", month: "long" });
 
         let card = document.createElement("div");
         card.className =

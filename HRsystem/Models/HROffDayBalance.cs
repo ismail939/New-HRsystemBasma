@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 namespace HRsystem.Models;
 
 public class HROffDayBalance
@@ -10,7 +11,7 @@ public class HROffDayBalance
     public int Annual { get; set; }
     [Required]
     public int Casual { get; set; }
-    [Required] 
+    [Required]
     public int Off { get; set; }
     [Required]
     public int CompensatoryOfNationalHoliday { get; set; }
@@ -18,6 +19,7 @@ public class HROffDayBalance
     public string Notes { get; set; } = string.Empty;
     [ForeignKey(nameof(HREmployee))]
     public int? EmployeeId { get; set; }
+    [JsonIgnore]
     public virtual HREmployee HREmployee { get; set; }
 }
 

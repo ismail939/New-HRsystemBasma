@@ -10,9 +10,17 @@
         <button id="createBtn" class="cursor-pointer mx-1 col-button-dark px-4 py-2 rounded">
             إضافة موظف
         </button>
-        <a href="/admin/dashboard/departments" class="cursor-pointer mx-1 col-button-dark px-4 py-2 rounded">
+        <a href="/admin/dashboard/departments" class="cursor-pointer flex items-center mx-1 col-button-dark px-4 py-2 rounded">
             الأقسام
         </a>
+        <select id="departmentFilter" class="mx-1 bg-white px-4 py-2 rounded">
+            <option value="">تصفية حسب القسم</option>
+            @foreach (var dept in Model.Departments)
+            {
+                <option value="@dept.Id">@dept.Name - (@dept.Code)</option>
+            }
+        </select>
+
     </div>
     <div x-data="{
         showSearch: false,
@@ -81,7 +89,7 @@
             <tbody id="employeesBody" class="listEmpTableTbody mt-3">
                 @foreach (var employee in Model.Employees)
                 {
-                    <tr id="row-@employee.Id" class="snap-start">
+                    <tr id="row-@employee.Id" class="snap-start" data-dept-id="@employee.HRDepartmentId">
                         <td>@employee.Name</td>
                         <td>@employee.NationalId</td>
                         <td>@employee.PhoneNumber</td>
@@ -100,21 +108,21 @@
                         <td>@employee.ContractType</td>
                         <td>
                             <!-- SHIFT -->
-                            <button class="col-button-dark text-[19px] rounded"
+                            <button class="col-button-dark text-[11px] rounded"
                                     onclick="openShiftModal('@employee.Name', @employee.Id)"               index="@employee.Id">
                                 الشفت
                             </button>
                         </td>
                         <td>
                             <!-- Button to open modal -->
-                            <button class="col-button-light  text-[19px] rounded"
+                            <button class="col-button-light  text-[11px] rounded"
                                     onclick="openRateModal('@employee.Name', @employee.Id)"       index="@employee.Id">
                                 تقييم
                             </button>
                         </td>
                         <td>
                             <!-- Button to open modal -->
-                            <button class="openModal col-button-dark text-[19px] rounded" index="@employee.Id">
+                            <button class="openModal col-button-dark text-[11px] rounded" index="@employee.Id">
                                 تعديل
                             </button>
                         </td>

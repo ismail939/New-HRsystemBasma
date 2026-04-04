@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 namespace HRsystem.Models;
 
 public class HREmployeeRate
@@ -15,5 +16,6 @@ public class HREmployeeRate
     public int Year {get; set;}
     [Required]
     public decimal Rate { get; set; }
+    [JsonIgnore]
     public virtual HREmployee HREmployee { get; set; }
 }

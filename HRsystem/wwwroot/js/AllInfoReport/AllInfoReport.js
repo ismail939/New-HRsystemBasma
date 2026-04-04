@@ -300,16 +300,16 @@ document.getElementById('chooseEmployee').addEventListener('change', function ()
         document.getElementById("empInfoNationalId").innerText = employee.NationalId;
         document.getElementById("empInfoPhoneNumber").innerText = employee.PhoneNumber;
         document.getElementById("empInfoBirthDate").innerText = (employee.DateOfBirth) ? new Date(employee.DateOfBirth)
-            .toISOString()
+            .toLocaleDateString()
             .split("T")[0] : "";
         document.getElementById("empInfoReligion").innerText = employee.Religion;
         document.getElementById("empInfoSocialStatus").innerText = employee.MarriageStatus;
         document.getElementById("empInfoHireDate").innerText = (employee.HireDate) ? new Date(employee.HireDate)
-            .toISOString()
+            .toLocaleDateString()
             .split("T")[0] : "";
         document.getElementById("empInfoInsuranceNumber").innerText = employee.InsuranceNumber;
         document.getElementById("empInfoEndDate").innerText = (employee.EndDate) ? new Date(employee.EndDate)
-            .toISOString()
+            .toLocaleDateString()
             .split("T")[0] : "";
         document.getElementById("empInfoDepartment").innerText = employee.Department;
         document.getElementById("empInfoJobName").innerText = employee.JobName;

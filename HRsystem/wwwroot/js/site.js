@@ -6,7 +6,20 @@
 
 });
 
+function toLocalISODate(date) {
+    const offset = date.getTimezoneOffset(); // handles DST automatically
+    const local = new Date(date.getTime() - offset * 60000);
+    return local.toISOString().split("T")[0];
+}
+function formatHours(decimalHours) {
+    if (decimalHours == null) return "";
 
+    const totalMinutes = Math.round(decimalHours * 60);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    return `${hours}:${minutes.toString().padStart(2, '0')}`;
+}
 function clearFlatpickrInModal(formId) {
   console.log("🔴Clearing Flatpickr in form:", formId);
   const form = document.getElementById(formId);

@@ -258,9 +258,9 @@ function addEmployeeRow(emp) {
         <td>${emp.PhoneNumber}</td>
         <td>${emp.MarriageStatus}</td>
         <td>${emp.Religion}</td>
-        <td>${emp.DateOfBirth ? new Date(emp.DateOfBirth).toISOString().split('T')[0] : ''}</td>
+        <td>${emp.DateOfBirth ? new Date(emp.DateOfBirth).toLocaleDateString().split('T')[0] : ''}</td>
         <td>${emp.InsuranceNumber}</td>
-        <td>${emp.HireDate ? new Date(emp.HireDate).toISOString().split('T')[0] : ''}</td>
+        <td>${emp.HireDate ? new Date(emp.HireDate).toLocaleDateString().split('T')[0] : ''}</td>
         <td></td>
         <td>${emp.Department}</td>
         <td>${emp.JobName}</td>

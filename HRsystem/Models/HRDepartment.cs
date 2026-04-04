@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 namespace HRsystem.Models;
 
 public class HRDepartment
@@ -24,17 +25,20 @@ public class HRDepartment
     public int? ParentDepartmentId { get; set; }
 
     [ForeignKey("ParentDepartmentId")]
+    [JsonIgnore]
     public virtual HRDepartment ParentDepartment { get; set; }
-
+    [JsonIgnore]
     public virtual ICollection<HRDepartment> SubDepartments { get; set; }
 
     // Manager (Employee)
     public int? ManagerId { get; set; }
 
     [ForeignKey("ManagerId")]
+    [JsonIgnore]
     public virtual HREmployee Manager { get; set; }
 
     // Employees in Department
+    [JsonIgnore]
     public virtual ICollection<HREmployee> Employees { get; set; }
 
     // Audit Fields

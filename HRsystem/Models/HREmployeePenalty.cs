@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 namespace HRsystem.Models;
 
 public class HREmployeePenalty
@@ -17,5 +18,6 @@ public class HREmployeePenalty
     public string Decision { get; set; }
     public string? Reason { get; set; }
     public bool IsActive { get; set; } = false;
+    [JsonIgnore]
     public virtual HREmployee HREmployee { get; set; }
 }

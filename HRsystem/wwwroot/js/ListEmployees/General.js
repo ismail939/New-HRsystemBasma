@@ -22,6 +22,20 @@ function showAllEmployees() {
     rows.forEach(row => row.style.display = '');
 }
 
+document.getElementById("departmentFilter").addEventListener("change", function () {
+    const selectedDeptId = this.value;
+    const rows = document.querySelectorAll('#employeesBody tr');
+    rows.forEach(row => {
+        const deptId = row.getAttribute('data-dept-id');
+        if (selectedDeptId === '' || deptId === selectedDeptId) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+
 function openLeaveReasonModal(LeaveReason, date) {
     if (date != "" && LeaveReason != "") {
         document.getElementById("LeaveReasonDateText").innerText = formatDate(date);

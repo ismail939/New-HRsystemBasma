@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 namespace HRsystem.Models;
 
 public class HREmployeeBasma
@@ -23,5 +24,6 @@ public class HREmployeeBasma
     public int Status { get; set; } = 1; // 1: arrived, 0: absent, 2: on leave, 3: absent|on leave.
     public string? Notes { get; set; }
     [Required]
+    [JsonIgnore]
     public virtual HREmployee HREmployee { get; set; }
 }

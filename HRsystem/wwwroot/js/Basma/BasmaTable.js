@@ -31,11 +31,12 @@ async function showBasmaListForDay() {
     // Set the date programmatically
     if (dateInput == "") {
         fp.setDate(new Date());
-        dateInput = new Date().toISOString().split('T')[0];
+        dateInput = new Date().toLocaleDateString().split('T')[0];
     }
+    console.log("Fetching basma list for date:", dateInput);
     const response = await fetch(`/basmaData?Day=${encodeURIComponent(dateInput)}`);
     const list = await response.json();
-    console.log(list + "🔵");
+    console.log(JSON.stringify(list) + "🔵");
     if (list.length === 0) {
         document.getElementById('noDataMessage').classList.remove('hidden');
         document.getElementById('employeesTable').classList.add('hidden');
@@ -63,7 +64,7 @@ async function showBasmaListForDay() {
                 : ""}
         </td>
 
-        <td>${basma.TotalHours ?? ""}</td>
+        <td>${formatHours(basma.TotalHours) ?? ""}</td>
         <td>${basma.LateMinutes ?? ""}</td>
         <td>${basma.EarlyLeaveMinutes ?? ""}</td>
         <td>
@@ -74,6 +75,7 @@ async function showBasmaListForDay() {
                     <select class="h-full border p-1 rounded focus:outline-none focus:ring focus:ring-[#7B9669]"
                             data-id="${basma.Id}">
                         <option value="0">غياب</option>
+                        <option value="1">حضور</option>
                         <option value="2">إجازة</option>
                     </select>
                     `
@@ -83,7 +85,7 @@ async function showBasmaListForDay() {
         </td>
         <td>
         ${basma.Ok
-                ? "منتهي"
+                ? `<button class="col-button-light" onclick="cancel(${basma.Id})">إلغاء</button>`
                 : `<button class="col-button-dark" onclick="confirm(${basma.Id})">تأكيد</button>`
             }
 
@@ -134,6 +136,7 @@ async function searchForEmployee() {
                     <select class="h-full border p-1 rounded focus:outline-none focus:ring focus:ring-[#7B9669]"
                             data-id="${basma.Id}">
                         <option value="0">غياب</option>
+                        <option value="1">حضور</option>
                         <option value="2">إجازة</option>
                     </select>
                     `
@@ -143,8 +146,8 @@ async function searchForEmployee() {
         </td>
         <td>
         ${basma.Ok
-                ? "منتهي"
-                : `<button class="col-button-dark" onclick="takeBasma(${basma.Id})">تأكيد</button>`
+                ? `<button class="col-button-light" onclick="cancel(${basma.Id})">إلغاء</button>`
+                : `<button class="col-button-dark" onclick="confirm(${basma.Id})">تأكيد</button>`
             }
 
         </td>
@@ -170,13 +173,44 @@ function confirm(basmaId) {
         if (response.code==1) {
             
             const row = document.getElementById(`row-${basmaId}`);
-            const buttonCell = row.cells[7]; // Assuming the button is in the 8th cell (index 7)
-            buttonCell.innerHTML = "منتهي";
-            row.cells[6].innerHTML = type === "2" ? "إجازة" : "غياب";
+            // const buttonCell = row.cells[7]; // Assuming the button is in the 8th cell (index 7)
+            // buttonCell.innerHTML = "منتهي";
+            if(type == 1){
+                row.cells[6].innerHTML = "حضور";
+            }else{
+                row.cells[6].innerHTML = type === "2" ? "إجازة" : "غياب";
+            }
+            row.cells[7].innerHTML = `<button class="col-button-light" onclick="cancel(${basmaId})">إلغاء</button>`;
         } else if(response.code==2){
             alert("قم بتسجيل هذا اليوم كإجازة عارضة اولا");
             return;
         }
+    }).catch(error => {
+        console.error('Error confirming basma:', error);
+    });
+}
+function cancel(basmaId) {
+    console.log("Canceling basma with ID:", basmaId);
+    // eb3t elbasma ll backend hena w e3ml Ok b true lw hya 8yab 
+    // bs lw agaza et2kd mn elbackend eno fe agaza hna.
+    const type = document.querySelector(`select[data-id='${basmaId}']`)?.value;
+    fetch(`/cancelBasma?id=${basmaId}`, {
+        method: 'POST'
+    }).then(res=>res.json()).then(response => {
+        // edit two things 1. from select to the value, 2. button text to "منتهي"
+        if (response.success) {
+            const row = document.getElementById(`row-${basmaId}`);
+            row.cells[6].innerHTML = `
+                    <select class="h-full border p-1 rounded focus:outline-none focus:ring focus:ring-[#7B9669]"
+                            data-id="${basmaId}">
+                        <option value="0">غياب</option>
+                        <option value="1">حضور</option>
+                        <option value="2">إجازة</option>
+                    </select>
+                    `;
+            row.cells[7].innerHTML = `<button class="col-button-dark" onclick="confirm(${basmaId})">تأكيد</button>`;
+        }
+       
     }).catch(error => {
         console.error('Error confirming basma:', error);
     });

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 namespace HRsystem.Models;
 
 public class HREmployeeFile
@@ -15,6 +16,6 @@ public class HREmployeeFile
 
     [Required]
     public string Url { get; set; }
-
+    [JsonIgnore]
     public virtual HREmployee Employee { get; set; }
 }

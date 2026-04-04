@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 namespace HRsystem.Models;
 
 public class HREmployeeShift
@@ -17,7 +18,7 @@ public class HREmployeeShift
 
     [Required]
     public int ShiftMode { get; set; } = 0; // 0=variable, 1=hours, 2=fixed.
-    
+
     [Required]
     public DateTime FromDate { get; set; }
 
@@ -29,6 +30,7 @@ public class HREmployeeShift
 
     [ForeignKey(nameof(HREmployee))]
     public int? EmployeeId { get; set; }
+    [JsonIgnore]
     public virtual HREmployee HREmployee { get; set; }
 
 }
