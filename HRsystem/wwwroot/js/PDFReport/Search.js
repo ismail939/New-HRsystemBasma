@@ -22,4 +22,12 @@ document.addEventListener("DOMContentLoaded", () => {
         showDivFlex("selectModal");
     }
     window.openSelectModal = openSelectModal;
+    function closeSelectModal() {
+        hideDivFlex("selectModal");
+    }
+    window.closeSelectModal = closeSelectModal;
+    document.getElementById("selectModal").addEventListener("click", (event) => {
+        if (event.target === document.getElementById("selectModal")) {
+            closeSelectModal();
+        }});
 });
