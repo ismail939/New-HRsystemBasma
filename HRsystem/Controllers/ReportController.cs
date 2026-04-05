@@ -31,7 +31,8 @@ namespace HRsystem.Controllers
         [Route("/PDFReports")]
         public IActionResult PDFReports()
         {
-            return View("PDFReports");
+            var departments = _context.HRDepartments.ToList();
+            return View("PDFReports", departments);
         }
 
         [Authorize(Roles = "Admin,HR")]

@@ -1,11 +1,25 @@
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Hello");
-
+    let startDate = null;
+    let endDate = null;
     const pdfStartDate = document.getElementById("pdfStartDate");
     const pdfEndDate = document.getElementById("pdfEndDate");
 
     pdfStartDate.addEventListener("change", (event) => {
-        const selectedDate = event.target.value; // get the selected date
-        pdfEndDate._flatpickr.set("minDate", selectedDate);
+        startDate = event.target.value; // get the selected date
+        pdfEndDate._flatpickr.set("minDate", startDate);
+        pdfEndDate.disabled = false; // enable the end date input
+        if(endDate && endDate < startDate) {
+            showDivFlex("dateWarningDiv");
+        }
     });
+    pdfEndDate.addEventListener("change", (event) => {
+        endDate = event.target.value;
+        hideDivFlex("dateWarningDiv");
+    });
+
+    function openSelectModal() {
+        showDivFlex("selectModal");
+    }
+    window.openSelectModal = openSelectModal;
 });

@@ -419,12 +419,12 @@ html[lang="ar"],
 }
 
 .reportCard {
-  @apply p-5 my-2 text-lg text-color3 shadow-sm bg-white rounded-lg transition-colors duration-150 !important;
+  @apply p-5 my-2 text-lg border-2 border-transparent text-color3 shadow-sm bg-white rounded-lg transition-all duration-150 !important;
 }
 
 .reportCard:hover {
-  @apply bg-opacity-80 !important;
-  transform: scale(1.02);
+  @apply bg-opacity-80  border-color3 !important;
+  transform: scale(1);
 }
 
 td {

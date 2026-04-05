@@ -1,3 +1,4 @@
+@model List<HRsystem.Models.HRDepartment>
 @{
     ViewData["Title"] = "إدارة التقارير";
 }
@@ -10,17 +11,48 @@
     <label for="">من</label>
     <input id="pdfStartDate" type="date" placeholder="البداية" class="border text-center border-gray-400 rounded px-2 py-2">
     <label for="">إلي</label>
-    <input id="pdfEndDate" type="date" placeholder="النهاية" class="border text-center border-gray-400 rounded px-2 py-2">
+    <input id="pdfEndDate" disabled type="date" placeholder="النهاية" class="border text-center border-gray-400 rounded px-2 py-2">
 </div>
 
-<div class="grid grid-cols-3 rounded-lg gap-2">
-    <a href="/reports/employees" class=" reportCard">
-        كشف بجميع الموظفين   
+<div class="flex md:flex-row flex-col w-full justify-center rounded-lg gap-2">
+    @* <div id="dateWarningDiv" class="inset-x-0 fixed w-full h-full bg-black/20 text-center flex justify-center items-center ">
+        <p class="text-color3 bg-color1 shadow-md p-4 font-bold text-lg">اختر تاريخ البداية و النهاية اولا</p>
+    </div> *@
+    <a href="/reports/employees" class=" reportCard w-full flex flex-col items-center justify-center gap-2">
+        <span class="text-lg font-bold mb-2"> كشف بيانات الموظفين   </span>     
+        <img src="~/images/employee.png" alt="تقرير الموظفين" class="w-16 h-16">
     </a>
-    <a href="/reports/employeesDH/2" class="reportCard">
-        تقرير عن حضور الموظفين 
+    <button onclick="openSelectModal()" class="reportCard cursor-pointer w-full flex flex-col items-center justify-center gap-2">
+        <span class="text-lg font-bold mb-2"> تقرير عن حضور الموظفين بقسم معين </span>     
+        <img src="~/images/department.svg" alt="تقرير الموظفين" class="w-16 h-16">
+    </button>
+    <a href="/reports/employeesDH/2" class="reportCard w-full flex flex-col items-center justify-center gap-2">
+        <span class="text-lg font-bold mb-2"> تقرير عن حضور مديرين الأقسام  </span>     
+        <img src="~/images/manager.png" alt="تقرير المديرين" class="w-16 h-16">
     </a>
    
+</div>
+
+<!-- SMALL DROPDOWN POPUP -->
+<div id="selectModal" class="hidden fixed inset-0 bg-black/30 z-50
+              items-center justify-center">
+
+    <div id="" class="col-modal relative p-6 rounded-2xl shadow-xl !h-1/4 !w-1/3 text-center">
+        <h3 class="text-lg font-bold mb-3">اختر القسم</h3>
+            <select id="departmentSelect" class="border border-gray-400 rounded px-4 py-2 w-full">
+                <option value="">اختر القسم</option>
+                @foreach (var dept in Model)
+                {
+                    <option value="@dept.Id">@dept.Name - @dept.Code</option>
+                }
+        </select>
+        <div class="flex flex-row gap-2 justify-center items-center w-full mt-2">
+            <a  href="/reports/employeesDH/1"
+                class="py-4 w-full px-4 rounded-lg col-button-dark">
+                تحميل التقرير
+            </a>
+        </div>
+    </div>
 </div>
 
 @section Scripts{
