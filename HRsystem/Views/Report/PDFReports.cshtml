@@ -15,9 +15,9 @@
 </div>
 
 <div class="flex md:flex-row flex-col w-full justify-center rounded-lg gap-2">
-    @* <div id="dateWarningDiv" class="inset-x-0 fixed w-full h-full bg-black/20 text-center flex justify-center items-center ">
+    <div id="dateWarningDiv" class="inset-x-0 fixed w-full h-full bg-black/20 text-center flex justify-center items-center ">
         <p class="text-color3 bg-color1 shadow-md p-4 font-bold text-lg">اختر تاريخ البداية و النهاية اولا</p>
-    </div> *@
+    </div>
     <a href="/reports/employees" class=" reportCard w-full flex flex-col items-center justify-center gap-2">
         <span class="text-lg font-bold mb-2"> كشف بيانات الموظفين   </span>     
         <img src="~/images/employee.png" alt="تقرير الموظفين" class="w-16 h-16">
@@ -43,14 +43,14 @@
                 <option value="">اختر القسم</option>
                 @foreach (var dept in Model)
                 {
-                    <option value="@dept.Id">@dept.Name - @dept.Code</option>
+                    <option value="@dept.Code">@dept.Name - @dept.Code</option>
                 }
         </select>
         <div class="flex flex-row gap-2 justify-center items-center w-full mt-2">
-            <a  href="/reports/employeesDH/1"
+            <button onclick="downloadReport()" id="downloadReportBtn"
                 class="py-4 w-full px-4 rounded-lg col-button-dark">
                 تحميل التقرير
-            </a>
+            </button>
         </div>
     </div>
 </div>

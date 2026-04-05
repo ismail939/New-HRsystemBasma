@@ -27,6 +27,8 @@ namespace HRsystem.Models
 // ViewModel for report
 public class HREmployeeDHVM
 {
+    public DateTime ReportStartDate { get; set; }
+    public DateTime ReportEndDate { get; set; }
     public string EmployeeName { get; set; }
 
     // Entry days count

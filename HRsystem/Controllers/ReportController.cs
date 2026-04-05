@@ -261,27 +261,33 @@ namespace HRsystem.Controllers
 
         [Authorize(Roles = "Admin,HR")]
         [HttpGet]
-        [Route("/reports/employeesDH/{id}")]
-        public IActionResult PrintDailyReport(int id)
+        [Route("/reports/employeesDH")]
+        public IActionResult PrintDailyReport(int id, DateTime startDate, DateTime endDate)
         {
             // 1) Fetch your data
-            var emp = _context.HREmployees.Find(id);
-            if (emp == null)
+            var emps = _context.HREmployees.Where(e=> e.HRDepartmentId == id).ToList();
+            if (emps.Count() == 0)
             {
                 return NotFound();
             }
             // 2) Build ViewModel
+            List<HREmployeeDHVM> list = new List<HREmployeeDHVM>();
+            foreach (var emp in emps)
+            {
+                
             var vm = new HREmployeeDHVM
             {
+                ReportStartDate = startDate,
+                ReportEndDate = endDate,
                 EmployeeName = emp.Name,
                 EntryDaysCount = _context.HREmployeeBasmas
-                .Where(b => b.EmployeeId == id
+                .Where(b => b.EmployeeId == emp.Id
                         && b.ArrivalTime != null
                         && b.DepartureTime != null)
                 .Count(),
 
                 Leaves = _context.HREmployeeOffDays
-                    .Where(a => a.EmployeeId == id)
+                    .Where(a => a.EmployeeId == emp.Id)
                     .Select(a => new LeaveDetail
                     {
                         Date = a.OffDayDate,
@@ -289,7 +295,7 @@ namespace HRsystem.Controllers
                     })
                     .ToList(),
                 Penalty = _context.HREmployeePenalties
-                    .Where(p => p.EmployeeId == id)
+                    .Where(p => p.EmployeeId == emp.Id)
                     .Select(p => new PenaltyDetail
                     {
                         Date = p.PenaltyDate,
@@ -298,22 +304,24 @@ namespace HRsystem.Controllers
                     })
                     .ToList(),
                 Absences = _context.HREmployeeBasmas
-                    .Where(a => a.EmployeeId == id)
+                    .Where(a => a.EmployeeId == emp.Id)
                     .Select(a => new AbsenceDetail
                     {
                         Date = a.DayDate
                     })
                     .ToList()
             };
-
+                list.Add(vm);
+            }
+           
             // 3) Create the report
-            var report = new EmployeeReportDHVM(vm);
+            var report = new EmployeeReportDHVM(list);
 
             // 4) Generate PDF 
             var pdfBytes = report.GeneratePdf();
 
             // 5) Return PDF
-            return File(pdfBytes, "application/pdf", $"EmployeeReport_{emp.Name}.pdf");
+            return File(pdfBytes, "application/pdf", $"EmployeeReport_.pdf");
         }
 
     }
