@@ -1,4 +1,5 @@
 using HRsystem.Models;
+using HRsystem.ViewModels;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -87,13 +88,14 @@ public class EmployeeReportDHVM : IDocument
                         }
 
                         Row("عدد ايام الحضور", EmployeeReport.EntryDaysCount.ToString(), true);
-                        Row("عدد ساعات العمل", EmployeeReport.LeavesCount.ToString(), false);
+                        Row("عدد ساعات العمل", EmployeeReport.TotalWorkHours.ToString(), false);
                         Row("عدد الغيابات", EmployeeReport.AbsencesCount.ToString(), true);
                         Row("عدد ايام الاجازة", EmployeeReport.LeavesCount.ToString(), false);
-                        Row("عدد ايام الراحات", EmployeeReport.LeavesCount.ToString(), true);
-                        Row("عدد الجزاءات", EmployeeReport.LeavesCount.ToString(), false);
-                        Row("التأخير عن بداية الشيفت", EmployeeReport.LeavesCount.ToString(), true);
-                        Row("مجموع دقائق الخروج المبكر", EmployeeReport.LeavesCount.ToString(), false);
+                        Row("عدد ايام المرضي", EmployeeReport.IllsCount.ToString(), true);
+                        Row("عدد ايام الراحات", EmployeeReport.OffsCount.ToString(), false);
+                        Row("عدد الجزاءات", EmployeeReport.PenaltyCount.ToString(), true);
+                        Row("التأخير عن بداية الشيفت", EmployeeReport.TotalLateMinutes.ToString(), false);
+                        Row("مجموع دقائق الخروج المبكر", EmployeeReport.TotalEarlyLeaveMinutes.ToString(), true);
                     });
 
                     // شكل الخلايا
@@ -108,30 +110,38 @@ public class EmployeeReportDHVM : IDocument
                             .AlignCenter();  // horizontal center
                     }
                     col.Item().PaddingTop(10);
-                    col.Item().Text("التقييم العام للموظف:").AlignCenter();
-                    col.Item().PaddingBottom(5);
-                    col.Item().Height(20).Element(bar =>
+                    if(EmployeeReport.TotalRate > 0)
                     {
-                        float percent = 80;   // your value 0–100
-
-                        bar.Row(row =>
+                        col.Item().Text("التقييم العام للموظف:").AlignCenter();
+                        col.Item().PaddingBottom(5);
+                        col.Item().Height(20).Element(bar =>
                         {
-                            // Filled part
-                            row.RelativeItem(percent)
-                            .Background(Colors.Green.Medium)
-                            .AlignCenter()
-                            .AlignMiddle()
-                            .Text($"{percent}%").FontColor(Colors.White);
+                            float percent = (float)EmployeeReport.TotalRate*20;   // your value 0–100
+                            Console.WriteLine($"⭐TotalRate: {EmployeeReport.TotalRate}, Percent: {percent}");
+                            bar.Row(row =>
+                            {
+                                // Filled part
+                                row.RelativeItem(percent)
+                                .Background(Colors.Green.Medium)
+                                .AlignCenter()
+                                .AlignMiddle()
+                                .Text($"{percent}%").FontColor(Colors.White);
 
-                            // Empty part
-                            row.RelativeItem(100 - percent)
-                            .Background(Colors.Grey.Lighten3);
+                                // Empty part
+                                row.RelativeItem(100 - percent)
+                                .Background(Colors.Grey.Lighten3);
+                            });
                         });
-                    });
+                        
+                    }
 
                     // --------------------------------------
                     // Penalty table
                     // --------------------------------------
+                    if(EmployeeReport.PenaltyCount == 0)
+                    {
+                        return; // ما فيش جزاءات، ما نعرضش الجدول
+                    }
                     col.Item().PaddingTop(20);
                     col.Item().Text($" الجزاءات:").FontSize(14).AlignCenter();
                     col.Item().PaddingTop(10);
@@ -214,6 +224,11 @@ public class EmployeeReportDHVM : IDocument
                         });
                         page.Content().Padding(20).ContentFromRightToLeft().Column(col =>
                         {
+                            if(EmployeeReport.BasmaList == null || EmployeeReport.BasmaList.Count == 0)
+                            {
+                                col.Item().Text("لا توجد بيانات حضور وانصراف لهذا الموظف في الفترة المحددة.").FontSize(12).AlignCenter();
+                                return;
+                            }
                             col.Item().Text($"الحضور والانصراف من {EmployeeReport.ReportStartDate:dd-MM-yyyy} إلي {EmployeeReport.ReportEndDate:dd-MM-yyyy}")
                                 .FontSize(14).AlignCenter();
 
@@ -232,6 +247,7 @@ public class EmployeeReportDHVM : IDocument
                                     columns.RelativeColumn();
                                     columns.RelativeColumn();
                                     columns.RelativeColumn(2);
+                                    columns.RelativeColumn();
                                     columns.RelativeColumn(2);
                                 });
 
@@ -250,9 +266,9 @@ public class EmployeeReportDHVM : IDocument
                                     {
                                         header.Cell()
                                             .Element(HeaderCellStyle)
-                                            .Padding(3)
+                                            .Padding(2)
                                             .Text(text)
-                                            .FontSize(9).Bold();
+                                            .FontSize(8).Bold();
                                     }
 
                                     HeaderCell("التاريخ");
@@ -264,26 +280,60 @@ public class EmployeeReportDHVM : IDocument
                                     HeaderCell("عدد الساعات");
                                     HeaderCell("التأخير");
                                     HeaderCell("دقائق الخروج المبكر");
+                                    HeaderCell("الحالة");
                                     HeaderCell("الملاحظات");
                                 });
 
-                                foreach (var penalty in EmployeeReport.Penalty)
+                            foreach (var basma in EmployeeReport.BasmaList)
+                            {
+                                table.Cell().Border(1).Padding(2).AlignCenter()
+                                    .Text($"{basma.DayDate:dd-MM-yyyy}").FontSize(8);
+
+                                table.Cell().Border(1).Padding(5).AlignCenter()
+                                    .Text(EmployeeReport.EmployeeName).FontSize(8);
+                                table.Cell().Border(1).Padding(5).AlignCenter()
+                                    .Text(basma.ShiftStart.HasValue ? basma.ShiftStart.Value.ToString("HH:mm") : "-").FontSize(8);
+                                table.Cell().Border(1).Padding(5).AlignCenter()
+                                    .Text(basma.ShiftEnd.HasValue ? basma.ShiftEnd.Value.ToString("HH:mm") : "-").FontSize(8);
+                                table.Cell().Border(1).Padding(5).AlignCenter()
+                                    .Text(basma.Arrival.HasValue ? basma.Arrival.Value.ToString("HH:mm") : "-").FontSize(8); 
+                                table.Cell().Border(1).Padding(5).AlignCenter()
+                                    .Text(basma.Departure.HasValue ? basma.Departure.Value.ToString("HH:mm") : "-").FontSize(8); 
+                                table.Cell().Border(1).Padding(5).AlignCenter()
+                                    .Text(basma.TotalHours.HasValue ? basma.TotalHours.Value.ToString("0.##") : "-").FontSize(8);
+                                table.Cell().Border(1).Padding(5).AlignCenter()
+                                    .Text(basma.LateMinutes.HasValue ? basma.LateMinutes.Value.ToString() : "-").FontSize(8);
+                                table.Cell().Border(1).Padding(5).AlignCenter()
+                                    .Text(basma.EarlyLeaveMinutes.HasValue ? basma.EarlyLeaveMinutes.Value.ToString() : "-").FontSize(8);
+                                if(basma.Status == 1)
                                 {
                                     table.Cell().Border(1).Padding(5).AlignCenter()
-                                        .Text($"{penalty.Date:dd-MM-yyyy}").FontSize(8);
-
-                                    table.Cell().Border(1).Padding(5).AlignCenter()
-                                        .Text(EmployeeReport.EmployeeName).FontSize(8);
-
-                                    for (int i = 0; i < 7; i++)
-                                    {
-                                        table.Cell().Border(1).Padding(5).AlignCenter()
-                                            .Text(penalty.Decision).FontSize(8);
-                                    }
-
-                                    table.Cell().Border(1).Padding(5).AlignCenter()
-                                        .Text("تم اخذ اذن ساعتين").FontSize(8);
+                                    .Text("حضور").FontSize(8);
                                 }
+                                else if(basma.Status == 2)
+                                {
+                                    var leave = EmployeeReport.Leaves.Find(l => l.Date.Date == basma.DayDate.Date);
+                                    if(leave != null)
+                                        {
+                                             table.Cell().Border(1).Padding(5).AlignCenter()
+                                             .Text(leave.Type).FontSize(8);
+                                        }
+                                    var off = EmployeeReport.Offs.Find(l => l.Date.Date == basma.DayDate.Date);
+                                    if(off != null)                                        {
+                                             table.Cell().Border(1).Padding(5).AlignCenter()
+                                             .Text(off.Type).FontSize(8);
+                                        }
+
+                                }
+                                else if(basma.Status == 0)
+                                {
+                                    table.Cell().Border(1).Padding(5).AlignCenter()
+                                    .Text("غياب").FontSize(8);
+                                }
+                                table.Cell().Border(1).Padding(5).AlignCenter()
+                                    .Text(basma.Notes ?? "-").FontSize(8);
+                                
+                            }  
                             });
                         });
                         // ========= FOOTER =========
