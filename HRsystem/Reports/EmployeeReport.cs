@@ -18,6 +18,7 @@ namespace HRsystem.Reports
             Employees = employees;
         }
 
+        [Obsolete]
         public void Compose(IDocumentContainer container)
         {
             int rowsPerPage = 15; // adjust based on row height and page size
@@ -32,12 +33,35 @@ namespace HRsystem.Reports
                     page.Size(PageSizes.A4.Landscape());
                     page.Margin(20);
                     page.DefaultTextStyle(x => x
-                        .FontSize(9)
+                        .FontSize(7)
                         .FontColor(Colors.Black)
                     );
+                    page.Background().Element(bg =>
+                        {
+                            bg.Padding(10)
+                            .Border(2)
+                            .BorderColor(Colors.Black);
+                        });
+                    page.Header().Column(headerCol =>
+                        {
+                            headerCol.Item().ContentFromRightToLeft().Row(row =>
+                            {
+                                // Right text
+                                row.RelativeItem().Column(col =>
+                                {
+                                    col.Item().PaddingTop(20);
+                                    col.Item().Text("القوات البحرية").FontSize(14).Bold();
+                                    col.Item().PaddingTop(5);
+                                    col.Item().Text("دار الاسطول الجزيرة").FontSize(14).Bold();
+                                });
 
-                    page.Header().ShowOnce().AlignCenter()
-                        .Text(text => text.Span("كشف بجميع الموظفين من 2026-01 الي 2026-02").Bold().FontSize(16));
+                                // Left logo
+                                row.ConstantItem(80).Image("wwwroot/images/logo2hh.png", ImageScaling.FitArea);
+                            });
+                            headerCol.Item().PaddingTop(20).AlignCenter().Text(text => text.Span("كشف بجميع الموظفين").Bold().FontSize(13));
+;
+                        });
+                    
 
                     page.Content().Padding(5)
                         .ContentFromRightToLeft()
@@ -45,48 +69,63 @@ namespace HRsystem.Reports
                         {
                             table.ColumnsDefinition(columns =>
                             {
-                                for (int i = 0; i < 12; i++) columns.RelativeColumn();
+                                columns.RelativeColumn(2);
+                                columns.RelativeColumn(2);
+                                columns.RelativeColumn(1);
+                                columns.RelativeColumn(2);
+                                columns.RelativeColumn(1);
+                                columns.RelativeColumn(1);
+                                columns.RelativeColumn(1);
+                                columns.RelativeColumn(1);
+                                columns.RelativeColumn(1);
+                                columns.RelativeColumn(1);
+                                columns.RelativeColumn(1);
+                                columns.RelativeColumn(1);
+                                columns.RelativeColumn(1);
                             });
 
                             // Header row
-                            string[] headers = { "اسم الموظف", "الرقم القومي", "رقم الهاتف", "الحالة الاجتماعية",
-                    "الدين", "تاريخ الميلاد", "رقم التأمين", "تاريخ التعيين",
+                            string[] headers = { "اسم الموظف", "الرقم القومي", "رقم الهاتف","العنوان", "الحالة الاجتماعية",
+                    "الديانة", "تاريخ الميلاد", "رقم التأمين", "تاريخ التعيين",
                     "تاريخ نهاية الخدمة", "القسم", "الوظيفة", "نوع العقد" };
 
                             table.Header(header =>
                             {
                                 foreach (var h in headers)
-                                    header.Cell().Element(cell => cell.Border(1).Padding(3).AlignCenter().AlignMiddle()
+                                    header.Cell().Element(cell => cell.Border(1).Padding(1).AlignCenter().AlignMiddle()
                                         .Text(text => text.Span(h).Bold()));
                             });
-
+                            int color = 0;
                             // Data rows
                             foreach (var emp in pageEmployees)
                             {
-                                table.Cell().Element(cell => cell.Border(1).Padding(3).AlignCenter().AlignMiddle()
+                                table.Cell().Background(color % 2 == 0 ? Colors.Grey.Lighten3 : Colors.White).Element(cell => cell.Border(1).Padding(2).AlignCenter().AlignMiddle()
                                     .Text(emp.Name));
-                                table.Cell().Element(cell => cell.Border(1).Padding(3).AlignCenter().AlignMiddle()
+                                table.Cell().Background(color % 2 == 0 ? Colors.Grey.Lighten3 : Colors.White).Element(cell => cell.Border(1).Padding(2).AlignCenter().AlignMiddle()
                                     .Text(emp.NationalId));
-                                table.Cell().Element(cell => cell.Border(1).Padding(3).AlignCenter().AlignMiddle()
+                                table.Cell().Background(color % 2 == 0 ? Colors.Grey.Lighten3 : Colors.White).Element(cell => cell.Border(1).Padding(2).AlignCenter().AlignMiddle()
                                     .Text(emp.PhoneNumber));
-                                table.Cell().Element(cell => cell.Border(1).Padding(3).AlignCenter().AlignMiddle()
+                                table.Cell().Background(color % 2 == 0 ? Colors.Grey.Lighten3 : Colors.White).Element(cell => cell.Border(1).Padding(2).AlignCenter().AlignMiddle()
+                                    .Text(emp.Address));
+                                table.Cell().Background(color % 2 == 0 ? Colors.Grey.Lighten3 : Colors.White).Element(cell => cell.Border(1).Padding(2).AlignCenter().AlignMiddle()
                                     .Text(emp.MarriageStatus));
-                                table.Cell().Element(cell => cell.Border(1).Padding(3).AlignCenter().AlignMiddle()
+                                table.Cell().Background(color % 2 == 0 ? Colors.Grey.Lighten3 : Colors.White).Element(cell => cell.Border(1).Padding(2).AlignCenter().AlignMiddle()
                                     .Text(emp.Religion));
-                                table.Cell().Element(cell => cell.Border(1).Padding(3).AlignCenter().AlignMiddle()
+                                table.Cell().Background(color % 2 == 0 ? Colors.Grey.Lighten3 : Colors.White).Element(cell => cell.Border(1).Padding(2).AlignCenter().AlignMiddle()
                                     .Text(emp.DateOfBirth.ToString("yyyy-MM-dd")));
-                                table.Cell().Element(cell => cell.Border(1).Padding(3).AlignCenter().AlignMiddle()
+                                table.Cell().Background(color % 2 == 0 ? Colors.Grey.Lighten3 : Colors.White).Element(cell => cell.Border(1).Padding(2).AlignCenter().AlignMiddle()
                                     .Text(emp.InsuranceNumber ?? ""));
-                                table.Cell().Element(cell => cell.Border(1).Padding(3).AlignCenter().AlignMiddle()
+                                table.Cell().Background(color % 2 == 0 ? Colors.Grey.Lighten3 : Colors.White).Element(cell => cell.Border(1).Padding(2).AlignCenter().AlignMiddle()
                                     .Text(emp.HireDate.ToString("yyyy-MM-dd")));
-                                table.Cell().Element(cell => cell.Border(1).Padding(3).AlignCenter().AlignMiddle()
+                                table.Cell().Background(color % 2 == 0 ? Colors.Grey.Lighten3 : Colors.White).Element(cell => cell.Border(1).Padding(2).AlignCenter().AlignMiddle()
                                     .Text(emp.EndDate.HasValue ? emp.EndDate.Value.ToString("yyyy-MM-dd") : ""));
-                                table.Cell().Element(cell => cell.Border(1).Padding(3).AlignCenter().AlignMiddle()
+                                table.Cell().Background(color % 2 == 0 ? Colors.Grey.Lighten3 : Colors.White).Element(cell => cell.Border(1).Padding(2).AlignCenter().AlignMiddle()
                                     .Text(emp.Department));
-                                table.Cell().Element(cell => cell.Border(1).Padding(3).AlignCenter().AlignMiddle()
+                                table.Cell().Background(color % 2 == 0 ? Colors.Grey.Lighten3 : Colors.White).Element(cell => cell.Border(1).Padding(2).AlignCenter().AlignMiddle()
                                     .Text(emp.JobName));
-                                table.Cell().Element(cell => cell.Border(1).Padding(3).AlignCenter().AlignMiddle()
+                                table.Cell().Background(color % 2 == 0 ? Colors.Grey.Lighten3 : Colors.White).Element(cell => cell.Border(1).Padding(2).AlignCenter().AlignMiddle()
                                     .Text(emp.ContractType));
+                                color++;
                             }
                         });
 

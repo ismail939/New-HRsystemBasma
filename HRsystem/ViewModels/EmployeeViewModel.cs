@@ -13,6 +13,7 @@ public class EmployeeViewModel
 
    
     public string? PhoneNumber { get; set; }
+    public string? Address { get; set; }
    
     public string? MarriageStatus { get; set; }
  

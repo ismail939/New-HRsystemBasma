@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
         form.querySelector('[name="Name"]').value = emp.Name ?? "";
         form.querySelector('[name="NationalId"]').value = emp.NationalId ?? "";
         form.querySelector('[name="PhoneNumber"]').value = emp.PhoneNumber ?? "";
+        form.querySelector('[name="Address"]').value = emp.Address ?? "";
         form.querySelector('[name="MarriageStatus"]').value = emp.MarriageStatus ?? "";
         form.querySelector('[name="Religion"]').value = emp.Religion ?? "";
         form.querySelector('[name="DateOfBirth"]').value = emp.DateOfBirth?.split('T')[0] ?? "";
@@ -226,15 +227,16 @@ document.getElementById('employeeForm').addEventListener('submit', async functio
         row.querySelectorAll('td')[0].innerText = formData.get('Name');
         row.querySelectorAll('td')[1].innerText = formData.get('NationalId');
         row.querySelectorAll('td')[2].innerText = formData.get('PhoneNumber');
-        row.querySelectorAll('td')[3].innerText = formData.get('MarriageStatus');
-        row.querySelectorAll('td')[4].innerText = formData.get('Religion');
-        row.querySelectorAll('td')[5].innerText = formData.get('DateOfBirth');
-        row.querySelectorAll('td')[6].innerText = formData.get('InsuranceNumber');
-        row.querySelectorAll('td')[7].innerText = formData.get('HireDate');
-        row.querySelectorAll('td')[8].innerText = formData.get('EndDate');
-        row.querySelectorAll('td')[9].innerText = formData.get('Department');
-        row.querySelectorAll('td')[10].innerText = formData.get('JobName');
-        row.querySelectorAll('td')[11].innerText = formData.get('ContractType');
+        row.querySelectorAll('td')[3].innerText = formData.get('Address');
+        row.querySelectorAll('td')[4].innerText = formData.get('MarriageStatus');
+        row.querySelectorAll('td')[5].innerText = formData.get('Religion');
+        row.querySelectorAll('td')[6].innerText = formData.get('DateOfBirth');
+        row.querySelectorAll('td')[7].innerText = formData.get('InsuranceNumber');
+        row.querySelectorAll('td')[8].innerText = formData.get('HireDate');
+        row.querySelectorAll('td')[9].innerText = formData.get('EndDate');
+        row.querySelectorAll('td')[10].innerText = formData.get('Department');
+        row.querySelectorAll('td')[11].innerText = formData.get('JobName');
+        row.querySelectorAll('td')[12].innerText = formData.get('ContractType');
         closeModal();
         setTimeout(() => {
             alert('تم الحفظ بنجاح ✅');
@@ -256,6 +258,7 @@ function addEmployeeRow(emp) {
         <td>${emp.Name}</td>
         <td>${emp.NationalId}</td>
         <td>${emp.PhoneNumber}</td>
+        <td>${emp.Address}</td>
         <td>${emp.MarriageStatus}</td>
         <td>${emp.Religion}</td>
         <td>${emp.DateOfBirth ? new Date(emp.DateOfBirth).toLocaleDateString().split('T')[0] : ''}</td>

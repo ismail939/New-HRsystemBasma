@@ -26,6 +26,7 @@ public class HREmployee
     public DateTime DateOfBirth { get; set; }
     
     public string? InsuranceNumber { get; set; }
+    public string? Address { get; set; }
     [Required]
     public DateTime HireDate { get; set; }
     public DateTime? EndDate { get; set; }

@@ -299,6 +299,7 @@ document.getElementById('chooseEmployee').addEventListener('change', function ()
         document.getElementById("empInfoName").innerText = employee.Name;
         document.getElementById("empInfoNationalId").innerText = employee.NationalId;
         document.getElementById("empInfoPhoneNumber").innerText = employee.PhoneNumber;
+        document.getElementById("empInfoAddress").innerText = employee.Address;
         document.getElementById("empInfoBirthDate").innerText = (employee.DateOfBirth) ? new Date(employee.DateOfBirth)
             .toLocaleDateString()
             .split("T")[0] : "";

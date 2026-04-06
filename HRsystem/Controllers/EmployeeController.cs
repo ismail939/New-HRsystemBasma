@@ -61,6 +61,7 @@ namespace HRsystem.Controllers
                     Name = emp.Name,
                     NationalId = emp.NationalId,
                     PhoneNumber = emp.PhoneNumber,
+                    Address = emp.Address,
                     MarriageStatus = emp.MarriageStatus,
                     Religion = emp.Religion,
                     DateOfBirth = emp.DateOfBirth,

@@ -30,6 +30,7 @@ namespace HRsystem.Models
 // ViewModel for report
 public class HREmployeeDHVM
 {
+    public string DepartmentName { get; set; }
     public DateTime ReportStartDate { get; set; }
     public DateTime ReportEndDate { get; set; }
     public string EmployeeName { get; set; }

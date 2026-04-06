@@ -5,11 +5,11 @@ using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using System;
 
-public class EmployeeReportDHVM : IDocument
+public class ManagersReport : IDocument
 {
     public List<HREmployeeDHVM> EmployeeReports { get; set; }
 
-    public EmployeeReportDHVM(List<HREmployeeDHVM> EmployeeReports)
+    public ManagersReport(List<HREmployeeDHVM> EmployeeReports)
     {
         this.EmployeeReports = EmployeeReports;
     }
@@ -61,7 +61,7 @@ public class EmployeeReportDHVM : IDocument
                 // ========= CONTENT (NO BORDER ANYMORE) =========
                 page.Content().Padding(10).ContentFromRightToLeft().Column(col =>
                 {
-                    col.Item().AlignCenter().Text($"تقرير موظف: {EmployeeReport.EmployeeName}")
+                    col.Item().AlignCenter().Text($"تقرير مدير قسم {EmployeeReport.DepartmentName}: {EmployeeReport.EmployeeName}")
                         .FontSize(14).Bold();
 
                     col.Item().PaddingTop(10).Text($"الفترة من: {EmployeeReport.ReportStartDate:dd-MM-yyyy} إلي: {EmployeeReport.ReportEndDate:dd-MM-yyyy}").AlignCenter();
@@ -229,7 +229,7 @@ public class EmployeeReportDHVM : IDocument
                                 col.Item().Text("لا توجد بيانات حضور وانصراف لهذا الموظف في الفترة المحددة.").FontSize(12).AlignCenter();
                                 return;
                             }
-                            col.Item().Text($"الحضور والانصراف من {EmployeeReport.ReportStartDate:dd-MM-yyyy} إلي {EmployeeReport.ReportEndDate:dd-MM-yyyy}   للموظف: {EmployeeReport.EmployeeName}")
+                            col.Item().Text($"الحضور والانصراف من {EmployeeReport.ReportStartDate:dd-MM-yyyy} إلي {EmployeeReport.ReportEndDate:dd-MM-yyyy}   لمدير قسم {EmployeeReport.DepartmentName}: {EmployeeReport.EmployeeName}")
                                 .FontSize(14).AlignCenter();
 
                             col.Item().PaddingTop(10);

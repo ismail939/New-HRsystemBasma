@@ -234,6 +234,7 @@ namespace HRsystem.Controllers
                 Name = e.Name,
                 NationalId = e.NationalId,
                 PhoneNumber = e.PhoneNumber,
+                Address = e.Address,
                 MarriageStatus = e.MarriageStatus,
                 Religion = e.Religion,
                 DateOfBirth = e.DateOfBirth,
@@ -276,8 +277,10 @@ namespace HRsystem.Controllers
             {
                     var BasmaList = _context.HREmployeeBasmas.Where(b => b.EmployeeId == emp.Id && b.DayDate >= startDate && b.DayDate <= endDate).ToList();
                     var shifts = _context.HREmployeeShift.ToList();
+                    var departmentName = _context.HRDepartments.FirstOrDefault(d => d.Id == emp.HRDepartmentId)?.Name ?? "غير محدد";
                 var vm = new HREmployeeDHVM
             {
+                DepartmentName = departmentName,
                 TotalRate = _context.HREmployeeRates
                 .Where(r => r.EmployeeId == emp.Id)
                 .AsEnumerable() // 👈 الحل هنا
@@ -401,6 +404,153 @@ namespace HRsystem.Controllers
             // 5) Return PDF
             return File(pdfBytes, "application/pdf", $"EmployeeReport_.pdf");
         }
+
+        [Authorize(Roles = "Admin,HR")]
+        [HttpGet]
+        [Route("/reports/managersDH")]
+        public IActionResult PrintManagersReport(DateTime startDate, DateTime endDate)
+        {
+            // 1) Fetch your data
+            var managerIds = _context.HRDepartments.Where(e => e.ManagerId != null).Select(p=>p.ManagerId).ToList();
+            var emps = _context.HREmployees.Where(e => managerIds.Contains(e.Id)).ToList();
+            if (emps.Count() == 0)
+            {
+                return NotFound();
+            }
+            // 2) Build ViewModel
+            List<HREmployeeDHVM> list = new List<HREmployeeDHVM>();
+            foreach (var emp in emps)
+            {
+                    var BasmaList = _context.HREmployeeBasmas.Where(b => b.EmployeeId == emp.Id && b.DayDate >= startDate && b.DayDate <= endDate).ToList();
+                    var shifts = _context.HREmployeeShift.ToList();
+                    var departmentName = _context.HRDepartments.FirstOrDefault(d => d.Id == emp.HRDepartmentId)?.Name ?? "غير محدد";
+                var vm = new HREmployeeDHVM
+            {
+                DepartmentName = departmentName,
+                TotalRate = _context.HREmployeeRates
+                .Where(r => r.EmployeeId == emp.Id)
+                .AsEnumerable() // 👈 الحل هنا
+                .Where(r =>
+                {
+                    var monthStart = new DateTime(r.Year, r.Month, 1);
+                    var monthEnd = monthStart.AddMonths(1).AddDays(-1);
+
+                    return startDate <= monthStart && endDate >= monthEnd;
+                })
+                .Select(r => r.Rate)
+                .DefaultIfEmpty(0)
+                .Average(),
+                BasmaList = BasmaList.Where(b=>b.Ok).Select(b => new BasmaWithShiftVM
+                {
+                    DayDate = b.DayDate,
+                    Arrival = b.ArrivalTime,
+                    Departure = b.DepartureTime,
+                    Notes = b.Notes,
+                    LateMinutes = b.LateMinutes,
+                    EarlyLeaveMinutes = b.EarlyLeaveMinutes,
+                    TotalHours = b.TotalHours,
+                    Status = b.Status,
+
+                    ShiftStart = shifts
+                        .Where(s => b.DayDate.Date >= s.FromDate.Date &&
+                            (s.ToDate == null || b.DayDate.Date <= s.ToDate?.Date)
+                            && s.EmployeeId == emp.Id)
+                        .OrderByDescending(s => s.FromDate)
+                        .Select(s => s.StartTime)
+                        .FirstOrDefault(),
+
+                    ShiftEnd = shifts
+                        .Where(s => b.DayDate.Date >= s.FromDate.Date &&
+                            (s.ToDate == null || b.DayDate.Date <= s.ToDate?.Date)
+                            && s.EmployeeId == emp.Id)
+                        .OrderByDescending(s => s.FromDate)
+                        .Select(s => s.EndTime)
+                        .FirstOrDefault()
+                }).OrderBy(b => b.DayDate).ToList(),
+                ReportStartDate = startDate,
+                ReportEndDate = endDate,
+                EmployeeName = emp.Name,
+                TotalWorkHours = (float)_context.HREmployeeBasmas
+                .Where(b => b.EmployeeId == emp.Id
+                            && b.Ok == true
+                        && b.DayDate >= startDate
+                        && b.DayDate <= endDate)
+                    .Sum(b => b.TotalHours ?? 0),
+                TotalLateMinutes = (int)_context.HREmployeeBasmas
+                .Where(b => b.EmployeeId == emp.Id
+                            && b.Ok == true
+                        && b.DayDate >= startDate
+                        && b.DayDate <= endDate)
+                    .Sum(b => b.LateMinutes ?? 0),
+                TotalEarlyLeaveMinutes = (int)_context.HREmployeeBasmas
+                .Where(b => b.EmployeeId == emp.Id
+                            && b.Ok == true
+                        && b.DayDate >= startDate
+                        && b.DayDate <= endDate)
+                    .Sum(b => b.EarlyLeaveMinutes ?? 0),
+                EntryDaysCount = _context.HREmployeeBasmas
+                .Where(b => b.EmployeeId == emp.Id
+                            && b.Status == 1
+                            && b.Ok == true
+                        && b.DayDate >= startDate
+                        && b.DayDate <= endDate)
+                .Count(),
+
+                Leaves = _context.HREmployeeOffDays
+                    .Where(a => a.EmployeeId == emp.Id && a.OffDayType != "راحة" && a.OffDayDate >= startDate && a.OffDayDate <= endDate)
+                    .Select(a => new LeaveDetail
+                    {
+                        Date = a.OffDayDate,
+                        Type = a.OffDayType
+                    })
+                    .ToList(),
+                Offs = _context.HREmployeeOffDays
+                    .Where(a => a.EmployeeId == emp.Id && a.OffDayType == "راحة" && a.OffDayDate >= startDate && a.OffDayDate <= endDate)
+                    .Select(a => new LeaveDetail
+                    {
+                        Date = a.OffDayDate,
+                        Type = a.OffDayType
+                    })
+                    .ToList(),
+                Ills = _context.HREmployeeOffDays
+                    .Where(a => a.EmployeeId == emp.Id && a.OffDayType == "مرضي" && a.OffDayDate >= startDate && a.OffDayDate <= endDate)
+                    .Select(a => new LeaveDetail
+                    {
+                        Date = a.OffDayDate,
+                        Type = a.OffDayType
+                    })
+                    .ToList(),
+                Penalty = _context.HREmployeePenalties
+                    .Where(p => p.IsActive && p.EmployeeId == emp.Id && p.PenaltyDate >= startDate && p.PenaltyDate <= endDate)
+                    .Select(p => new PenaltyDetail
+                    {
+                        Date = p.PenaltyDate,
+                        Decision = p.Decision,
+                        Reason = p.Reason
+                    })
+                    .ToList(),
+                Absences = _context.HREmployeeBasmas
+                    .Where(a => a.EmployeeId == emp.Id && a.DayDate >= startDate && a.DayDate <= endDate && a.Ok == true && a.Status == 0)
+                    .Select(a => new AbsenceDetail
+                    {
+                        Date = a.DayDate
+                    })
+                    .ToList()
+
+            };
+                list.Add(vm);
+            }
+
+            // 3) Create the report
+            var report = new ManagersReport(list);
+
+            // 4) Generate PDF 
+            var pdfBytes = report.GeneratePdf();
+
+            // 5) Return PDF
+            return File(pdfBytes, "application/pdf", $"ManagersReport_{startDate}_to_{endDate}.pdf");
+        }
+
 
     }
 }
