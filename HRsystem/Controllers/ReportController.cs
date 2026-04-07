@@ -302,6 +302,7 @@ namespace HRsystem.Controllers
                     Notes = b.Notes,
                     LateMinutes = b.LateMinutes,
                     EarlyLeaveMinutes = b.EarlyLeaveMinutes,
+                    OvertimeMinutes = b.OvertimeMinutes,
                     TotalHours = b.TotalHours,
                     Status = b.Status,
 
@@ -342,6 +343,13 @@ namespace HRsystem.Controllers
                         && b.DayDate >= startDate
                         && b.DayDate <= endDate)
                     .Sum(b => b.EarlyLeaveMinutes ?? 0),
+                TotalOvertimeMinutes = (int)_context.HREmployeeBasmas
+                .Where(b => b.EmployeeId == emp.Id
+                            && b.Ok == true
+                        && b.DayDate >= startDate
+                        && b.DayDate <= endDate)
+                    .Sum(b => b.OvertimeMinutes ?? 0),
+
                 EntryDaysCount = _context.HREmployeeBasmas
                 .Where(b => b.EmployeeId == emp.Id
                             && b.Status == 1
@@ -448,6 +456,7 @@ namespace HRsystem.Controllers
                     Notes = b.Notes,
                     LateMinutes = b.LateMinutes,
                     EarlyLeaveMinutes = b.EarlyLeaveMinutes,
+                    OvertimeMinutes = b.OvertimeMinutes,
                     TotalHours = b.TotalHours,
                     Status = b.Status,
 
@@ -488,6 +497,12 @@ namespace HRsystem.Controllers
                         && b.DayDate >= startDate
                         && b.DayDate <= endDate)
                     .Sum(b => b.EarlyLeaveMinutes ?? 0),
+                TotalOvertimeMinutes = (int)_context.HREmployeeBasmas
+                .Where(b => b.EmployeeId == emp.Id
+                            && b.Ok == true
+                        && b.DayDate >= startDate
+                        && b.DayDate <= endDate)
+                    .Sum(b => b.OvertimeMinutes ?? 0),
                 EntryDaysCount = _context.HREmployeeBasmas
                 .Where(b => b.EmployeeId == emp.Id
                             && b.Status == 1

@@ -75,6 +75,7 @@ async function showBasmaListForDay() {
         <td>${formatHours(basma.TotalHours) ?? ""}</td>
         <td>${basma.LateMinutes ?? ""}</td>
         <td>${basma.EarlyLeaveMinutes ?? ""}</td>
+        <td>${basma.OvertimeMinutes ?? ""}</td>
         <td>
             ${
               basma.Status === 1
@@ -165,6 +166,7 @@ async function searchForEmployee() {
         <td>${basma.TotalHours ?? ""}</td>
         <td>${basma.LateMinutes ?? ""}</td>
         <td>${basma.EarlyLeaveMinutes ?? ""}</td>
+        <td>${basma.OvertimeMinutes ?? ""}</td>
         <td>
             ${
               basma.Status === 1
@@ -217,11 +219,11 @@ function confirm(basmaId) {
         // const buttonCell = row.cells[7]; // Assuming the button is in the 8th cell (index 7)
         // buttonCell.innerHTML = "منتهي";
         if (type == 1) {
-          row.cells[6].innerHTML = "حضور";
+          row.cells[7].innerHTML = "حضور";
         } else {
-          row.cells[6].innerHTML = type === "2" ? "إجازة" : "غياب";
+          row.cells[7].innerHTML = type === "2" ? "إجازة" : "غياب";
         }
-        row.cells[7].innerHTML = `<button class="col-button-light" onclick="cancel(${basmaId})">إلغاء</button>`;
+        row.cells[8].innerHTML = `<button class="col-button-light" onclick="cancel(${basmaId})">إلغاء</button>`;
       } else if (response.code == 2) {
         alert("قم بتسجيل هذا اليوم كإجازة عارضة اولا");
         return;
@@ -244,7 +246,7 @@ function cancel(basmaId) {
       // edit two things 1. from select to the value, 2. button text to "منتهي"
       if (response.success) {
         const row = document.getElementById(`row-${basmaId}`);
-        row.cells[6].innerHTML = `
+        row.cells[7].innerHTML = `
                     <select class="h-full border p-1 rounded focus:outline-none focus:ring focus:ring-[#7B9669]"
                             data-id="${basmaId}">
                         <option value="0">غياب</option>
@@ -252,7 +254,7 @@ function cancel(basmaId) {
                         <option value="2">إجازة</option>
                     </select>
                     `;
-        row.cells[7].innerHTML = `<button class="col-button-dark" onclick="confirm(${basmaId})">تأكيد</button>`;
+        row.cells[8].innerHTML = `<button class="col-button-dark" onclick="confirm(${basmaId})">تأكيد</button>`;
       }
     })
     .catch((error) => {

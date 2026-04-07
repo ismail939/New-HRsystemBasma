@@ -23,6 +23,7 @@ namespace HRsystem.Controllers
         {
             public int LateMinutes { get; set; }
             public int EarlyLeaveMinutes { get; set; }
+            public int OvertimeMinutes { get; set; }
             public float TotalHours { get; set; }
         }
 
@@ -64,6 +65,8 @@ namespace HRsystem.Controllers
                         TotalHours = basma.TotalHours,
                         LateMinutes = basma.LateMinutes,
                         EarlyLeaveMinutes = basma.EarlyLeaveMinutes,
+                        OvertimeMinutes = basma.OvertimeMinutes,
+
                         Ok = basma.Ok,
                         Status = basma.Status,
                         Notes = basma.Notes
@@ -72,7 +75,7 @@ namespace HRsystem.Controllers
             }
             ;
             basmaList = basmaList.OrderBy(b => b.EmployeeName).ToList();
-            basmaList.ForEach(p => Console.WriteLine($"🟢 Basma List Entry: {p.EmployeeName}, {p.DayDate}, {p.ArrivalTime}, {p.DepartureTime}, {p.TotalHours}, {p.LateMinutes}, {p.EarlyLeaveMinutes}, {p.Status}, {p.Notes}"));
+            basmaList.ForEach(p => Console.WriteLine($"🟢 Basma List Entry: {p.EmployeeName}, {p.DayDate}, {p.ArrivalTime}, {p.DepartureTime}, {p.TotalHours}, {p.LateMinutes}, {p.EarlyLeaveMinutes}, {p.OvertimeMinutes}, {p.Status}, {p.Notes}"));
             return Json(basmaList);
         }
 
@@ -157,6 +160,7 @@ namespace HRsystem.Controllers
                         {
                             LateMinutes = 0,
                             EarlyLeaveMinutes = 0,
+                            OvertimeMinutes = 0,
                             TotalHours = 0
                         };
                     }
@@ -185,6 +189,7 @@ namespace HRsystem.Controllers
                     basma.DepartureTime = departureTime;
                     basma.LateMinutes = latency.LateMinutes;
                     basma.EarlyLeaveMinutes = latency.EarlyLeaveMinutes;
+                    basma.OvertimeMinutes = latency.OvertimeMinutes;
                     basma.TotalHours = latency.TotalHours;
                     basma.Ok = checkTimes.Count >= 1;
                     basma.Status = 1;
@@ -254,6 +259,7 @@ namespace HRsystem.Controllers
                 {
                     LateMinutes = 0,
                     EarlyLeaveMinutes = 0,
+                    OvertimeMinutes = 0,
                     TotalHours = 0
                 };
             }
@@ -264,6 +270,7 @@ namespace HRsystem.Controllers
                 {
                     LateMinutes = 0,
                     EarlyLeaveMinutes = 0,
+                    OvertimeMinutes = 0,
                     TotalHours = checkOut.Subtract(checkIn).Hours
                 };
             }
@@ -282,6 +289,7 @@ namespace HRsystem.Controllers
                 {
                     LateMinutes = 0,
                     EarlyLeaveMinutes = (int)requiredTimeSpan.Subtract(checkOut.Subtract(checkIn)).TotalMinutes,
+                    OvertimeMinutes = (int)Math.Max(0, (checkOut - checkIn - requiredTimeSpan).TotalMinutes),
                     TotalHours = (float)checkOut.Subtract(checkIn).TotalMinutes / 60.0f
                 };
             }
@@ -305,13 +313,17 @@ namespace HRsystem.Controllers
                     0,
                     ((shift.EndTime ?? checkOut).TimeOfDay - checkOut.TimeOfDay).TotalMinutes
                 );
-
+                var overtimeMinutes = (int)Math.Max(
+                    0,
+                    (checkOut - checkIn - requiredTimeSpan).TotalMinutes
+                );
                 Console.WriteLine("🟢🟢🟢🟢🟢🟢");
                 Console.WriteLine("🟢" + checkOut.Subtract(checkIn).TotalMinutes / 60.0f);
                 return new LatencyResult
                 {
                     LateMinutes = lateMinutes,
                     EarlyLeaveMinutes = earlyLeaveMinutes,
+                    OvertimeMinutes = overtimeMinutes,
                     TotalHours = (float)checkOut.Subtract(checkIn).TotalMinutes / 60.0f
                 };
             }
@@ -319,6 +331,7 @@ namespace HRsystem.Controllers
             {
                 LateMinutes = 0,
                 EarlyLeaveMinutes = 0,
+                OvertimeMinutes = 0,
                 TotalHours = 0
             };
         }
@@ -418,6 +431,7 @@ namespace HRsystem.Controllers
                         TotalHours = basma.TotalHours,
                         LateMinutes = basma.LateMinutes,
                         EarlyLeaveMinutes = basma.EarlyLeaveMinutes,
+                        OvertimeMinutes = basma.OvertimeMinutes,
                         Status = basma.Status,
                         Notes = basma.Notes
                     });

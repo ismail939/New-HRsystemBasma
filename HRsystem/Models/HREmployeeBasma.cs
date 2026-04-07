@@ -18,6 +18,7 @@ public class HREmployeeBasma
     public float? TotalHours { get; set; } 
     public int? LateMinutes { get; set; }
     public int? EarlyLeaveMinutes { get; set; }
+    public int? OvertimeMinutes { get; set; }
     [Required]
     public bool Ok {get; set;} = false;
     

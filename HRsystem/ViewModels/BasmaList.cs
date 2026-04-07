@@ -11,6 +11,7 @@ public class BasmaList
     public float? TotalHours { get; set; }
     public int? LateMinutes { get; set; }
     public int? EarlyLeaveMinutes {get; set;}
+    public int? OvertimeMinutes { get; set; }
     public bool Ok {get; set;}
     public int Status { get; set; }
     public string? Notes { get; set; }

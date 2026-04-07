@@ -11,6 +11,7 @@ namespace HRsystem.ViewModels
         public float? TotalHours { get; set; }
         public int? LateMinutes { get; set; }
         public int? EarlyLeaveMinutes { get; set; }
+        public int? OvertimeMinutes { get; set; }
         public int Status { get; set; }
         public int ShiftId { get; set; }
     }

@@ -96,6 +96,7 @@ public class ManagersReport : IDocument
                         Row("عدد الجزاءات", EmployeeReport.PenaltyCount.ToString(), true);
                         Row("التأخير عن بداية الشيفت", EmployeeReport.TotalLateMinutes.ToString(), false);
                         Row("مجموع دقائق الخروج المبكر", EmployeeReport.TotalEarlyLeaveMinutes.ToString(), true);
+                        Row("مجموع ساعات العمل الإضافي", (EmployeeReport.TotalOvertimeMinutes / 60.0).ToString("F2"), false);
                     });
 
                     // شكل الخلايا
@@ -305,6 +306,8 @@ public class ManagersReport : IDocument
                                     .Text(basma.LateMinutes.HasValue ? basma.LateMinutes.Value.ToString() : "-").FontSize(8));
                                 table.Cell().Background(color % 2 == 0 ? Colors.Grey.Lighten3 : Colors.White).Element(cell => cell.Border(1).Padding(5).AlignCenter()
                                     .Text(basma.EarlyLeaveMinutes.HasValue ? basma.EarlyLeaveMinutes.Value.ToString() : "-").FontSize(8));
+                                table.Cell().Background(color % 2 == 0 ? Colors.Grey.Lighten3 : Colors.White).Element(cell => cell.Border(1).Padding(5).AlignCenter()
+                                    .Text(basma.OvertimeMinutes.HasValue ? basma.OvertimeMinutes.Value.ToString() : "-").FontSize(8));
                                 if(basma.Status == 1)
                                 {
                                     table.Cell().Background(color % 2 == 0 ? Colors.Grey.Lighten3 : Colors.White).Element(cell => cell.Border(1).Padding(5).AlignCenter()

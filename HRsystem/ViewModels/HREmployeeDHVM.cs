@@ -49,6 +49,7 @@ public class HREmployeeDHVM
     public float TotalWorkHours { get; set; }
     public int TotalLateMinutes { get; set; }
     public int TotalEarlyLeaveMinutes { get; set; }
+    public int TotalOvertimeMinutes { get; set; }
     // Absences (Geza2at)
     public List<AbsenceDetail> Absences { get; set; } = new List<AbsenceDetail>();
     public int AbsencesCount => Absences?.Count ?? 0;
