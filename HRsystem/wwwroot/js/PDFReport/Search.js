@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let startDate = null;
   let endDate = null;
   let chosenDepartment = "";
+  let departmentId = null;
   const pdfStartDate = document.getElementById("pdfStartDate");
   const pdfEndDate = document.getElementById("pdfEndDate");
 
@@ -32,9 +33,23 @@ document.addEventListener("DOMContentLoaded", () => {
       closeSelectModal();
     }
   });
-document.getElementById("departmentSelect").addEventListener("change", (event) => {
-    chosenDepartment = event.target.value;
+  function openSelectDailyModal() {
+    showDivFlex("selectDailyModal");
+  }
+  window.openSelectDailyModal = openSelectDailyModal;
+  function closeSelectDailyModal() {
+    hideDivFlex("selectDailyModal");
+  }
+  window.closeSelectDailyModal = closeSelectDailyModal;
+  document.getElementById("selectDailyModal").addEventListener("click", (event) => {
+    if (event.target === document.getElementById("selectDailyModal")) {
+      closeSelectDailyModal();
+    }
   });
+// document.getElementById("departmentSelect").addEventListener("change", (event) => {
+//     chosenDepartment = event.target.value;
+
+//   });
   
     
     function downloadReport() {
@@ -42,9 +57,14 @@ document.getElementById("departmentSelect").addEventListener("change", (event) =
         alert("Please select both start and end dates.");
         return;
       }
-      const fileName = `report_${chosenDepartment}_${startDate}_to_${endDate}.pdf`;
+      let select = document.getElementById("departmentSelect");
+      let selectedOption = select.options[select.selectedIndex];
+
+      let id = select.value;
+      let code = selectedOption.getAttribute("data-code");
+      const fileName = `report_${code}_${startDate}_to_${endDate}.pdf`;
       fetch(
-        `/reports/employeesDH?id=1&startDate=${startDate}&endDate=${endDate}`,
+        `/reports/employeesDH?id=${id}&startDate=${startDate}&endDate=${endDate}`,
       )
         .then((res) => res.blob())
         .then((blob) => {
@@ -61,6 +81,35 @@ document.getElementById("departmentSelect").addEventListener("change", (event) =
         });
     }
     window.downloadReport = downloadReport;
+    function downloadDailyReport() {
+      if (!startDate || !endDate) {
+        alert("Please select both start and end dates.");
+        return;
+      }
+      let select = document.getElementById("department2Select");
+      let selectedOption = select.options[select.selectedIndex];
+
+      let id = select.value;
+      let code = selectedOption.getAttribute("data-code");
+      const fileName = `report_${code}_${startDate}_to_${endDate}.pdf`;
+      fetch(
+        `/reports/employeesDaily?id=${id}&startDate=${startDate}&endDate=${endDate}`,
+      )
+        .then((res) => res.blob())
+        .then((blob) => {
+          const url = window.URL.createObjectURL(blob);
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+
+          window.URL.revokeObjectURL(url);
+        });
+    }
+    window.downloadDailyReport = downloadDailyReport;
 
     function downloadManagersReport() {
       if (!startDate || !endDate) {

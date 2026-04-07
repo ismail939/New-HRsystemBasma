@@ -260,7 +260,7 @@ namespace HRsystem.Controllers
                     LateMinutes = 0,
                     EarlyLeaveMinutes = 0,
                     OvertimeMinutes = 0,
-                    TotalHours = 0
+                    TotalHours = (float)checkOut.Subtract(checkIn).TotalMinutes/60.0f
                 };
             }
 
@@ -271,7 +271,7 @@ namespace HRsystem.Controllers
                     LateMinutes = 0,
                     EarlyLeaveMinutes = 0,
                     OvertimeMinutes = 0,
-                    TotalHours = checkOut.Subtract(checkIn).Hours
+                    TotalHours = (float)checkOut.Subtract(checkIn).TotalMinutes/60.0f
                 };
             }
             else if (shift.ShiftMode == 1)

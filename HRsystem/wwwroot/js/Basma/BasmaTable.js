@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
   console.log("Table.js loaded");
   globalBasmaList = [];
+  proceedShowingBasma();
 });
 // function filterByDate() {
 //     const dateInput = document.getElementById('datePicker').value;
