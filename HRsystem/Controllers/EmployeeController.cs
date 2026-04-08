@@ -420,6 +420,15 @@ namespace HRsystem.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("/getDepartmentEmployees")]
+        public IActionResult GetDepartmentEmployees(int departmentId)
+        {
+            var employees = _context.HREmployees.Where(e => e.HRDepartmentId == departmentId).ToList();
+            var DepartmentName = _context.HRDepartments.Where(d => d.Id == departmentId).Select(d => d.Name).FirstOrDefault();
+            return Json(new { employees = employees, departmentName = DepartmentName });
+        }
+
         [Authorize(Roles = "Admin,HR")]
         [HttpPost]
         [Route("/addShiftVariable")]

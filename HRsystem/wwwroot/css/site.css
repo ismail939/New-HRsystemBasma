@@ -165,7 +165,7 @@
 }
 
 .col-button-dark:hover {
-  @apply bg-color5 shadow-sm border-color3 !important;
+  @apply bg-color4 shadow-sm border-color3 !important;
   transform: scale(1.02);
 }
 
@@ -174,7 +174,7 @@
 }
 
 .col-button-light:hover {
-  @apply bg-color5 shadow-lg border-color3 !important;
+  @apply bg-color4 shadow-lg border-color3 !important;
   transform: scale(1.02);
 }
 
@@ -580,4 +580,8 @@ table tr input,
 table tr textarea {
   background-color: inherit;
   border: 1px solid #999;
+}
+
+.shiftCard{
+  @apply bg-color2 text-white px-4 py-2 rounded-lg shadow-md transition-all duration-200 !important;
 }

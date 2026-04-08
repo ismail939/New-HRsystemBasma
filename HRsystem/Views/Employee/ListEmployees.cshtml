@@ -11,7 +11,8 @@
         <button id="createBtn" class="cursor-pointer mx-1 col-button-dark px-4 py-2 rounded">
             إضافة موظف
         </button>
-        <a href="/admin/dashboard/departments" class="cursor-pointer flex items-center mx-1 col-button-dark px-4 py-2 rounded">
+        <a href="/admin/dashboard/departments"
+               class="cursor-pointer flex items-center mx-1 col-button-dark px-4 py-2 rounded">
             الأقسام
         </a>
         <select id="departmentFilter" class="mx-1 bg-white px-4 py-2 rounded">
@@ -21,6 +22,10 @@
                 <option value="@dept.Id">@dept.Name - (@dept.Code)</option>
             }
         </select>
+        <button class="col-button-dark text-[11px] rounded"
+                                    onclick="openShiftModal()">
+                                الشفت
+        </button>
 
     </div>
     <div x-data="{
@@ -40,8 +45,7 @@
         }
         }" class="flex items-center gap-2">
         <!-- Search / Refresh Button -->
-        <button @@click="toggleSearch"
-            class="p-1 col-button-dark transition-all duration-300">
+        <button @@click="toggleSearch" class="p-1 col-button-dark transition-all duration-300">
             <i :class="showSearch ? 'bi-arrow-clockwise' : 'bi-search'" class="text-lg"></i>
         </button>
 
@@ -82,7 +86,7 @@
                     <th>القسم</th>
                     <th>المسمى الوظيفي</th>
                     <th>نوع العقد</th>
-                    <th>الشفت</th>
+                    @* <th>الشفت</th> *@
                     <th>تقييم</th>
                     <th>تعديل بيانات</th>
                 </tr>
@@ -107,17 +111,17 @@
                         </td>
                         <td>@employee.JobName</td>
                         <td>@employee.ContractType</td>
-                        <td>
+                        @* <td>
                             <!-- SHIFT -->
                             <button class="col-button-dark text-[11px] rounded"
-                                    onclick="openShiftModal('@employee.Name', @employee.Id)"               index="@employee.Id">
+                                    onclick="openShiftModal('@employee.Name', @employee.Id)" index="@employee.Id">
                                 الشفت
                             </button>
-                        </td>
+                        </td> *@
                         <td>
                             <!-- Button to open modal -->
                             <button class="col-button-light  text-[11px] rounded"
-                                    onclick="openRateModal('@employee.Name', @employee.Id)"       index="@employee.Id">
+                                    onclick="openRateModal('@employee.Name', @employee.Id)" index="@employee.Id">
                                 تقييم
                             </button>
                         </td>
@@ -161,56 +165,9 @@
             <i class="bi bi-x-square-fill"></i>
         </button>
         <h3 id="shiftModalTitle" class="text-lg font-bold mb-3"></h3>
-        <div id="currentShift"
-             class="shadow-lg p-2 m-1 text-[16px] flex flex-col items-center font-bold text-color5 transition duration-300 delay-300 ease-in-out">
-            <span id="noShift" class="hidden">لا يوجد شفت لهذا الموظف</span>
-            <div id="thereIsShift" class="hidden p-2 w-full">
-                <div id="hoursShiftDiv" class="hidden">
-                    عدد الساعات المطلوبة: <span id="hoursShiftNumber">8</span> ساعات
-                </div>
-                <div id="fixedShiftDiv" class="hidden">
-                    الشفت يبدأ من <span id="shiftStartTime">7:30 ص</span> الي <span id="shiftEndTime">4:30 م</span>
-                </div>
-                <div id="variableShiftDiv" class="hidden">
-                    الشفت متغير
-                </div>
-            </div>
-            <button id="editShiftButton" class="col-button-dark my-2">تعديل</button>
-        </div>
-        <div id="editShift"
-             class="hidden relative flex-col items-center shadow-lg rounded-md p-2 m-1 transition duration-300 delay-300 ease-in-out">
-            <button id="switchBtn" class="absolute top-2 left-2">
-                <i class="bi bi-x-square-fill"></i>
-            </button>
-            <div class="flex gap-2 flex-row justify-center items-center">
-                <button id="variableShift" class="rounded-lg px-4 text-white text-center bg-color5">متغير</button>
-                <button id="hoursBtn" class="rounded-lg px-4 text-white text-center bg-color5">عدد ساعات</button>
-                <button id="fixedBtn" class="rounded-lg px-4 text-white text-center bg-color5">شفت ثابت</button>
-            </div>
-            <div id="newVariableShift" class="hidden items-center gap-2 justify-center w-full my-2">
-                <h2 class="font-light !text-color5 mb-2">الشفت متغير ولا يحتاج لتحديد وقت أو عدد ساعات</h2>
-                <button id="saveVariableShiftBtn" class="col-button-light">حفظ💾</button>
-            </div>
-            <div id="newHoursShift" class="hidden flex-row items-center gap-2 justify-center w-full my-2">
-                <label for="hours">عدد الساعات</label>
-                <input type="number" id="hours"
-                       class="w-1/4 border-2 border-color2 rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#7B9669] appearance-none">
-                <button id="saveHoursShiftBtn" class="col-button-light">حفظ💾</button>
-            </div>
-            <div id="newFixedShift" class="hidden p-2 w-full gap-4 flex-row justify-center items-center my-2">
-                <div class="flex flex-row items-center gap-2">
-                    <label for="startTime" class="block mb-2">بداية الشفت</label>
-                    <input type="time" id="startTime" class="rounded p-2 border-2 border-[#7B9669] 
-                    focus:outline-none focus:ring-2 focus:ring-[#7B9669] appearance-none" />
-                </div>
-                <div class="flex flex-row items-center gap-2">
-                    <label for="endTime" class="block mb-2">نهاية الشفت</label>
-                    <input type="time" id="endTime" disabled class="rounded p-2 border-2 border-[#7B9669] 
-                    focus:outline-none focus:ring-2 focus:ring-[#7B9669] appearance-none" />
-                    <button id="saveFixedShiftBtn" class="col-button-light">حفظ💾</button>
-                </div>
-            </div>
 
+        <div id="shiftContent" class="flex flex-row justify-around items-center gap-4 h-full w-full mt-2">
+           
         </div>
     </div>
 </div>
@@ -284,15 +241,14 @@
         <button onclick="closeModalCreate()" class="absolute top-2 left-2 text-[25px]">
             <i class="bi bi-x-square-fill"></i>
         </button>
-        @* 
+        @*
         <!-- Tabs -->
         <div class="flex border-b mb-4">
            
         </div> *@
 
         <h2 class="text-2xl font-semibold mb-4 text-blue-700 text-center">إضافة موظف جديد</h2>
-        <form id="employeeFormCreate" method="post"
-              class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-1 w-full p-3">
+        <form id="employeeFormCreate" method="post" class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-1 w-full p-3">
 
             <input type="hidden" name="Id" />
 
@@ -362,7 +318,8 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700">القسم</label>
-                <select name="HRDepartmentId" id="" class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]">
+                <select name="HRDepartmentId" id=""
+                        class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]">
                     <option value="">بدون قسم</option>
                     @foreach (var dept in Model.Departments)
                     {
@@ -506,13 +463,14 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700">القسم</label>
-                    <select name="HRDepartmentId" id="" class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]">
-                    <option value="">بدون قسم</option>
-                    @foreach (var dept in Model.Departments)
-                    {
-                        <option value="@dept.Id">@dept.Name - (@dept.Code)</option>
-                    }
-                </select>
+                    <select name="HRDepartmentId" id=""
+                            class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]">
+                        <option value="">بدون قسم</option>
+                        @foreach (var dept in Model.Departments)
+                        {
+                            <option value="@dept.Id">@dept.Name - (@dept.Code)</option>
+                        }
+                    </select>
                 </div>
 
                 <div>
@@ -584,22 +542,22 @@
 
 
     <script>
-            var employees = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Employees));// from Razor
-            const observer = new MutationObserver(mutations => {
-                mutations.forEach(m => {
-                    if (m.attributeName === "class") {
-                        console.log(
-                            "⚠️ Modal class changed:",
-                            modal.className,
-                            "at",
-                            new Date().toLocaleTimeString(),
-                            new Error().stack
-                        );
-                    }
-                });
+        var employees = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Employees));// from Razor
+        const observer = new MutationObserver(mutations => {
+            mutations.forEach(m => {
+                if (m.attributeName === "class") {
+                    console.log(
+                        "⚠️ Modal class changed:",
+                        modal.className,
+                        "at",
+                        new Date().toLocaleTimeString(),
+                        new Error().stack
+                    );
+                }
             });
+        });
 
-            observer.observe(modal, { attributes: true });
+        observer.observe(modal, { attributes: true });
     </script>
 
 }
