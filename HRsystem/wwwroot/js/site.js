@@ -3,7 +3,14 @@
     dateFormat: "Y-m-d",
     locale: "ar", // full Arabic locale (digits + weekdays RTL)
   });
-
+  flatpickr("input[type='time']", {
+    enableTime: true,
+    noCalendar: true,
+    dateFormat: "H:i",
+    time_24hr: false,
+    direction: "ltr", // Ensure the time picker is RTL
+    // Center the time input text
+});
 });
 
 function toLocalISODate(date) {
