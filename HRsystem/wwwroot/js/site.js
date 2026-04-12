@@ -11,6 +11,29 @@
     direction: "ltr", // Ensure the time picker is RTL
     // Center the time input text
 });
+flatpickr("#startWeekDate", {
+    dateFormat: "Y-m-d",
+    enable: [
+        date => date.getDay() === 6
+    ],
+    onChange: function(selectedDates) {
+        if (selectedDates.length > 0) {
+            let start = selectedDates[0];
+
+            let end = new Date(start);
+            end.setDate(start.getDate() + 6); // الجمعة
+
+            endPicker.setDate(end);
+        }
+    }
+});
+
+const endPicker = flatpickr("#endWeekDate", {
+    dateFormat: "Y-m-d",
+    enable: [
+        date => date.getDay() === 5
+    ]
+});
 });
 
 function toLocalISODate(date) {

@@ -156,92 +156,50 @@
 </div>
 
 <!-- SHIFT -->
-<div id="shiftModal" class="flex fixed inset-0 bg-black/30 z-50
+<div id="shiftModal" class="hidden fixed inset-0 bg-black/30 z-50
     items-center justify-center">
 
-    <div id="" class="relative col-modal !md:w-1/2 !md:h-1/3  p-6 rounded-2xl shadow-xl text-center overflow-y-hidden">
+    <div id="" class="relative col-modal !w-[100vw] m-2 !h-[95%]  p-6 rounded-2xl shadow-xl text-center overflow-y-hidden">
         <button onclick="closeShiftModal()" class="absolute top-2 left-2 text-[25px]">
             <i class="bi bi-x-square-fill"></i>
         </button>
         <h3 id="shiftModalTitle" class="text-lg font-bold mb-3"></h3>
 
-        <div id="shiftContent" class="flex flex-col justify-start items-start gap-4 h-full w-full mt-2">
-            <div class="flex h-1/3 flex-row p-2 gap-2 justify-around items-center w-full">
+        <div id="shiftContent" class="flex flex-col justify-start items-start h-full w-full mt-2">
+            <div class="flex flex-row p-2 gap-1 justify-around items-center w-full">
                 <div id="shiftDateSection"
-                     class="flex flex-col justify-center items-center p-2 shadow-md gap-2 border-2 border-color3 h-full w-1/2">
-                    <h2 class="shadow-lg p-2 rounded-lg w-full">اختر تاريخ الشفت</h2>
+                     class="flex flex-col justify-center items-center p-2 shadow-md gap-2 border-2 rounded-lg border-color3 h-full w-1/2">
+                    <h2 class="shadow-lg p-2 font-bold rounded-lg w-full">اختر الأسبوع</h2>
                     <div class="flex flex-row justify-center gap-2 items-center">
-                        <input type="date" id="shiftDateTime" placeholder="يوم البداية"
+                        <input type="date" id="startWeekDate" placeholder="يوم البداية"
                                class="bg-color1 border-2 w-1/2 text-center border-color3 rounded-lg">
-                        <input type="date" id="shift2DateTime" placeholder="يوم النهاية"
+                        <input type="date" id="endWeekDate" placeholder="يوم النهاية"
                                class="bg-color1 border-2 w-1/2 text-center border-color3 rounded-lg">
                     </div>
-                    <button id="searchShift" class="col-button-dark mt-3 w-full">بحث</button>
+                    <button id="searchShift" onclick="SearchWeeks()" class="col-button-dark mt-3 w-full">بحث</button>
                 </div>
-                <div id="shiftDetailsSection" class="flex gap-2 flex-col justify-center items-center p-2 border-color3 border-2 w-1/2 h-full rounded-lg shadow-md">
-                    <h2 class="shadow-lg p-2 rounded-lg w-full">إضافة شفت للقائمة</h2>
+                <div id="shiftDetailsSection" class="flex gap-2 flex-col justify-center items-center p-2 h-full border-color3 border-2 w-1/2 rounded-lg shadow-md">
+                    <h2 class="shadow-lg p-2 font-bold rounded-lg w-full">إضافة شفت للقائمة</h2>
                     <div class="flex gap-2 flex-row p-2 rounded-lg shadow-sm">
                         <input dir="ltr" type="time" id="shiftStartTime" placeholder="وقت البداية"
                                class="bg-color1 border-2 text-center border-color3 rounded-lg">
                         <input dir="ltr" type="time" id="shiftEndTime" placeholder="وقت النهاية"
                                class="bg-color1 border-2 text-center border-color3 rounded-lg">
+                        <input type="number" placeholder="عدد الساعات" id="shiftHours" class="hidden bg-color1 border-2 text-center border-color3 rounded-lg">
                         <select id="shiftType" class="bg-color1 border-2 text-center border-color3 rounded-lg">
                             <option value="">نوع الشفت</option>
-                            <option value="">متغير</option>
-                            <option value="">ثابت</option>
-                            <option value=" ">عدد ساعات</option>
+                            <option value="0">متغير</option>
+                            <option value="2">ثابت</option>
+                            <option value="1">عدد ساعات</option>
                         </select>
-                        <button class="col-button-dark"><i class="bi bi-plus-circle"></i></button>
+                        <button onclick="addShiftOption()" class="col-button-dark"><i class="bi bi-plus-circle"></i></button>
                     </div>
                 </div>
             </div>
-            <div id="employeesTable"
-                 class="w-full border-2 overflow-x-hidden border-color3 p-2 overflow-y-auto h-2/3 rounded-lg shadow-md">
-                <h2 class="font-bold m-2">قم باختيار الشيفت لكل الموظفين</h2>
-                <div id="empCard" class="shadow-lg flex flex-row gap-2 justify-center items-center">
-                   <h6 class="font-bold text-[14px] p-2 m-1 shadow-md border-2 border-color5">
-                        إسماعيل سلامة أبو السعود صالح
-                   </h6>
-                   <div class="dayCard flex flex-col shadow-md p-2 m-1 border-color5 border-2">
-                        <div class="font-bold border-b-2 border-color3 mb-2">3 ابريل </div>
-                        <div class="">
-                            <select dir="ltr" name="" id="" class="rounded-md ">
-                                <option value="1">
-                                    9:00 AM to 5:00 PM 
-                                </option>
-                                <option value="2">
-                                    8 hours
-                                </option>
-                            </select>
-                        </div>
-                   </div>
-                   <div class="dayCard flex flex-col shadow-md p-2 m-1 border-color5 border-2">
-                        <div class="font-bold border-b-2 border-color3 mb-2">4 ابريل </div>
-                        <div class="">
-                            <select dir="ltr" name="" id="" class="rounded-md ">
-                                <option value="1">
-                                    9:00 AM to 5:00 PM 
-                                </option>
-                                <option value="2">
-                                    8 hours
-                                </option>
-                            </select>
-                        </div>
-                   </div>
-                   <div class="dayCard flex flex-col shadow-md p-2 m-1 border-color5 border-2">
-                        <div class="font-bold border-b-2 border-color3 mb-2">5 ابريل </div>
-                        <div class="">
-                            <select dir="ltr" name="" id="" class="rounded-md ">
-                                <option value="1">
-                                    9:00 AM to 5:00 PM 
-                                </option>
-                                <option value="2">
-                                    8 hours
-                                </option>
-                            </select>
-                        </div>
-                   </div>
-                </div>
+            <div id="employeesRows"
+                 class="w-full overflow-x-hidden flex-1 m-2 p-2 overflow-y-auto  rounded-lg shadow-md">
+                <h2 class="font-bold text-[16px] border-2 border-color3 p-1 rounded-lg m-2">قم باختيار الشيفت لكل الموظفين</h2>
+               
             </div>
         </div>
     </div>

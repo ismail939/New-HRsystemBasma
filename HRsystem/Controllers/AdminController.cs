@@ -233,7 +233,7 @@ namespace HRsystem.Controllers
                 .Where(e => e.HRDepartmentId == departmentId)
                 .Select(e => new { Id = e.Id, Name = e.Name })
                 .ToList();
-
+            
             return Json(employees);
         }
 

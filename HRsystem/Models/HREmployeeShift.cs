@@ -19,9 +19,12 @@ public class HREmployeeShift
     [Required]
     public int ShiftMode { get; set; } = 0; // 0=variable, 1=hours, 2=fixed.
 
+    // start of week saturday
     [Required]
     public DateTime FromDate { get; set; }
 
+    
+    /// end of week friday
     public DateTime? ToDate { get; set; }
 
     public int? LateToleranceMinutes { get; set; }

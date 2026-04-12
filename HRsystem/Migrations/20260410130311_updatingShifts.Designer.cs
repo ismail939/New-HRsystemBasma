@@ -4,6 +4,7 @@ using HRsystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRsystem.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260410130311_updatingShifts")]
+    partial class updatingShifts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,44 +24,6 @@ namespace HRsystem.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("HRShiftOption", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("EarlyLeaveToleranceMinutes")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("EndTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("LateToleranceMinutes")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("RequiredHours")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ShiftMode")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("StartTime")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("HRShiftOptions");
-                });
 
             modelBuilder.Entity("HRsystem.Models.CheckInOut", b =>
                 {
@@ -433,9 +398,6 @@ namespace HRsystem.Migrations
                     b.Property<DateTime>("FromDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("HRShiftOptionId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("LateToleranceMinutes")
                         .HasColumnType("int");
 
@@ -454,8 +416,6 @@ namespace HRsystem.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("EmployeeId");
-
-                    b.HasIndex("HRShiftOptionId");
 
                     b.ToTable("HREmployeeShift");
                 });
@@ -635,10 +595,6 @@ namespace HRsystem.Migrations
                         .WithMany()
                         .HasForeignKey("EmployeeId");
 
-                    b.HasOne("HRShiftOption", null)
-                        .WithMany("EmployeeShifts")
-                        .HasForeignKey("HRShiftOptionId");
-
                     b.Navigation("HREmployee");
                 });
 
@@ -649,11 +605,6 @@ namespace HRsystem.Migrations
                         .HasForeignKey("EmployeeId");
 
                     b.Navigation("HREmployee");
-                });
-
-            modelBuilder.Entity("HRShiftOption", b =>
-                {
-                    b.Navigation("EmployeeShifts");
                 });
 
             modelBuilder.Entity("HRsystem.Models.HRDepartment", b =>

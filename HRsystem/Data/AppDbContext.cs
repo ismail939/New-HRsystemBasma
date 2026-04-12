@@ -40,5 +40,6 @@ namespace HRsystem.Data
         public DbSet<User> Users { get; set; }
         public DbSet<HRDepartment> HRDepartments { get; set; }
         public DbSet<HRLog> HRLogs { get; set; }
+        public DbSet<HRShiftOption> HRShiftOptions { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 // let empIdShiftModal = 0;
 // document.getElementById("saveHoursShiftBtn").addEventListener("click", () => {
-//     // validate the data 
+//     // validate the data
 //     const hours = document.getElementById("hours").value;
 //     if (isNumber(hours)) {
 //         // send a post request
@@ -50,8 +50,8 @@
 //     }
 // })
 // document.getElementById("saveVariableShiftBtn").addEventListener("click", () => {
-//     // validate the data 
-    
+//     // validate the data
+
 //         // send a post request
 //         fetch(`/addShiftVariable?EmployeeId=${empIdShiftModal}`, {
 //             method: 'POST'
@@ -123,7 +123,7 @@
 //     }
 // });
 // document.getElementById("saveFixedShiftBtn").addEventListener("click", () => {
-//     // validate the data 
+//     // validate the data
 //     const startTimeParts = document.getElementById("startTime").value.split(":");
 
 //     const endTimeParts = document.getElementById("endTime").value.split(":");
@@ -181,35 +181,201 @@
 // })
 
 // SHIFT
+let employeesForShift = [];
+let departmentName = "";
+const days = [
+  "الأحد",
+  "الإتنين",
+  "الثلاثاء",
+  "الأربعاء",
+  "الخميس",
+  "الجمعة",
+  "السبت",
+];
+const months = [
+  "يناير",
+  "فبراير",
+  "مارس",
+  "ابريل",
+  "مايو",
+  "يونيو",
+  "يوليو",
+  "اغسطس",
+  "سبتمبر",
+  "اكتوبر",
+  "نوفمبر",
+  "ديسمبر",
+];
 function openShiftModal() {
+  const departmentId = document.getElementById("departmentFilter").value;
+  if (departmentId == "") {
+    alert("الرجاء اختيار قسم أولاً!");
+    return;
+  }
 
-    const departmentId = document.getElementById("departmentFilter").value;
-    if(departmentId == ""){
-        alert("الرجاء اختيار قسم أولاً!");
-        return;
+  fetch(`/getDepartmentEmployees?departmentId=${departmentId}`)
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data);
+      showDivFlex("shiftModal");
+      employeesForShift = data.employees;
+      departmentName = data.departmentName;
+      document.getElementById("shiftModalTitle").innerText =
+        `تعديل الشفت لقسم: ${data.departmentName}`;
+    });
+}
+function buildSelect(empId, dateStr, options) {
+    let html = `
+        <select class="border shiftSelectF !text-color3 rounded p-1"
+                data-emp="${empId}"
+                data-date="${dateStr}">
+            <option value="">اختر شيفت</option>
+            <option value="off">راحة</option>
+    `;
+
+    options.forEach(option => {
+        html += `<option value="${option.Id}">${option.Name}</option>`;
+    });
+
+    html += `</select>`;
+
+    return html;
+}
+document.addEventListener("change", function (e) {
+    if (e.target.classList.contains("shiftSelectF")) {
+
+        const value = e.target.value;
+        const parent = e.target.closest(".dayCard");
+        // reset classes
+        parent.classList.remove("bg-color1", "bg-color2", "bg-color3", "!text-color1", "!text-color3");
+
+        if (value === "off") {
+           parent.classList.add("bg-color2");
+            parent.classList.add("!text-color3");
+        } else{
+            parent.classList.add("!bg-color3");
+            parent.classList.add("text-color1");
+        }
+       
+    }
+});
+function SearchWeeks() {
+  const employeesRows = document.getElementById("employeesRows");
+
+  const startDate = new Date(document.getElementById("startWeekDate").value); // أو التاريخ اللي انت مختاره
+  if (startDate == "Invalid Date") {
+    alert("الرجاء اختيار تاريخ بداية الأسبوع!");
+    return;
+  }
+  options = [];
+   
+  employeesForShift.forEach(async (emp) => {
+    let daysHtml = "";
+    const res = await fetch(`/getShiftOptions`);
+    const options = await res.json();
+    for (let i = 0; i < 7; i++) {
+      let currentDay = new Date(startDate);
+      currentDay.setDate(startDate.getDate() + i);
+
+      let dayName = days[currentDay.getDay()];
+      let dateStr = `${dayName} - ${currentDay.getDate()} ${months[currentDay.getMonth()]}`;
+
+      const dayCard = document.createElement("div");
+      dayCard.className =
+        "flex dayCard text-color3 flex-col gap-2 items-center bg-color3 p-2 rounded-lg shadow-sm";
+
+      dayCard.innerHTML = `
+      <div class="text-sm font-bold !text-color1">${dateStr}</div>
+       `;
+      const selectHtml = buildSelect(emp.Id, currentDay, options);
+      dayCard.innerHTML += selectHtml;
+      daysHtml += dayCard.outerHTML;
+     
     }
 
-    fetch(`/getDepartmentEmployees?departmentId=${departmentId}`).then(res => res.json()).then(data => {
-        console.log(data);
-        showDivFlex("shiftModal");
-        console.log(data);
-        document.getElementById("shiftModalTitle").innerText = `تعديل الشفت لقسم: ${data.departmentName}`;
-    })
+    let row = `
+        <div id="employeeDiv-${emp.Id}" 
+             class="shadow-lg flex flex-col gap-3 p-3 rounded-lg">
 
+            <span class="font-bold">${emp.Name}</span>
+
+            <div class="grid grid-cols-7 gap-2">
+                ${daysHtml}
+            </div>
+        </div>
+        `;
+    employeesRows.innerHTML += row;
+  });
 }
+
+document.getElementById("shiftType").addEventListener("change", function () {
+  const selectedValue = this.value;
+  if (selectedValue == "1") {
+    console.log("hours");
+    hideDiv("shiftStartTime");
+    hideDiv("shiftEndTime");
+    showDiv("shiftHours");
+  } else if (selectedValue == "2") {
+    console.log("fixed");
+    hideDiv("shiftHours");
+    showDiv("shiftStartTime");
+    showDiv("shiftEndTime");
+  } else {
+    console.log("variable");
+    hideDiv("shiftHours");
+    hideDiv("shiftStartTime");
+    hideDiv("shiftEndTime");
+  }
+});
+
+function addShiftOption() {
+  const startTime = document.getElementById("shiftStartTime").value;
+  const endTime = document.getElementById("shiftEndTime").value;
+  const hours = document.getElementById("shiftHours").value;
+  const shiftType = document.getElementById("shiftType").value;
+  if (shiftType == "") {
+    alert("الرجاء اختيار نوع الشفت!");
+    return;
+  } else if (shiftType == "1" && !isNumber(hours)) {
+    alert("الرجاء إدخال عدد ساعات صحيح!");
+    return;
+  } else if (shiftType == "2" && (!startTime || !endTime)) {
+    alert("الرجاء إدخال وقت بداية ونهاية الشفت!");
+    return;
+  }
+  fetch(
+    `/addShiftOption?StartTime=${startTime}&EndTime=${endTime}&ShiftMode=${shiftType}&Hours=${hours}`,
+    {
+      method: "POST",
+    },
+  )
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.success) {
+        alert("تم إضافة خيار الشفت بنجاح!");
+      } else {
+        alert("حدث خطأ أثناء إضافة خيار الشفت. الرجاء المحاولة مرة أخرى.");
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      alert("حدث خطأ أثناء إضافة خيار الشفت. الرجاء المحاولة مرة أخرى.");
+    });
+}
+
 function closeShiftModal() {
-    hideDivFlex("shiftModal");
-    hideDiv("noShift");
-    hideDiv("thereIsShift");
-    hideDivFlex("editShift");
-    showDivFlex("currentShift");
+  hideDivFlex("shiftModal");
+  employeesForShift = [];
+  departmentName = "";
+  document.getElementById("shiftModalTitle").innerText = "";
+  document.getElementById("employeesRows").innerHTML = "";
 }
 const shiftModal = document.getElementById("shiftModal");
 shiftModal.addEventListener("click", function (e) {
-    if (e.target == this) {
-        closeShiftModal();
-    }
-})
+  if (e.target == this) {
+    closeShiftModal();
+  }
+});
 
 // document.getElementById("switchBtn").addEventListener("click", function () {
 //     toggleVisibility("currentShift", true);

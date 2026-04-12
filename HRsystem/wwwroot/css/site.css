@@ -196,10 +196,10 @@
   color: white !important;
   padding: 7px !important;
 }
-
-/* * {
+/* 
+* {
   outline: 1px solid red !important;
-} */
+}  */
 .col-nav {
   @apply bg-color2 !important;
 }

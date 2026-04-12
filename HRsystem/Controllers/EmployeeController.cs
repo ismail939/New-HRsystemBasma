@@ -424,94 +424,61 @@ namespace HRsystem.Controllers
         [Route("/getDepartmentEmployees")]
         public IActionResult GetDepartmentEmployees(int departmentId)
         {
-            var employees = _context.HREmployees.Where(e => e.HRDepartmentId == departmentId).ToList();
+            var employees = _context.HREmployees.Where(e => e.HRDepartmentId == departmentId).Select(e => new { e.Id, e.Name }).ToList();
             var DepartmentName = _context.HRDepartments.Where(d => d.Id == departmentId).Select(d => d.Name).FirstOrDefault();
             return Json(new { employees = employees, departmentName = DepartmentName });
         }
 
-        [Authorize(Roles = "Admin,HR")]
         [HttpPost]
-        [Route("/addShiftVariable")]
-        public IActionResult AddShiftVariable(int EmployeeId)
+        [Route("/addShiftOption")]
+        public IActionResult AddShiftOption(DateTime? StartTime, DateTime? EndTime, int ShiftMode, int? Hours)
         {
-            // check if there is a shift for this emp with the toDate = null and make the toDate the datetime.now
-            var updatedShift = _context.HREmployeeShift.FirstOrDefault(shift => shift.EmployeeId == EmployeeId && shift.ToDate == null);
-            if (updatedShift != null)
+            // create the name so we can retrieve it later and show it to the user in the dropdown
+            string FormatTime(DateTime? time)
             {
-                updatedShift.ToDate = DateTime.Now;
-                _context.SaveChanges();
-            }
-            var employeeShift = new HREmployeeShift
-            {
-                ShiftMode = 0,
-                FromDate = DateTime.Now,
-                EmployeeId = EmployeeId
-            };
-            _context.HREmployeeShift.Add(employeeShift);
-            _context.HRLogs.Add(new HRLog
-            {
-                Action = $"User ({User.Identity.Name}) added shift for employee ({employeeShift.EmployeeId}) with mode ({employeeShift.ShiftMode})"
-            });
-            _context.SaveChanges();
-            return Json(new { success = true });
-        }
+                if (!time.HasValue) return "-";
 
-        [Authorize(Roles = "Admin,HR")]
-        [HttpPost]
-        [Route("/addShiftHours")]
-        public IActionResult AddShift(int EmployeeId, int Hours)
-        {
-            // check if there is a shift for this emp with the toDate = null and make the toDate the datetime.now
-            var updatedShift = _context.HREmployeeShift.FirstOrDefault(shift => shift.EmployeeId == EmployeeId && shift.ToDate == null);
-            if (updatedShift != null)
-            {
-                updatedShift.ToDate = DateTime.Now;
+                return time.Value.ToString("hh:mm tt", new System.Globalization.CultureInfo("ar-EG"));
             }
-            _context.SaveChanges();
-            var employeeShift = new HREmployeeShift
+            string name;
+            if (ShiftMode == 1)
             {
-                RequiredHours = Hours,
-                ShiftMode = 1,
-                FromDate = DateTime.Now,
-                EmployeeId = EmployeeId
-            };
-            _context.HREmployeeShift.Add(employeeShift);
-            _context.HRLogs.Add(new HRLog
+                name = $"عدد ساعات: {Hours}";
+            }else if(ShiftMode == 2)
             {
-                Action = $"User ({User.Identity.Name}) added shift for employee ({employeeShift.EmployeeId}) with mode ({employeeShift.ShiftMode}) and hours ({employeeShift.RequiredHours})"
-            });
-            _context.SaveChanges();
-            return Json(new { success = true });
-        }
+                name = $"من {FormatTime(StartTime)} إلى {FormatTime(EndTime)}";
+            }else{
+                name = "متغير";
+            }
 
-        [Authorize(Roles = "Admin,HR")]
-        [HttpPost]
-        [Route("/addShiftFixed")]
-        public IActionResult AddShiftFixed(int EmployeeId, DateTime StartTime, DateTime EndTime)
-        {
-            // check if there is a shift for this emp with the toDate = null and make the toDate the datetime.now
-            var updatedShift = _context.HREmployeeShift.FirstOrDefault(shift => shift.EmployeeId == EmployeeId && shift.ToDate == null);
-            if (updatedShift != null)
-            {
-                updatedShift.ToDate = DateTime.Now;
+            // check if the same shift option already exists
+            var exists = _context.HRShiftOptions.Any(s => s.ShiftMode == ShiftMode && s.StartTime == StartTime && s.EndTime == EndTime && s.RequiredHours == Hours);
+            if (exists)            {
+                return Json(new { success = false, message = "Shift option already exists" });
             }
-            _context.SaveChanges();
-            var employeeShift = new HREmployeeShift
+
+            var newShiftOption = new HRShiftOption
             {
+                Name = name,
                 StartTime = StartTime,
                 EndTime = EndTime,
-                ShiftMode = 2,
-                FromDate = DateTime.Now,
-                EmployeeId = EmployeeId
+                ShiftMode = ShiftMode,
+                RequiredHours = ShiftMode == 1 ? Hours : null
             };
-            _context.HREmployeeShift.Add(employeeShift);
+            _context.HRShiftOptions.Add(newShiftOption);
             _context.HRLogs.Add(new HRLog
             {
-                Action = $"User ({User.Identity.Name}) added shift for employee ({employeeShift.EmployeeId}) with mode ({employeeShift.ShiftMode}), start time ({employeeShift.StartTime}) and end time ({employeeShift.EndTime})"
+                Action = $"User ({User.Identity.Name}) added shift option ({name})"
             });
             _context.SaveChanges();
-            return Json(new { success = true });
+            return Json(new { success = true, Name = name }); 
         }
-
+        [HttpGet]
+        [Route("/getShiftOptions")]
+        public IActionResult GetShiftOptions()
+        {
+            var shiftOptions = _context.HRShiftOptions.Select(s => new { s.Id, s.Name }).ToList();
+            return Json(shiftOptions);
+        }
     }
 }
