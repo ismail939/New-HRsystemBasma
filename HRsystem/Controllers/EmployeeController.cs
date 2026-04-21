@@ -10,6 +10,7 @@ using FastReport;
 using Microsoft.AspNetCore.Authorization;
 using System.IO.Compression;
 using HRsystem.ViewModels;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace HRsystem.Controllers
 {
@@ -73,14 +74,14 @@ namespace HRsystem.Controllers
                     LeaveReason = emp.LeaveReason,
                     BasmaId = emp.BasmaId,
                     HRDepartmentId = emp.HRDepartmentId,
-                    Department = depName==""?"": depName
+                    Department = depName == "" ? "" : depName
                 });
             }
             var departments = _context.HRDepartments.ToList();
             var employeesNdepartments = new ListEmployeesViewModel
             {
-              Employees = employeeVMs,
-              Departments = departments  
+                Employees = employeeVMs,
+                Departments = departments
             };
             return View(employeesNdepartments);
         }
@@ -112,7 +113,7 @@ namespace HRsystem.Controllers
             {
                 return Json(new { success = false, message = "بيانات الموظف غير صالحة." });
             }
-            
+
             _context.HREmployees.Add(newEmployee);
             _context.HRLogs.Add(new HRLog
             {
@@ -169,7 +170,7 @@ namespace HRsystem.Controllers
             // Clean the name (remove spaces/special chars for filename)
             string cleanName = string.Concat(empName.Split(Path.GetInvalidFileNameChars())).Replace(" ", "_");
 
-            Console.WriteLine(cleanName+"❎");
+            Console.WriteLine(cleanName + "❎");
             // Create ZIP in memory
             using var ms = new MemoryStream();
             using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, true))
@@ -408,7 +409,7 @@ namespace HRsystem.Controllers
         [Route("/getShift")]
         public IActionResult GetShift(int employeeId)
         {
-            var employeeShift = _context.HREmployeeShift.FirstOrDefault(sh => sh.EmployeeId == employeeId && DateTime.Now > sh.FromDate && sh.ToDate == null);
+            var employeeShift = _context.HREmployeeShift.FirstOrDefault(sh => sh.HREmployeeId == employeeId && DateTime.Now > sh.FromDate && sh.ToDate == null);
             // check if empshift is good or no
             if (employeeShift != null)
             {
@@ -429,6 +430,109 @@ namespace HRsystem.Controllers
             return Json(new { employees = employees, departmentName = DepartmentName });
         }
 
+
+        [HttpGet]
+        [Route("/getOffdaysNemployees")] /// add here all the shiftOptions if there are. upon the flag
+        public IActionResult GetOffdaysNemployees(string employeeIds, DateTime startDate)
+        {
+            var employeeIdList = employeeIds.Split(',').Select(int.Parse).ToList();
+            var offDays = _context.HREmployeeOffDays
+                .Where(od => employeeIdList.Contains(od.EmployeeId) &&
+                             od.OffDayDate.Date >= startDate.Date &&
+                             od.OffDayDate.Date <= startDate.Date.AddDays(6))
+                .GroupBy(od => od.EmployeeId)
+                .Select(g => new
+                {
+                    EmployeeId = g.Key,
+                    OffDays = g.Select(x => new { x.OffDayDate, x.OffDayType }).ToList()
+                })
+                .ToList(); return Json(new { offDays = offDays });
+        }
+
+        [HttpGet]
+        [Route("/getShiftsForWeek")]
+        public IActionResult GetShiftsForWeek(int DepartmentId, DateTime From, DateTime To)
+        {
+            // 1. employees in department
+            var employees = _context.HREmployees
+                .Where(e => e.HRDepartmentId == DepartmentId)
+                .Select(e => e.Id)
+                .ToList();
+
+            // 2. default shifts
+            var shifts = _context.HREmployeeShift
+                .Where(s => employees.Contains(s.HREmployeeId)
+                         && s.FromDate.Date <= To.Date
+                         && s.ToDate.Value.Date >= From.Date)
+                .ToList();
+
+            // 3. overrides
+            var overrides = _context.ShiftOverrides
+                .Where(o => shifts.Select(s => s.Id).Contains(o.HREmployeeShiftId))
+                .ToList();
+
+            // 4. offs
+            var offs = _context.HREmployeeOffDays
+                .Where(o => employees.Contains(o.EmployeeId)
+                         && o.OffDayDate.Date >= From.Date
+                         && o.OffDayDate.Date <= To.Date)
+                .ToList();
+
+            var result = new List<object>();
+
+            // 5. generate days
+            for (var date = From.Date; date <= To.Date; date = date.AddDays(1))
+            {
+                foreach (var empId in employees)
+                {
+                    // OFF has priority
+                    var off = offs.FirstOrDefault(o =>
+                        o.EmployeeId == empId && o.OffDayDate.Date == date);
+
+                    if (off != null)
+                    {
+                        result.Add(new
+                        {
+                            EmployeeId = empId,
+                            Date = date,
+                            ShiftOptionId = "off",
+                            OffDayType = off.OffDayType
+                        });
+                        continue;
+                    }
+
+                    // default shift
+                    var shift = shifts.FirstOrDefault(s =>
+                        s.HREmployeeId == empId &&
+                        s.FromDate.Date <= date &&
+                        s.ToDate.Value.Date >= date);
+
+                    if (shift == null)
+                        continue;
+
+                    var shiftOptionId = shift.ShiftOptionId;
+
+                    // check override
+                    var ov = overrides.FirstOrDefault(o =>
+                        o.HREmployeeShiftId == shift.Id &&
+                        o.DayOfWeek == (int)date.DayOfWeek);
+
+                    if (ov != null)
+                        shiftOptionId = ov.ShiftOptionId;
+
+                    result.Add(new
+                    {
+                        EmployeeId = empId,
+                        Date = date,
+                        ShiftOptionId = shiftOptionId?.ToString(),
+                        OffDayType = (string?)null
+                    });
+                }
+            }
+
+            return Json(result);
+        }
+
         [HttpPost]
         [Route("/addShiftOption")]
         public IActionResult AddShiftOption(DateTime? StartTime, DateTime? EndTime, int ShiftMode, int? Hours)
@@ -444,16 +548,20 @@ namespace HRsystem.Controllers
             if (ShiftMode == 1)
             {
                 name = $"عدد ساعات: {Hours}";
-            }else if(ShiftMode == 2)
+            }
+            else if (ShiftMode == 2)
             {
                 name = $"من {FormatTime(StartTime)} إلى {FormatTime(EndTime)}";
-            }else{
+            }
+            else
+            {
                 name = "متغير";
             }
 
             // check if the same shift option already exists
             var exists = _context.HRShiftOptions.Any(s => s.ShiftMode == ShiftMode && s.StartTime == StartTime && s.EndTime == EndTime && s.RequiredHours == Hours);
-            if (exists)            {
+            if (exists)
+            {
                 return Json(new { success = false, message = "Shift option already exists" });
             }
 
@@ -471,7 +579,7 @@ namespace HRsystem.Controllers
                 Action = $"User ({User.Identity.Name}) added shift option ({name})"
             });
             _context.SaveChanges();
-            return Json(new { success = true, Name = name }); 
+            return Json(new { success = true, Name = name , ShiftOptionId = newShiftOption.Id});
         }
         [HttpGet]
         [Route("/getShiftOptions")]
@@ -479,6 +587,167 @@ namespace HRsystem.Controllers
         {
             var shiftOptions = _context.HRShiftOptions.Select(s => new { s.Id, s.Name }).ToList();
             return Json(shiftOptions);
+        }
+
+        [HttpPost]
+        [Route("/saveShifts")]
+        public IActionResult SaveShifts([FromBody] ShiftList ShiftList)
+        {
+            DateTime From = ShiftList.From.Date;
+            DateTime To = ShiftList.To.Date;
+
+            // =========================
+            // 1. OFF DAYS (UPSERT)
+            // =========================
+            var offs = ShiftList.Shifts
+                .Where(x => x.ShiftOptionId == "off")
+                .ToList();
+
+            var offEmpIds = offs.Select(x => x.EmployeeId).Distinct().ToList();
+
+            var existingOffs = _context.HREmployeeOffDays
+                .Where(o => offEmpIds.Contains(o.EmployeeId)
+                         && o.OffDayDate.Date >= From
+                         && o.OffDayDate.Date <= To)
+                .ToList();
+
+            // remove old offs in range
+            _context.HREmployeeOffDays.RemoveRange(existingOffs);
+
+            var offEntities = offs.Select(x => new HREmployeeOffDay
+            {
+                EmployeeId = x.EmployeeId,
+                OffDayDate = x.Date.Date,
+                OffDayType = "راحة"
+            }).ToList();
+
+            _context.HREmployeeOffDays.AddRange(offEntities);
+
+            // =========================
+            // 2. WORKING SHIFTS
+            // =========================
+            var workingShifts = ShiftList.Shifts
+                .Where(x => x.ShiftOptionId != "off")
+                .ToList();
+
+            var empIds = workingShifts
+                .Select(x => x.EmployeeId)
+                .Distinct()
+                .ToList();
+
+            // =========================
+            // 3. GROUP + DEFAULT SHIFT
+            // =========================
+            var result = workingShifts
+                .GroupBy(s => s.EmployeeId)
+                .Select(empGroup =>
+                {
+                    var mostFrequentShift = empGroup
+                        .GroupBy(x => x.ShiftOptionId)
+                        .OrderByDescending(g => g.Count())
+                        .First().Key;
+
+                    return new
+                    {
+                        HREmployeeId = empGroup.Key,
+                        MostFrequentShiftOptionId = mostFrequentShift,
+                        Others = empGroup
+                            .Where(x => x.ShiftOptionId != mostFrequentShift)
+                            .ToList()
+                    };
+                })
+                .ToList();
+
+            // =========================
+            // 4. GET EXISTING SHIFTS (UPSERT)
+            // =========================
+            var existingShifts = _context.HREmployeeShift
+                .Where(s => empIds.Contains(s.HREmployeeId)
+                         && s.FromDate.Date == From
+                         && s.ToDate == To)
+                .ToList();
+
+            var existingMap = existingShifts
+                .ToDictionary(x => x.HREmployeeId, x => x);
+
+            var newShifts = new List<HREmployeeShift>();
+
+            foreach (var emp in result)
+            {
+                int shiftOptionId = int.TryParse(emp.MostFrequentShiftOptionId, out int resu) ? resu : 0;
+
+                if (existingMap.ContainsKey(emp.HREmployeeId))
+                {
+                    // UPDATE
+                    var existing = existingMap[emp.HREmployeeId];
+                    existing.ShiftOptionId = shiftOptionId;
+                }
+                else
+                {
+                    // INSERT
+                    newShifts.Add(new HREmployeeShift
+                    {
+                        FromDate = From,
+                        ToDate = To,
+                        HREmployeeId = emp.HREmployeeId,
+                        ShiftOptionId = shiftOptionId
+                    });
+                }
+            }
+
+            _context.HREmployeeShift.AddRange(newShifts);
+            _context.SaveChanges();
+
+            // =========================
+            // 5. REFRESH SHIFTS (for IDs)
+            // =========================
+            var savedShifts = _context.HREmployeeShift
+                .Where(s => empIds.Contains(s.HREmployeeId)
+                         && s.FromDate.Date == From
+                         && s.ToDate == To)
+                .ToList();
+
+            var shiftMap = savedShifts
+                .ToDictionary(x => x.HREmployeeId, x => x);
+
+            // =========================
+            // 6. DELETE OLD OVERRIDES
+            // =========================
+            var shiftIds = savedShifts.Select(s => s.Id).ToList();
+
+            var oldOverrides = _context.ShiftOverrides
+                .Where(o => shiftIds.Contains(o.HREmployeeShiftId));
+
+            _context.ShiftOverrides.RemoveRange(oldOverrides);
+            _context.SaveChanges();
+
+            // =========================
+            // 7. ADD NEW OVERRIDES
+            // =========================
+            var overrides = new List<ShiftOverride>();
+
+            foreach (var emp in result)
+            {
+                var shiftEntity = shiftMap[emp.HREmployeeId];
+
+                foreach (var other in emp.Others)
+                {
+                    overrides.Add(new ShiftOverride
+                    {
+                        HREmployeeShiftId = shiftEntity.Id,
+                        DayOfWeek = (int)other.Date.DayOfWeek,
+                        ShiftOptionId = int.TryParse(other.ShiftOptionId, out int r) ? r : 0
+                    });
+                }
+            }
+
+            _context.ShiftOverrides.AddRange(overrides);
+            _context.SaveChanges();
+
+            // =========================
+            // DONE
+            // =========================
+            return Json(new { success = true });
         }
     }
 }

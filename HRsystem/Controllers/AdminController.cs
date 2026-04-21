@@ -157,7 +157,7 @@ namespace HRsystem.Controllers
                 _context.HREmployeePenalties.RemoveRange(items3);
                 _context.SaveChanges();
                 // shift 
-                var shiftsId = _context.HREmployeeShift.Where(b => b.EmployeeId == emp.Id).Select(b => b.Id).ToList();
+                var shiftsId = _context.HREmployeeShift.Where(b => b.HREmployeeId == emp.Id).Select(b => b.Id).ToList();
                 var items4 = _context.HREmployeeShift
                     .Where(x => shiftsId.Contains(x.Id))
                     .ToList();

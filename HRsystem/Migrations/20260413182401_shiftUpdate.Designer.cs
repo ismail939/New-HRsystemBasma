@@ -4,6 +4,7 @@ using HRsystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRsystem.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260413182401_shiftUpdate")]
+    partial class shiftUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -75,8 +78,6 @@ namespace HRsystem.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId", "CheckTime");
 
                     b.ToTable("CheckInOuts");
                 });
@@ -426,6 +427,9 @@ namespace HRsystem.Migrations
                     b.Property<int?>("EarlyLeaveToleranceMinutes")
                         .HasColumnType("int");
 
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("FromDate")
                         .HasColumnType("datetime2");
 
@@ -443,9 +447,11 @@ namespace HRsystem.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("HREmployeeId");
+
                     b.HasIndex("ShiftOptionId");
 
-                    b.HasIndex("HREmployeeId", "FromDate");
+                    b.HasIndex("EmployeeId", "FromDate");
 
                     b.ToTable("HREmployeeShift");
                 });
@@ -528,7 +534,7 @@ namespace HRsystem.Migrations
                     b.HasIndex("HREmployeeShiftId", "DayOfWeek")
                         .IsUnique();
 
-                    b.ToTable("ShiftOverrides");
+                    b.ToTable("ShiftOverride");
                 });
 
             modelBuilder.Entity("HRsystem.Models.User", b =>

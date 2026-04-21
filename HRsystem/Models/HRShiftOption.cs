@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using HRsystem.Models;
+using Microsoft.EntityFrameworkCore;
+
 
 public class HRShiftOption
 {
@@ -22,5 +24,7 @@ public class HRShiftOption
     public bool IsActive { get; set; } = true;
 
     [JsonIgnore]
-    public virtual ICollection<HREmployeeShift> EmployeeShifts { get; set; }
+    public virtual ICollection<HREmployeeShift> EmployeeShifts { get; set; } = new List<HREmployeeShift>();
+    [JsonIgnore]
+    public virtual ICollection<ShiftOverride> ShiftOverrides { get; set; } = new List<ShiftOverride>();
 }

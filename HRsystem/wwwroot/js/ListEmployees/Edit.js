@@ -224,19 +224,19 @@ document.getElementById('employeeForm').addEventListener('submit', async functio
     if (response.ok) {
         const index = sessionStorage.getItem("editIndex");
         const row = document.getElementById('row-' + index);
-        row.querySelectorAll('td')[0].innerText = formData.get('Name');
-        row.querySelectorAll('td')[1].innerText = formData.get('NationalId');
-        row.querySelectorAll('td')[2].innerText = formData.get('PhoneNumber');
-        row.querySelectorAll('td')[3].innerText = formData.get('Address');
-        row.querySelectorAll('td')[4].innerText = formData.get('MarriageStatus');
-        row.querySelectorAll('td')[5].innerText = formData.get('Religion');
-        row.querySelectorAll('td')[6].innerText = formData.get('DateOfBirth');
-        row.querySelectorAll('td')[7].innerText = formData.get('InsuranceNumber');
-        row.querySelectorAll('td')[8].innerText = formData.get('HireDate');
-        row.querySelectorAll('td')[9].innerText = formData.get('EndDate');
-        row.querySelectorAll('td')[10].innerText = formData.get('Department');
-        row.querySelectorAll('td')[11].innerText = formData.get('JobName');
-        row.querySelectorAll('td')[12].innerText = formData.get('ContractType');
+        // row.querySelectorAll('td')[0].innerText = formData.get('Name');
+        // row.querySelectorAll('td')[1].innerText = formData.get('NationalId');
+        // row.querySelectorAll('td')[2].innerText = formData.get('PhoneNumber');
+        // row.querySelectorAll('td')[3].innerText = formData.get('Address');
+        // row.querySelectorAll('td')[4].innerText = formData.get('MarriageStatus');
+        // row.querySelectorAll('td')[5].innerText = formData.get('Religion');
+        // row.querySelectorAll('td')[6].innerText = formData.get('DateOfBirth');
+        // row.querySelectorAll('td')[7].innerText = formData.get('InsuranceNumber');
+        // row.querySelectorAll('td')[8].innerText = formData.get('HireDate');
+        // row.querySelectorAll('td')[9].innerText = formData.get('EndDate');
+        // row.querySelectorAll('td')[10].innerText = formData.get('Department');
+        // row.querySelectorAll('td')[11].innerText = formData.get('JobName');
+        // row.querySelectorAll('td')[12].innerText = formData.get('ContractType');
         closeModal();
         setTimeout(() => {
             alert('تم الحفظ بنجاح ✅');

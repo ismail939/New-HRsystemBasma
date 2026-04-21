@@ -41,5 +41,6 @@ namespace HRsystem.Data
         public DbSet<HRDepartment> HRDepartments { get; set; }
         public DbSet<HRLog> HRLogs { get; set; }
         public DbSet<HRShiftOption> HRShiftOptions { get; set; }
+        public DbSet<ShiftOverride> ShiftOverrides {get; set;}
     }
 }

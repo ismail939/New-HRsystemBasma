@@ -183,14 +183,15 @@
 // SHIFT
 let employeesForShift = [];
 let departmentName = "";
+let DepartmentId = 0;
 const days = [
+  "السبت",
   "الأحد",
   "الإتنين",
   "الثلاثاء",
   "الأربعاء",
   "الخميس",
   "الجمعة",
-  "السبت",
 ];
 const months = [
   "يناير",
@@ -208,15 +209,14 @@ const months = [
 ];
 function openShiftModal() {
   const departmentId = document.getElementById("departmentFilter").value;
+  DepartmentId = departmentId;
   if (departmentId == "") {
     alert("الرجاء اختيار قسم أولاً!");
     return;
   }
-
   fetch(`/getDepartmentEmployees?departmentId=${departmentId}`)
     .then((res) => res.json())
     .then((data) => {
-      console.log(data);
       showDivFlex("shiftModal");
       employeesForShift = data.employees;
       departmentName = data.departmentName;
@@ -224,88 +224,151 @@ function openShiftModal() {
         `تعديل الشفت لقسم: ${data.departmentName}`;
     });
 }
-function buildSelect(empId, dateStr, options) {
-    let html = `
-        <select class="border shiftSelectF !text-color3 rounded p-1"
-                data-emp="${empId}"
-                data-date="${dateStr}">
-            <option value="">اختر شيفت</option>
-            <option value="off">راحة</option>
-    `;
+function buildSelect(empId, date, options, selectedValue = null) {
+  let html = `<select class="shiftSelectF"
+      data-emp="${empId}"
+      data-date="${date.toISOString()}">`;
 
-    options.forEach(option => {
-        html += `<option value="${option.Id}">${option.Name}</option>`;
-    });
+  html += `<option value="">-- اختر --</option>
+  <option value="off">راحة</option>`;
 
-    html += `</select>`;
+  options.forEach((opt) => {
+    let selected = selectedValue == opt.Id ? "selected" : "";
+    html += `<option value="${opt.Id}" ${selected}>${opt.Name}</option>`;
+  });
 
-    return html;
+  html += `</select>`;
+  return html;
 }
 document.addEventListener("change", function (e) {
-    if (e.target.classList.contains("shiftSelectF")) {
+  if (e.target.classList.contains("shiftSelectF")) {
+    const value = e.target.value;
+    const parent = e.target.closest(".dayCard");
+    // reset classes
+    parent.classList.remove(
+      "bg-color1",
+      "bg-color2",
+      "bg-color3",
+      "!text-color1",
+      "!text-color3",
+    );
 
-        const value = e.target.value;
-        const parent = e.target.closest(".dayCard");
-        // reset classes
-        parent.classList.remove("bg-color1", "bg-color2", "bg-color3", "!text-color1", "!text-color3");
-
-        if (value === "off") {
-           parent.classList.add("bg-color2");
-            parent.classList.add("!text-color3");
-        } else{
-            parent.classList.add("!bg-color3");
-            parent.classList.add("text-color1");
-        }
-       
+    if (value === "off") {
+      parent.classList.add("bg-color2");
+      parent.classList.add("text-color3");
+    } else {
+      parent.classList.add("bg-color3");
+      parent.classList.add("text-color1");
     }
+  }
 });
-function SearchWeeks() {
+async function SearchWeeks() {
   const employeesRows = document.getElementById("employeesRows");
+  employeesRows.innerHTML = "";
 
-  const startDate = new Date(document.getElementById("startWeekDate").value); // أو التاريخ اللي انت مختاره
+  employeesRows.innerHTML += `
+    <div id="labeLL" class="font-bold text-[16px] hidden border-2 border-color3 p-1 rounded-lg m-2">
+      قم باختيار الشيفت لكل الموظفين
+    </div>
+  `;
+
+  const startDate = new Date(document.getElementById("startWeekDate").value);
+  const endDate = new Date(document.getElementById("endWeekDate").value);
+
   if (startDate == "Invalid Date") {
     alert("الرجاء اختيار تاريخ بداية الأسبوع!");
     return;
   }
-  options = [];
-   
-  employeesForShift.forEach(async (emp) => {
+
+  // 🔥 GET ALL SHIFTS (includes OFF + overrides)
+  const shifts = await fetch(
+    `/getShiftsForWeek?DepartmentId=${DepartmentId}&From=${startDate.toISOString()}&To=${endDate.toISOString()}`,
+  );
+  const shiftsRes = await shifts.json();
+
+  // 🧠 group by employee
+  const grouped = {};
+  shiftsRes.forEach((s) => {
+    if (!grouped[s.EmployeeId]) {
+      grouped[s.EmployeeId] = [];
+    }
+    grouped[s.EmployeeId].push(s);
+  });
+
+  const res = await fetch(`/getShiftOptions`);
+  const options = await res.json();
+
+  // 🎯 RENDER
+  employeesForShift.forEach((emp) => {
     let daysHtml = "";
-    const res = await fetch(`/getShiftOptions`);
-    const options = await res.json();
+
+    const empShifts = grouped[emp.Id] || [];
+
     for (let i = 0; i < 7; i++) {
       let currentDay = new Date(startDate);
       currentDay.setDate(startDate.getDate() + i);
 
-      let dayName = days[currentDay.getDay()];
+      const dayName = currentDay.toLocaleDateString("ar-EG", {
+        weekday: "long",
+      });
       let dateStr = `${dayName} - ${currentDay.getDate()} ${months[currentDay.getMonth()]}`;
 
+      // 🔥 find shift for this day
+      const shift = empShifts.find(
+        (s) => new Date(s.Date).toDateString() === currentDay.toDateString(),
+      );
+
+      // 🟥 OFF DAY
+      if (shift && shift.ShiftOptionId === "off") {
+        const dayCard = document.createElement("div");
+        dayCard.className =
+          "flex dayCard text-color3 flex-col gap-2 items-center bg-color2 p-2 rounded-lg shadow-sm";
+
+        const offType = shift.OffDayType || "راحة";
+
+        dayCard.innerHTML = `
+        <div class="text-sm font-bold !text-color1">${dateStr}</div>
+        <div class="text-xs font-bold !text-color3">${offType}</div>
+      `;
+
+        daysHtml += dayCard.outerHTML;
+        continue;
+      }
+
+      // 🟩 NORMAL SHIFT
       const dayCard = document.createElement("div");
       dayCard.className =
         "flex dayCard text-color3 flex-col gap-2 items-center bg-color3 p-2 rounded-lg shadow-sm";
 
       dayCard.innerHTML = `
-      <div class="text-sm font-bold !text-color1">${dateStr}</div>
-       `;
-      const selectHtml = buildSelect(emp.Id, currentDay, options);
+        <div class="text-sm font-bold !text-color1">${dateStr}</div>
+      `;
+
+      // 🔥 build select with pre-selected value
+      let selectedValue = shift ? shift.ShiftOptionId : null;
+      let selectHtml = buildSelect(emp.Id, currentDay, options, selectedValue);
+
       dayCard.innerHTML += selectHtml;
       daysHtml += dayCard.outerHTML;
-     
     }
 
     let row = `
-        <div id="employeeDiv-${emp.Id}" 
-             class="shadow-lg flex flex-col gap-3 p-3 rounded-lg">
+      <div id="employeeDiv-${emp.Id}" 
+           class="shadow-lg flex flex-col gap-3 p-3 rounded-lg">
 
-            <span class="font-bold">${emp.Name}</span>
+          <span class="font-bold">${emp.Name}</span>
 
-            <div class="grid grid-cols-7 gap-2">
-                ${daysHtml}
-            </div>
-        </div>
-        `;
+          <div class="grid grid-cols-7 gap-2">
+              ${daysHtml}
+          </div>
+      </div>
+    `;
+
     employeesRows.innerHTML += row;
   });
+
+  showDiv("saveShiftsButton");
+  showDiv("labeLL");
 }
 
 document.getElementById("shiftType").addEventListener("change", function () {
@@ -329,10 +392,16 @@ document.getElementById("shiftType").addEventListener("change", function () {
 });
 
 function addShiftOption() {
+  const shiftType = document.getElementById("shiftType").value;
+  if (shiftType == "1") {
+    document.getElementById("shiftStartTime").value = null;
+    document.getElementById("shiftEndTime").value = null;
+  } else if (shiftType == "2") {
+    document.getElementById("shiftHours").value = null;
+  }
   const startTime = document.getElementById("shiftStartTime").value;
   const endTime = document.getElementById("shiftEndTime").value;
   const hours = document.getElementById("shiftHours").value;
-  const shiftType = document.getElementById("shiftType").value;
   if (shiftType == "") {
     alert("الرجاء اختيار نوع الشفت!");
     return;
@@ -353,6 +422,13 @@ function addShiftOption() {
     .then((data) => {
       if (data.success) {
         alert("تم إضافة خيار الشفت بنجاح!");
+        document.querySelectorAll(".shiftSelectF").forEach((select) => {
+          const option = document.createElement("option");
+          option.value = data.ShiftOptionId;
+          option.textContent = data.Name;
+
+          select.appendChild(option);
+        });
       } else {
         alert("حدث خطأ أثناء إضافة خيار الشفت. الرجاء المحاولة مرة أخرى.");
       }
@@ -369,6 +445,7 @@ function closeShiftModal() {
   departmentName = "";
   document.getElementById("shiftModalTitle").innerText = "";
   document.getElementById("employeesRows").innerHTML = "";
+  hideDiv("saveShiftsButton");
 }
 const shiftModal = document.getElementById("shiftModal");
 shiftModal.addEventListener("click", function (e) {
@@ -376,6 +453,59 @@ shiftModal.addEventListener("click", function (e) {
     closeShiftModal();
   }
 });
+
+document
+  .getElementById("saveShiftsButton")
+  .addEventListener("click", function () {
+    const shiftData = [];
+    let valid = true;
+    document.querySelectorAll(".shiftSelectF").forEach((select) => {
+      const EmployeeId = select.getAttribute("data-emp");
+      const DateValue = new Date(
+        select.getAttribute("data-date"),
+      ).toISOString();
+      console.log("😊😊😊");
+      console.log(
+        `Here are the empId ${EmployeeId} and here is the DateValue ${DateValue}`,
+      );
+      const ShiftOptionId = select.value;
+      if (ShiftOptionId) {
+        shiftData.push({
+          EmployeeId: parseInt(EmployeeId),
+          Date: DateValue,
+          ShiftOptionId: ShiftOptionId,
+        });
+      } else {
+        valid = false;
+      }
+    });
+    if (!valid) {
+      alert("اكمل الشفت لكل الموظفين حتي تستطيع الحفظ");
+      return;
+    }
+    const From = document.getElementById("startWeekDate").value;
+    const To = document.getElementById("endWeekDate").value;
+    fetch("/saveShifts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ Shifts: shiftData, From: From, To: To }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          alert("تم حفظ الشفتات بنجاح!");
+          closeShiftModal();
+        } else {
+          alert("حدث خطأ أثناء حفظ الشفتات. الرجاء المحاولة مرة أخرى.");
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("حدث خطأ أثناء حفظ الشفتات. الرجاء المحاولة مرة أخرى.");
+      });
+  });
 
 // document.getElementById("switchBtn").addEventListener("click", function () {
 //     toggleVisibility("currentShift", true);
