@@ -41,7 +41,10 @@
             </div>
         </template>
     </div>
-    <button class="col-button-light absolute left-2" onclick="saveNotes()">حفظ الملاحظات</button>
+    <div class="absolute left-2 flex gap-2 flex-row">
+        <a class="col-button-dark" onclick="downloadDailyReport()">طباعة التقرير</a>
+    <button class="col-button-light" onclick="saveNotes()">حفظ الملاحظات</button>
+    </div>
 </div>
 
 
@@ -53,60 +56,14 @@
                 <th>وقت الحضور</th>
                 <th>وقت الانصراف</th>
                 <th>عدد ساعات العمل</th>
-                <th>دقائق التأخير</th>
-                <th>دقائق الخروج المبكر</th>
-                <th>دقائق العمل الإضافي</th>
+                <th>التأخير</th>
+                <th>الخروج المبكر</th>
+                <th>العمل الإضافي</th>
                 <th>الحالة</th>
-                <th>تأكيد</th>
                 <th>ملاحظات</th>
             </tr>
         </thead>
         <tbody id="employeesBody" class="mt-3">
-           
-            @* <tr>
-                <td>ابراهيم محمد حسن</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>
-                    <select class="border p-2 rounded focus:outline-none focus:ring focus:ring-[#7B9669]">
-                        <option>غياب</option>
-                        <option>إجازة</option>
-                    </select>
-                </td>
-                <td>
-                    <button class="col-button-dark flex items-center justify-center gap-1">
-                        <i class="bi bi-check-square-fill text-lg"></i>
-                    </button>
-                </td>
-                
-                <td class="border !p-0">
-                    <input type="text" class="w-full rounded focus:outline-none focus:ring focus:ring-[#7B9669] h-full border-0">
-                </td>
-                
-            </tr>
-            <tr>
-                <td>احمد محمد حسن</td>
-                <td>7:30</td>
-                <td>15:45</td>
-                <td>8.25</td>
-                <td>30</td>
-                <td>15</td>
-                <td>
-                    حضور
-                </td>
-                <td>
-
-                </td>
-                
-                <td class="border !p-0">
-                    <input type="text" class="w-full rounded focus:outline-none focus:ring focus:ring-[#7B9669] h-full border-0">
-                </td>
-                
-            </tr> *@
-
         </tbody>
     </table>
     <div class="hidden" id="noDataMessage">

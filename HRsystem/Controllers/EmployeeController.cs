@@ -44,7 +44,7 @@ namespace HRsystem.Controllers
         public IActionResult ListEmployees()
         {
             Console.WriteLine("Entered ListEmployees action");
-            var employees = _context.HREmployees.ToList();
+            var employees = _context.HREmployees.AsNoTracking().OrderBy(e=>e.Name).ToList();
             Console.WriteLine("here is the number of the items: " + employees.Count);
             foreach (var emp in employees)
             {
@@ -65,7 +65,7 @@ namespace HRsystem.Controllers
                     Address = emp.Address,
                     MarriageStatus = emp.MarriageStatus,
                     Religion = emp.Religion,
-                    DateOfBirth = emp.DateOfBirth,
+                    DateOfBirth = emp.DateOfBirth ?? DateTime.MinValue,
                     InsuranceNumber = emp.InsuranceNumber,
                     HireDate = emp.HireDate,
                     EndDate = emp.EndDate,
@@ -425,7 +425,7 @@ namespace HRsystem.Controllers
         [Route("/getDepartmentEmployees")]
         public IActionResult GetDepartmentEmployees(int departmentId)
         {
-            var employees = _context.HREmployees.Where(e => e.HRDepartmentId == departmentId).Select(e => new { e.Id, e.Name }).ToList();
+            var employees = _context.HREmployees.Where(e => e.HRDepartmentId == departmentId).Select(e => new { e.Id, e.Name }).OrderBy(e=>e.Name).ToList();
             var DepartmentName = _context.HRDepartments.Where(d => d.Id == departmentId).Select(d => d.Name).FirstOrDefault();
             return Json(new { employees = employees, departmentName = DepartmentName });
         }

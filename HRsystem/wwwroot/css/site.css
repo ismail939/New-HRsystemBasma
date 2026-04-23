@@ -205,7 +205,7 @@
 }
 
 .tableContainer {
-  @apply overflow-y-auto max-h-[75vh] rounded-lg shadow-md mx-1  w-full  justify-center overflow-x-auto;
+  @apply overflow-y-auto max-h-[60vh] rounded-lg shadow-md mx-1  w-full  justify-center overflow-x-auto;
 }
 
 .table-base {

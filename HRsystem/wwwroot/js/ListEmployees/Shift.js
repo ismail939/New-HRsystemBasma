@@ -447,12 +447,12 @@ function closeShiftModal() {
   document.getElementById("employeesRows").innerHTML = "";
   hideDiv("saveShiftsButton");
 }
-const shiftModal = document.getElementById("shiftModal");
-shiftModal.addEventListener("click", function (e) {
-  if (e.target == this) {
-    closeShiftModal();
-  }
-});
+// const shiftModal = document.getElementById("shiftModal");
+// shiftModal.addEventListener("click", function (e) {
+//   if (e.target == this) {
+//     closeShiftModal();
+//   }
+// });
 
 document
   .getElementById("saveShiftsButton")

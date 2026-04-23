@@ -9,10 +9,10 @@ public class BasmaList
     public DateTime? ArrivalTime { get; set; }
     public DateTime? DepartureTime { get; set; }
     public float? TotalHours { get; set; }
-    public int? LateMinutes { get; set; }
-    public int? EarlyLeaveMinutes {get; set;}
-    public int? OvertimeMinutes { get; set; }
-    public bool Ok {get; set;}
+    public float? LateMinutes { get; set; }
+    public float? EarlyLeaveMinutes {get; set;}
+    public float? OvertimeMinutes { get; set; }
     public int Status { get; set; }
     public string? Notes { get; set; }
+    public string? OffDayType { get; set; }
 }

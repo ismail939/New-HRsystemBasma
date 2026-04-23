@@ -113,7 +113,7 @@ namespace HRsystem.Controllers
                     PhoneNumber = emp.PhoneNumber,
                     MarriageStatus = emp.MarriageStatus,
                     Religion = emp.Religion,
-                    DateOfBirth = emp.DateOfBirth,
+                    DateOfBirth = emp.DateOfBirth??DateTime.MinValue,
                     InsuranceNumber = emp.InsuranceNumber,
                     HireDate = emp.HireDate,
                     EndDate = emp.EndDate,
@@ -168,6 +168,8 @@ namespace HRsystem.Controllers
                 var items5 = _context.HREmployeeRates
                     .Where(x => rateIds.Contains(x.Id))
                     .ToList();
+                var items6 = _context.ShiftOverrides.Where(sh=>shiftsId.Contains(sh.HREmployeeShiftId)).ToList();
+                _context.ShiftOverrides.RemoveRange(items6);
                 _context.HREmployeeRates.RemoveRange(items5);
                 _context.SaveChanges();
                 // files

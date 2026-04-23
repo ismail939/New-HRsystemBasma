@@ -11,6 +11,11 @@
     direction: "ltr", // Ensure the time picker is RTL
     // Center the time input text
 });
+document.addEventListener("wheel", function (e) {
+  if (document.activeElement.type === "number") {
+    document.activeElement.blur();
+  }
+});
 flatpickr("#startWeekDate", {
     dateFormat: "Y-m-d",
     enable: [

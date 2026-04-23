@@ -16,13 +16,11 @@ public class HREmployeeBasma
     public DateTime? ArrivalTime { get; set; }
     public DateTime? DepartureTime { get; set; }
     public float? TotalHours { get; set; } 
-    public int? LateMinutes { get; set; }
-    public int? EarlyLeaveMinutes { get; set; }
-    public int? OvertimeMinutes { get; set; }
-    [Required]
-    public bool Ok {get; set;} = false;
-    
+    public float? LateMinutes { get; set; }
+    public float? EarlyLeaveMinutes { get; set; }
+    public float? OvertimeMinutes { get; set; }    
     public int Status { get; set; } = 1; // 1: arrived, 0: absent, 2: on leave, 3: absent|on leave.
+    public string? OffDayType { get; set; } // "sick", "vacation", "other"
     public string? Notes { get; set; }
     [Required]
     [JsonIgnore]

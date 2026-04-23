@@ -43,7 +43,7 @@ namespace HRsystem.Controllers
                     PhoneNumber = emp.PhoneNumber,
                     MarriageStatus = emp.MarriageStatus,
                     Religion = emp.Religion,
-                    DateOfBirth = emp.DateOfBirth,
+                    DateOfBirth = (DateTime)emp.DateOfBirth,
                     InsuranceNumber = emp.InsuranceNumber,
                     HireDate = emp.HireDate,
                     EndDate = emp.EndDate,

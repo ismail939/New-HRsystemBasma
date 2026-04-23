@@ -2,6 +2,30 @@ document.addEventListener("DOMContentLoaded", function () {
   console.log("Table.js loaded");
   globalBasmaList = [];
   proceedShowingBasma();
+  function downloadDailyReport() {
+  console.log("Downloading daily report...");
+      const dayDate = document.getElementById("datePicker").value;
+     
+      const fileName = `report_${dayDate}.pdf`;
+      fetch(
+        `/dailyReporttt?Day=${dayDate}`,
+      )
+        .then((res) => res.blob())
+        .then((blob) => {
+          const url = window.URL.createObjectURL(blob);
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+
+          window.URL.revokeObjectURL(url);
+        });
+    }
+    window.downloadDailyReport = downloadDailyReport;
+
 });
 // function filterByDate() {
 //     const dateInput = document.getElementById('datePicker').value;
@@ -47,6 +71,7 @@ async function showBasmaListForDay() {
   var html = "";
   globalBasmaList = list;
   list.forEach((basma) => {
+    console.log(basma);
     html += `
                 <tr id="row-${basma.Id}" class="snap-start h-12">
         <td>${basma.EmployeeName ?? ""}</td>
@@ -74,35 +99,19 @@ async function showBasmaListForDay() {
         </td>
 
         <td>${formatHours(basma.TotalHours) ?? ""}</td>
-        <td>${basma.LateMinutes ?? ""}</td>
-        <td>${basma.EarlyLeaveMinutes ?? ""}</td>
-        <td>${basma.OvertimeMinutes ?? ""}</td>
+        <td>${formatHours(basma.LateMinutes) ?? ""}</td>
+        <td>${formatHours(basma.EarlyLeaveMinutes) ?? ""}</td>
+        <td>${formatHours(basma.OvertimeMinutes) ?? ""}</td>
         <td>
             ${
               basma.Status === 1
                 ? `<span>حضور</span>`
-                : basma.Status === 3
-                  ? `
-                    <select class="h-full border p-1 rounded focus:outline-none focus:ring focus:ring-[#7B9669]"
-                            data-id="${basma.Id}">
-                        <option value="0">غياب</option>
-                        <option value="1">حضور</option>
-                        <option value="2">إجازة</option>
-                    </select>
-                    `
                   : basma.Status === 2
-                    ? `<span>إجازة</span>`
+                    ? `<span>${basma.OffDayType ?? "إجازة"}</span>`
                     : `<span>غياب</span>`
             }
         </td>
-        <td>
-        ${
-          basma.Ok
-            ? `<button class="col-button-light" onclick="cancel(${basma.Id})">إلغاء</button>`
-            : `<button class="col-button-dark" onclick="confirm(${basma.Id})">تأكيد</button>`
-        }
-
-        </td>
+        
         <td class="border !p-0">
             <input type="text" value="${basma.Notes ? basma.Notes : ""}" class="w-full -z-50 text-color3 rounded-sm focus:outline-none focus:ring focus:ring-[#7B9669] h-12 border-0">
         </td>
@@ -116,7 +125,7 @@ function proceedShowingBasma() {
     showBasmaListForDay();
     setTimeout(() => {
       document.getElementById("tableResponsive").classList.remove("hidden");
-      hideDivFlex("showBasmaModal");
+      // hideDivFlex("showBasmaModal");
     }, 120);
 }
 function goToEmployees(){
@@ -124,8 +133,8 @@ function goToEmployees(){
     window.location.href = `/employees`; // Redirect to the employees page
 }
 document.getElementById("datePicker").addEventListener("change", () => {
-    showDivFlex("showBasmaModal");
-  }
+  showBasmaListForDay();
+}
 );
 async function searchForEmployee() {
   const input = document.getElementById("searchInput").value.trim();
@@ -138,6 +147,7 @@ async function searchForEmployee() {
   console.log(list + "🟠");
   var html = "";
   list.forEach((basma) => {
+    console.log(basma);
     html += `
                 <tr id="row-${basma.Id}" class="snap-start h-12">
         <td>${basma.EmployeeName ?? ""}</td>
@@ -164,35 +174,18 @@ async function searchForEmployee() {
             }
         </td>
 
-        <td>${basma.TotalHours ?? ""}</td>
-        <td>${basma.LateMinutes ?? ""}</td>
-        <td>${basma.EarlyLeaveMinutes ?? ""}</td>
-        <td>${basma.OvertimeMinutes ?? ""}</td>
+        <td>${formatHours(basma.TotalHours ?? "")}</td>
+        <td>${formatHours(basma.LateMinutes ?? "")}</td>
+        <td>${formatHours(basma.EarlyLeaveMinutes ?? "")}</td>
+        <td>${formatHours(basma.OvertimeMinutes ?? "")}</td>
         <td>
             ${
               basma.Status === 1
                 ? `<span>حضور</span>`
-                : basma.Status === 3
-                  ? `
-                    <select class="h-full border p-1 rounded focus:outline-none focus:ring focus:ring-[#7B9669]"
-                            data-id="${basma.Id}">
-                        <option value="0">غياب</option>
-                        <option value="1">حضور</option>
-                        <option value="2">إجازة</option>
-                    </select>
-                    `
                   : basma.Status === 2
-                    ? `<span>إجازة</span>`
-                    : `<span>غياب</span>`
+                    ? `<span>${basma.OffDayType ?? "إجازة"}</span>`
+                    : `<span>غياب</span>` 
             }
-        </td>
-        <td>
-        ${
-          basma.Ok
-            ? `<button class="col-button-light" onclick="cancel(${basma.Id})">إلغاء</button>`
-            : `<button class="col-button-dark" onclick="confirm(${basma.Id})">تأكيد</button>`
-        }
-
         </td>
         <td class="border !p-0">
             <input type="text" value="${basma.Notes ? basma.Notes : ""}" class="w-full -z-50 text-color3 rounded-sm focus:outline-none focus:ring focus:ring-[#7B9669] h-12 border-0">
@@ -204,64 +197,38 @@ async function searchForEmployee() {
   tableBody.innerHTML = html;
 }
 
-function confirm(basmaId) {
-  console.log("Confirming basma with ID:", basmaId);
-  // eb3t elbasma ll backend hena w e3ml Ok b true lw hya 8yab
-  // bs lw agaza et2kd mn elbackend eno fe agaza hna.
-  const type = document.querySelector(`select[data-id='${basmaId}']`)?.value;
-  fetch(`/confirmBasma?id=${basmaId}&type=${type}`, {
-    method: "POST",
-  })
-    .then((res) => res.json())
-    .then((response) => {
-      // edit two things 1. from select to the value, 2. button text to "منتهي"
-      if (response.code == 1) {
-        const row = document.getElementById(`row-${basmaId}`);
-        // const buttonCell = row.cells[7]; // Assuming the button is in the 8th cell (index 7)
-        // buttonCell.innerHTML = "منتهي";
-        if (type == 1) {
-          row.cells[7].innerHTML = "حضور";
-        } else {
-          row.cells[7].innerHTML = type === "2" ? "إجازة" : "غياب";
-        }
-        row.cells[8].innerHTML = `<button class="col-button-light" onclick="cancel(${basmaId})">إلغاء</button>`;
-      } else if (response.code == 2) {
-        alert("قم بتسجيل هذا اليوم كإجازة عارضة اولا");
-        return;
-      }
-    })
-    .catch((error) => {
-      console.error("Error confirming basma:", error);
-    });
-}
-function cancel(basmaId) {
-  console.log("Canceling basma with ID:", basmaId);
-  // eb3t elbasma ll backend hena w e3ml Ok b true lw hya 8yab
-  // bs lw agaza et2kd mn elbackend eno fe agaza hna.
-  const type = document.querySelector(`select[data-id='${basmaId}']`)?.value;
-  fetch(`/cancelBasma?id=${basmaId}`, {
-    method: "POST",
-  })
-    .then((res) => res.json())
-    .then((response) => {
-      // edit two things 1. from select to the value, 2. button text to "منتهي"
-      if (response.success) {
-        const row = document.getElementById(`row-${basmaId}`);
-        row.cells[7].innerHTML = `
-                    <select class="h-full border p-1 rounded focus:outline-none focus:ring focus:ring-[#7B9669]"
-                            data-id="${basmaId}">
-                        <option value="0">غياب</option>
-                        <option value="1">حضور</option>
-                        <option value="2">إجازة</option>
-                    </select>
-                    `;
-        row.cells[8].innerHTML = `<button class="col-button-dark" onclick="confirm(${basmaId})">تأكيد</button>`;
-      }
-    })
-    .catch((error) => {
-      console.error("Error confirming basma:", error);
-    });
-}
+// function confirm(basmaId) {
+//   console.log("Confirming basma with ID:", basmaId);
+//   // eb3t elbasma ll backend hena w e3ml Ok b true lw hya 8yab
+//   // bs lw agaza et2kd mn elbackend eno fe agaza hna.
+//   const type = document.querySelector(`select[data-id='${basmaId}']`)?.value;
+//   fetch(`/confirmBasma?id=${basmaId}&type=${type}`, {
+//     method: "POST",
+//   })
+//     .then((res) => res.json())
+//     .then((response) => {
+//       // edit two things 1. from select to the value, 2. button text to "منتهي"
+//       if (response.code == 1) {
+//         const row = document.getElementById(`row-${basmaId}`);
+//         // const buttonCell = row.cells[7]; // Assuming the button is in the 8th cell (index 7)
+//         // buttonCell.innerHTML = "منتهي";
+//         if (type == 1) {
+//           row.cells[7].innerHTML = "حضور";
+//         } else {
+//           row.cells[7].innerHTML = type === "2" ? "إجازة" : "غياب";
+//         }
+//         row.cells[8].innerHTML = `<button class="col-button-light" onclick="cancel(${basmaId})">إلغاء</button>`;
+//       } else if (response.code == 2) {
+//         alert("قم بتسجيل هذا اليوم كإجازة عارضة اولا");
+//         return;
+//       }
+//     })
+//     .catch((error) => {
+//       console.error("Error confirming basma:", error);
+//     });
+// }
+
+
 
 function saveNotes() {
   const notes = [];

@@ -5,9 +5,9 @@ public class Helper
 {
             public class LatencyResult
         {
-            public int LateMinutes { get; set; }
-            public int EarlyLeaveMinutes { get; set; }
-            public int OvertimeMinutes { get; set; }
+            public float LateMinutes { get; set; }
+            public float EarlyLeaveMinutes { get; set; }
+            public float OvertimeMinutes { get; set; }
             public float TotalHours { get; set; }
         }
      public LatencyResult LatencyForEmployee(List<HREmployeeShift> employeeShifts, int employeeId, DateTime checkIn, DateTime checkOut)

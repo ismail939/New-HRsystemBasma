@@ -237,7 +237,7 @@ namespace HRsystem.Controllers
                 Address = e.Address,
                 MarriageStatus = e.MarriageStatus,
                 Religion = e.Religion,
-                DateOfBirth = e.DateOfBirth,
+                DateOfBirth = (DateTime)e.DateOfBirth,
                 InsuranceNumber = e.InsuranceNumber,
                 HireDate = e.HireDate,
                 EndDate = e.EndDate,

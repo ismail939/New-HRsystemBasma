@@ -12,18 +12,18 @@ public class HREmployee
     [StringLength(100)]
     public string Name { get; set; }
 
-    [Required]
-    public string NationalId { get; set; }
+    
+    public string? NationalId { get; set; }
 
-    [Required]
+   
     [Phone]
-    public string PhoneNumber { get; set; }
-    [Required]
-    public string MarriageStatus { get; set; }
-    [Required]
-    public string Religion { get; set; }
-    [Required]
-    public DateTime DateOfBirth { get; set; }
+    public string? PhoneNumber { get; set; }
+    
+    public string? MarriageStatus { get; set; }
+    
+    public string? Religion { get; set; }
+    
+    public DateTime? DateOfBirth { get; set; }
     
     public string? InsuranceNumber { get; set; }
     public string? Address { get; set; }
@@ -33,8 +33,8 @@ public class HREmployee
     
     [Required]
     public string JobName { get; set; }
-    [Required]
-    public string ContractType { get; set; }
+ 
+    public string? ContractType { get; set; }
     public string? LeaveReason {get; set;}
     public int? BasmaId { get; set; }
     [ForeignKey("HRDepartment")]
