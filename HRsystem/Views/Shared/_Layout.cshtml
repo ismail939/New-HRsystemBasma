@@ -58,6 +58,10 @@
                                     <div class="hidden min-[1450px]:flex items-center">
                                         <div class="bg-color1 text-color5 font-bold m-2 p-2 rounded-lg">
                                             @User.Identity?.Name
+                                            @if (User.IsInRole("Admin"))
+                                            {
+                                                <span class="text-sm text-color3"> (Admin) </span>
+                                            }
                                         </div>
 
                                         <form method="post" action="/logout">
