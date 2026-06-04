@@ -48,9 +48,8 @@ public class ManagersReport : IDocument
                         row.RelativeItem().Column(col =>
                         {
                             col.Item().PaddingTop(20);
-                            col.Item().Text("القوات البحرية").FontSize(14).Bold();
-                            col.Item().PaddingTop(5);
-                            col.Item().Text("دار الاسطول الجزيرة").FontSize(14).Bold();
+                            col.Item().Text("إدارة الموارد البشرية").FontSize(14).Bold();
+
                         });
 
                         // Left logo
@@ -214,9 +213,7 @@ public class ManagersReport : IDocument
                                 row.RelativeItem().Column(col =>
                                 {
                                     col.Item().PaddingTop(20);
-                                    col.Item().Text("القوات البحرية").FontSize(14).Bold();
-                                    col.Item().PaddingTop(5);
-                                    col.Item().Text("دار الاسطول الجزيرة").FontSize(14).Bold();
+                                    col.Item().Text("إدارة الموارد البشرية").FontSize(14).Bold();
                                 });
 
                                 // Left logo

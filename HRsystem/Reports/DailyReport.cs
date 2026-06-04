@@ -33,9 +33,7 @@ public class DailyReport : IDocument
                 {
                     row.RelativeItem().Column(col =>
                     {
-                        col.Item().Text("القوات البحرية").FontSize(14).Bold();
-                        col.Item().Text("دار الاسطول الجزيرة").FontSize(14).Bold();
-                    });
+                        col.Item().Text("إدارة الموارد البشرية").FontSize(12);});
 
                     row.ConstantItem(80)
                         .Height(50)
