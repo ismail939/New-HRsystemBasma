@@ -12,7 +12,6 @@ public class HREmployee
     [StringLength(100)]
     public string Name { get; set; }
 
-    
     public string? NationalId { get; set; }
 
    

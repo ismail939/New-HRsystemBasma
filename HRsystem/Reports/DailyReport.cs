@@ -12,7 +12,6 @@ public class DailyReport : IDocument
         _data = data;
     }
 
-    [Obsolete]
     public void Compose(IDocumentContainer container)
     {
         container.Page(page =>

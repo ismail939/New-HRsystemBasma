@@ -18,7 +18,6 @@ namespace HRsystem.Reports
             Employees = employees;
         }
 
-        [Obsolete]
         public void Compose(IDocumentContainer container)
         {
             int rowsPerPage = 15; // adjust based on row height and page size

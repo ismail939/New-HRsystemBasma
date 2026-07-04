@@ -17,6 +17,11 @@ namespace HRsystem.Data
             
 
             modelBuilder.Entity<HREmployee>()
+               .HasIndex(e => e.NationalId)
+               .IsUnique()
+               .HasFilter("[NationalId] IS NOT NULL");
+
+            modelBuilder.Entity<HREmployee>()
                .HasOne(e => e.HRDepartment)
                .WithMany(d => d.Employees)
                .HasForeignKey(e => e.HRDepartmentId);

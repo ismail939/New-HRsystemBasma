@@ -25,12 +25,14 @@ namespace HRsystem.Controllers
             _context = context;
         }
 
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/admin/dashboard")]
         public IActionResult Dashboard()
         {
             return View();
         }
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         [Route("/admin/users")]
         public IActionResult Users()
@@ -38,6 +40,7 @@ namespace HRsystem.Controllers
             var users = _context.Users.ToList();
             return View(users);
         }
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/admin/dashboard/departments")]
         public IActionResult Departments()
@@ -92,6 +95,7 @@ namespace HRsystem.Controllers
             }
             return View("Departments", list);
         }
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/admin/employees")]
         public IActionResult Employees()
@@ -128,6 +132,7 @@ namespace HRsystem.Controllers
 
             return View("Employees", employeeVMs);
         }
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [Route("/deleteEmployee")]
         public async Task<IActionResult> DeleteEmployee(int employeeId)
@@ -226,6 +231,7 @@ namespace HRsystem.Controllers
             }
             return Json(new {success=true});
         }
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/Admin/GetDepartmentEmployees")]
         public IActionResult GetDepartmentEmployees(int departmentId)
@@ -239,6 +245,7 @@ namespace HRsystem.Controllers
             return Json(employees);
         }
 
+        [Authorize(Roles = "Admin,HR")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(DepartmentPostRequest request)
@@ -279,6 +286,7 @@ namespace HRsystem.Controllers
 
             return RedirectToAction("Departments");
         }
+        [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/createDepartment")]
         public IActionResult CreateForm()
@@ -305,6 +313,7 @@ namespace HRsystem.Controllers
             return View("CreateDepartment", model);
         }
 
+        [Authorize(Roles = "Admin,HR")]
         [HttpPost]
         public IActionResult EditDepartment(int Id,
             string Name,
@@ -333,6 +342,7 @@ namespace HRsystem.Controllers
             return RedirectToAction("Departments");
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public IActionResult EditUser(int Id,
             string Username,
@@ -351,13 +361,14 @@ namespace HRsystem.Controllers
                 return View("Users", users);
             }
             user.Username = Username;
-            user.Password = Password;
+            user.Password = PasswordHasher.HashPassword(Password);
             user.Role = Role;
             _context.Users.Update(user);
             _context.SaveChanges();
             return RedirectToAction("Users");
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public IActionResult AddUser(string Username, string Password, string Role)
         {
@@ -368,10 +379,12 @@ namespace HRsystem.Controllers
                 var users = _context.Users.ToList();
                 return View("Users", users);
             }
+            var hashedPassword = PasswordHasher.HashPassword(Password);
+
             var user = new User
             {
                 Username = Username,
-                Password = Password,
+                Password = hashedPassword,
                 Role = Role
             };
             _context.Users.Add(user);
@@ -379,6 +392,7 @@ namespace HRsystem.Controllers
             return RedirectToAction("Users");
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         [Route("/logs")]
         public IActionResult Logs()

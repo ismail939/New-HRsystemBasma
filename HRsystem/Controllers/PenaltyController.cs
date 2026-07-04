@@ -101,7 +101,7 @@ namespace HRsystem.Controllers
             return Json(penalties);
         }
 
-        [Authorize(Roles = "Admin,HR")]
+        [Authorize(Roles = "HR")]
         [HttpPost]
         [Route("/employee/togglePenaltyActive")]
         public IActionResult TogglePenaltyActive([FromBody] PenaltyToggleRequest RequestBody)

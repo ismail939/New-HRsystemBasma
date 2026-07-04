@@ -25,6 +25,7 @@ namespace HRsystem.Controllers
         }
 
 
+
         [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/getEmployee")]
@@ -107,7 +108,7 @@ namespace HRsystem.Controllers
         [Authorize(Roles = "Admin,HR")]
         [HttpPost]
         [Route("/employees/add")]
-        public IActionResult AddEmployee(HREmployee newEmployee, List<IFormFile> imageFiles)
+        public IActionResult AddEmployee(HREmployee newEmployee, List<IFormFile> imageFiles, string initialPassword)
         {
             if (newEmployee == null)
             {
@@ -115,6 +116,13 @@ namespace HRsystem.Controllers
             }
 
             _context.HREmployees.Add(newEmployee);
+            _context.Users.Add(new User
+            {
+                Username = newEmployee.NationalId,
+                Password = PasswordHasher.HashPassword(initialPassword),
+                Role = "Employee",
+                IsActive = false
+            });
             _context.HRLogs.Add(new HRLog
             {
                 Action = $"User ({User.Identity.Name}) added employee ({newEmployee.Name})"

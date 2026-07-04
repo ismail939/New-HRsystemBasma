@@ -11,7 +11,8 @@ namespace HRsystem.Models
         [Required]
         public string Username { get; set; }
         [Required]
-        public string Password { get; set; } // ⚠️ hash later
+        public string Password { get; set; }
         public string Role { get; set; }
+        public bool IsActive { get; set; } = false;
     }
 }

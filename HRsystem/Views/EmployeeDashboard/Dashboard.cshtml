@@ -1,0 +1,255 @@
+@model HRsystem.ViewModels.EmployeeDashboardViewModel
+@{
+    Layout = "_EmployeeLayout";
+    ViewData["Title"] = "الرئيسية";
+}
+
+<div class="p-4 md:p-6 space-y-6" dir="rtl">
+    <!-- Welcome Header - Centered with name -->
+    <div class="w-full md:w-2/3 mx-auto">
+        <div
+            class="bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-sm rounded-3xl shadow-2xl p-6 md:p-8 text-center border border-color3/10 relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-color3/5 to-transparent pointer-events-none"></div>
+            <h1 class="text-2xl md:text-3xl font-bold text-color3 relative">
+                مرحباً بك، @Model.EmployeeName
+            </h1>
+        </div>
+    </div>
+
+    <!-- Stats Cards Row - smaller compact cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+        <!-- Card 1: Vacation Balance - compact -->
+        <div class="stat-card hover:shadow-lg transition-all duration-300 flex flex-col h-full">
+            <div class="flex flex-col items-center p-3 md:p-4 flex-1">
+                <div
+                    class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-color3 flex items-center justify-center mb-2 shadow">
+                    <i class="bi bi-calendar-check text-white text-lg md:text-xl"></i>
+                </div>
+                <div class="flex flex-row gap-2 items-center justify-center flex-wrap">
+                    <div class="text-center bg-white rounded-md px-2 py-1 shadow">
+                        <span class="stat-value text-lg md:text-xl">@Model.AnnualBalance</span>
+                        <span class="stat-label text-[10px] block">سنوي</span>
+                    </div>
+                    <div class="text-center bg-white rounded-md px-2 py-1 shadow">
+                        <span class="stat-value text-lg md:text-xl">@Model.CasualBalance</span>
+                        <span class="stat-label text-[10px] block">عارض</span>
+                    </div>
+                    <div class="text-center bg-white rounded-md px-2 py-1 shadow">
+                        <span class="stat-value text-lg md:text-xl">@Model.OffBalance</span>
+                        <span class="stat-label text-[10px] block">بدون راتب</span>
+                    </div>
+                    <div class="text-center bg-white rounded-md px-2 py-1 shadow">
+                        <span class="stat-value text-lg md:text-xl">@Model.CompensatoryBalance</span>
+                        <span class="stat-label text-[10px] block">تعويضي</span>
+                    </div>
+                </div>
+                <span class="stat-label text-xs font-semibold mt-3">رصيد الإجازات</span>
+            </div>
+            <div class="px-4 pb-3 pt-0 text-center">
+                <button onclick="window.location.href='/employee-dashboard/request-vacation'"
+                        class="col-button-dark px-3 py-1 rounded-lg text-[11px] flex items-center gap-1 mx-auto">
+                    <i class="bi bi-plus-circle"></i>
+                    طلب اجازة
+                </button>
+            </div>
+        </div>
+
+        <!-- Card 2: Penalties - compact -->
+        <div class="stat-card hover:shadow-lg transition-all duration-300 h-full">
+            <div class="flex flex-col items-center justify-center p-3 md:p-4 h-full">
+                <div
+                    class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-color3 flex items-center justify-center mb-2 shadow">
+                    <i class="bi bi-exclamation-triangle text-white text-lg md:text-xl"></i>
+                </div>
+                <div class="flex flex-row gap-3 items-center justify-center">
+                    <div class="text-center bg-white rounded-md px-2 py-1 shadow">
+                        <span class="stat-value text-xl md:text-2xl">@Model.ActivePenaltiesCount</span>
+                        <span class="stat-label text-xs block">عدد الجزاءات</span>
+                    </div>
+                    <div class="text-center bg-white rounded-md px-2 py-1 shadow">
+                        <span class="stat-value text-xl md:text-2xl">@Model.TotalPenaltyPoints</span>
+                        <span class="stat-label text-xs block">إجمالي النقاط</span>
+                    </div>
+                </div>
+                <button class="col-button-dark px-3 py-1 rounded-lg text-[11px] flex items-center gap-1 m-3" onclick="window.location.href='/employee-dashboard/penalties'">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    الجزاءات
+                </button>
+            </div>
+        </div>
+
+        <!-- Card 3: Salary - compact -->
+        <div class="stat-card hover:shadow-lg transition-all duration-300 h-full">
+            <div class="flex flex-col items-center justify-center p-3 md:p-4 h-full">
+                <div
+                    class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-color3 flex items-center justify-center mb-2 shadow">
+                    <i class="bi bi-currency-dollar text-white text-lg md:text-xl"></i>
+                </div>
+                <div class="flex flex-row gap-2 items-center justify-center flex-wrap">
+                    <div class="text-center bg-white rounded-md px-2 py-1 shadow">
+                        <span class="stat-value text-lg md:text-xl">@Model.NetSalary.ToString("N0")</span>
+                        <span class="stat-label text-[10px] block">صافي الراتب</span>
+                    </div>
+                    <div class="text-center bg-white rounded-md px-2 py-1 shadow">
+                        <span class="stat-value text-lg md:text-xl">@Model.BasicSalary.ToString("N0")</span>
+                        <span class="stat-label text-[10px] block">أساسي</span>
+                    </div>
+                </div>
+                <div class="flex flex-row gap-2 items-center justify-center mt-2">
+                    <div class="text-center bg-white rounded-md px-2 py-1 shadow">
+                        <span class="stat-value text-sm md:text-base">@Model.YearToDateEarnings.ToString("N0")</span>
+                        <span class="stat-label text-[10px] block">منذ بداية السنة</span>
+                    </div>
+                </div>
+                <div class="mt-2 text-center">
+                    <span class="text-[10px] text-gray-500">الدفعة القادمة: @Model.NextPaymentDate</span>
+                </div>
+                <span class="stat-label text-xs font-semibold mt-2">الراتب</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Days Scrollable Card - bigger cards, ~10 visible -->
+    <div class="bg-white/60 backdrop-blur-sm rounded-2xl shadow-xl p-4 md:p-6 border border-color3/20">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-color3 flex items-center gap-2">
+                <i class="bi bi-calendar-week"></i>
+                الأيام
+            </h2>
+            <div class="flex items-center gap-2">
+                <button onclick="skipDays(10)" class="col-button-dark rounded-full w-9 h-9 flex items-center justify-center p-0 hover:shadow-lg transition-all duration-200" title="10 أيام سابقة">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+                <button onclick="skipDays(-10)" class="col-button-dark rounded-full w-9 h-9 flex items-center justify-center p-0 hover:shadow-lg transition-all duration-200" title="10 أيام قادمة">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="daysScrollContainer" class="flex gap-2 overflow-x-auto py-2"
+             style="scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
+            @foreach (var day in Model.Days)
+            {
+                <div class="flex-shrink-0 w-[calc((100vw-4rem)/6)] md:w-[120px] snap-start">
+                    <div
+                        class="rounded-xl p-2.5 md:p-3 text-center transition-all duration-200 hover:shadow-lg @GetDayCardClass(day)">
+                        <!-- Day Name -->
+                        <div class="text-[10px] md:text-[11px] font-semibold mb-1 @GetDayTextClass(day)">
+                            @day.DayName
+                        </div>
+                        <!-- Day Number -->
+                        <div class="text-lg md:text-xl font-extrabold leading-tight @GetDayNumberClass(day)">
+                            @day.DayNumber
+                        </div>
+                        <!-- Month -->
+                        <div class="text-[10px] mb-1 @GetDayTextClass(day)">
+                            @day.MonthName
+                        </div>
+                        <!-- Divider -->
+                        <div class="border-t @GetDividerClass(day) my-1"></div>
+                        <!-- Status -->
+                        @if (day.IsOffDay)
+                        {
+                            <div class="text-[10px] md:text-[11px] font-bold text-green-700">إجازة</div>
+                            <div class="text-[8px] md:text-[9px] text-green-600 mt-0.5">@day.OffDayType</div>
+                        }
+                        else if (day.IsToday)
+                        {
+                            <div class="text-[10px] md:text-[11px] font-bold text-color3">اليوم</div>
+                            <div class="text-[8px] md:text-[9px] text-color3 mt-0.5">حاضر</div>
+                        }
+                        else if (day.IsPast)
+                        {
+                            <div class="text-[10px] md:text-[11px] font-bold text-color3">دوام</div>
+                            <div class="text-[8px] md:text-[9px] text-gray-400 mt-0.5">7 ➔ 4</div>
+                        }
+                        else
+                        {
+                            <div class="text-[10px] md:text-[11px] font-bold text-color5">قادم</div>
+                            <div class="text-[8px] md:text-[9px] text-gray-400 mt-0.5">--</div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetDayCardClass(DayStatus day)
+    {
+        if (day.IsToday) return "today bg-white border-2 border-color4 shadow-xl scale-110 z-20 relative";
+        if (day.IsOffDay) return "bg-green-50 border border-green-300";
+        if (day.IsPast) return "bg-white border border-gray-200";
+        return "bg-white/80 border border-dashed border-color5/40";
+    }
+
+    string GetDayTextClass(DayStatus day)
+    {
+        if (day.IsToday) return "text-color3";
+        if (day.IsOffDay) return "text-green-700";
+        if (day.IsPast) return "text-gray-500";
+        return "text-color5";
+    }
+
+    string GetDayNumberClass(DayStatus day)
+    {
+        if (day.IsToday) return "text-color3";
+        if (day.IsOffDay) return "text-green-800";
+        if (day.IsPast) return "text-gray-600";
+        return "text-color3";
+    }
+
+    string GetDividerClass(DayStatus day)
+    {
+        if (day.IsToday) return "border-color3";
+        if (day.IsOffDay) return "border-green-300";
+        if (day.IsPast) return "border-gray-300";
+        return "border-color5/30";
+    }
+}
+
+@section Scripts {
+    <script>
+        function skipDays(count) {
+            var sc = document.getElementById('daysScrollContainer');
+            if (!sc) return;
+            var cardW = sc.children.length > 0 ? sc.children[0].offsetWidth + 8 : 128;
+            sc.scrollBy({ left: count * cardW, behavior: 'smooth' });
+        }
+
+        (function () {
+            var sc = document.getElementById('daysScrollContainer');
+            if (!sc) return;
+
+            var todayCentered = false;
+
+            function centerToday() {
+                if (todayCentered) return;
+                var cards = sc.children;
+                for (var i = 0; i < cards.length; i++) {
+                    var inner = cards[i].querySelector('.today');
+                    if (inner) {
+                        var cardLeft = cards[i].offsetLeft;
+                        var cw = sc.clientWidth;
+                        var cardW = cards[i].offsetWidth;
+                        sc.scrollLeft = cardLeft - (cw / 2) + (cardW / 2);
+                        todayCentered = true;
+                        break;
+                    }
+                }
+            }
+
+            function retryCenter(n) {
+                if (todayCentered) return;
+                centerToday();
+                if (!todayCentered && n > 0) {
+                    setTimeout(function () { retryCenter(n - 1); }, 200);
+                }
+            }
+
+            centerToday();
+            setTimeout(function () { retryCenter(10); }, 100);
+        })();
+    </script>
+}

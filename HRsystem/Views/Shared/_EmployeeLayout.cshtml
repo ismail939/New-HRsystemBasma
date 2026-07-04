@@ -1,0 +1,143 @@
+@{
+    @* var currentController = Context.Request.RouteValues["controller"]?.ToString(); *@
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    Console.WriteLine("Current Controller: 🟢" + currentController);
+}
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.css" />
+    <link href="~/css/output.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/HRsystem.styles.css" asp-append-version="true" />
+    <link rel="icon" href="~/images/logo2.png" sizes="96x96" type="image/png">
+</head>
+
+<body id="" class="h-full w-full min-h-screen bg-color1">
+
+
+
+    <div class="flex flex-row min-h-screen ">
+
+        <nav class="w-full h-16 col-nav text-white flex fixed top-0 inset-x-0 z-40">
+
+            <div class="w-full flex flex-row items-center justify-start h-full">
+
+                <!-- Logo -->
+                <div class="flex items-center border-l-2 border-white h-full p-2">
+                    <img src="/images/logo2.png" class="w-12 h-12" />
+                    <span class="font-bold px-2 whitespace-nowrap">الموارد البشرية</span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <ul class="hidden min-[1450px]:flex flex-row gap-1 w-4/6 mx-4 h-full">
+                   
+                            </ul>
+
+                            <!-- Right Side Info -->
+                            <div class="hidden min-[1450px]:flex items-center">
+                                <div class="bg-color1 text-color5 font-bold m-2 p-2 rounded-lg">
+                                    @User.Identity?.Name
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <span class="text-sm text-color3"> (Admin) </span>
+                                    }
+                                </div>
+
+                                <form method="post" action="/logout">
+                                    @Html.AntiForgeryToken()
+                                    <button class="col-button-dark m-2 p-1 text-[12px]">
+                                        تسجيل الخروج
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Hamburger Button -->
+                            <button onclick="toggleMenu()" class="min-[1450px]:hidden text-2xl mr-2">
+                                ☰
+                            </button>
+
+                        </div>
+
+
+
+                    </nav>
+                    <!-- Mobile Side Panel -->
+                    <div id="mobileMenu"
+                         class="fixed top-0 right-0 h-full w-64 !bg-color1 text-color3 transform translate-x-full transition-transform duration-100 z-50 shadow-lg ">
+                        <div class="p-4 flex justify-between items-center border-b border-color3">
+                            <span class="font-bold">القائمة</span>
+                            <button onclick="toggleMenu()" class="text-[25px]">
+                                <i class="bi bi-x-square-fill"></i>
+                            </button>
+                        </div>
+                        <div class="flex justify-center w-full">
+                            <img src="/images/logo2.png" class="w-32 h-32 self-center" />
+                        </div>
+                        <div class="text-center mt-3">اسم المستخدم</div>
+
+                        <div class="bg-color1 text-color5 font-bold m-2 text-center border-2 border-color3 p-2 rounded-lg">
+                            @User.Identity?.Name
+                        </div>
+                        <ul class="flex flex-col gap-1 p-4 !text-color3 !bg-color1 border-y text-center border-color3">
+
+                           
+
+
+
+
+                            <li>
+                                <form method="post" action="/logout">
+                                    @Html.AntiForgeryToken()
+                                    <button class="col-button-dark mt-2 w-full p-2">
+                                        تسجيل الخروج
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="overlay" onclick="toggleMenu()" class="fixed inset-0 bg-black/50 hidden z-40"></div>
+                    <!-- Main Content -->
+                    <div class="flex !p-2 w-full transition-all duration-700 mt-16 " id="main-content">
+
+                        @* <!-- زر فتح/إغلاق الـ sidebar -->
+            <button class="bg-blue-600 text-white px-4 py-2 rounded mb-4" onclick="toggleSidebar()">
+                ☰ القائمة
+            </button> *@
+
+                        <main role="main" class="pb-3 w-full h-full">
+                            <div id="loadingOverlay" class="loading-overlay hidden">
+                                <div class="spinner"></div>
+                            </div>
+
+                            @RenderBody()
+                        </main>
+                    </div>
+                </div>
+                <script>
+                        function toggleMenu() {
+                            const menu = document.getElementById("mobileMenu");
+                            const overlay = document.getElementById("overlay");
+                            menu.classList.toggle("translate-x-full");
+                            overlay.classList.toggle("hidden");
+
+                            document.body.classList.toggle("overflow-hidden"); // 🔥 important
+                        }
+                </script>
+                <script src="~/lib/jquery/dist/jquery.min.js"></script>
+                <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+                <script src="~/js/site.js" asp-append-version="true"></script>
+                <link href="~/lib/flatpickr/dist/flatpickr.min.css" rel="stylesheet" />
+                <script src="~/lib/flatpickr/dist/flatpickr.min.js"></script>
+                <script src="~/lib/flatpickr/dist/l10n/ar.js"></script>
+                <script src="~/lib/alpinejs/dist/cdn.min.js" defer></script>
+
+                @await RenderSectionAsync("Scripts", required: false)
+            </body>
+
+        </html>

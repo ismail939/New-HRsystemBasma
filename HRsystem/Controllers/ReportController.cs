@@ -237,7 +237,7 @@ namespace HRsystem.Controllers
                 Address = e.Address,
                 MarriageStatus = e.MarriageStatus,
                 Religion = e.Religion,
-                DateOfBirth = (DateTime)e.DateOfBirth,
+                DateOfBirth = e.DateOfBirth??DateTime.MinValue,
                 InsuranceNumber = e.InsuranceNumber,
                 HireDate = e.HireDate,
                 EndDate = e.EndDate,
@@ -573,7 +573,7 @@ namespace HRsystem.Controllers
         //                 ShiftStart = shifts
         //                     .Where(s => b.DayDate.Date >= s.FromDate.Date &&
         //                         (s.ToDate == null || b.DayDate.Date <= s.ToDate?.Date)
-        //                         && s.EmployeeId == emp.Id)
+        //                         && s.HREmployeeId == emp.Id)
         //                     .OrderByDescending(s => s.FromDate)
         //                     .Select(s => s.StartTime)
         //                     .FirstOrDefault(),
@@ -581,7 +581,7 @@ namespace HRsystem.Controllers
         //                 ShiftEnd = shifts
         //                     .Where(s => b.DayDate.Date >= s.FromDate.Date &&
         //                         (s.ToDate == null || b.DayDate.Date <= s.ToDate?.Date)
-        //                         && s.EmployeeId == emp.Id)
+        //                         && s.HREmployeeId == emp.Id)
         //                     .OrderByDescending(s => s.FromDate)
         //                     .Select(s => s.EndTime)
         //                     .FirstOrDefault()

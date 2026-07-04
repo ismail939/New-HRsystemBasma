@@ -14,7 +14,6 @@ public class ManagersReport : IDocument
         this.EmployeeReports = EmployeeReports;
     }
 
-    [Obsolete]
     public void Compose(IDocumentContainer container)
     {
         foreach (var EmployeeReport in EmployeeReports)
