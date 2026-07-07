@@ -1,7 +1,6 @@
 using HRsystem.Data;
+using HRsystem.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
-
-//using HRsystem.Services;
 using Microsoft.EntityFrameworkCore;
 using QuestPDF.Infrastructure;
 // using zkemkeeper;
@@ -51,7 +50,17 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 
+// Register Notification Service
+builder.Services.AddScoped<INotificationService, NotificationService>();
+
 var app = builder.Build();
+
+// Seed data
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await DbSeeder.SeedAsync(context);
+}
 
 // Use a global exception handler
 app.UseExceptionHandler("/Home/Error"); // Redirect to Error action

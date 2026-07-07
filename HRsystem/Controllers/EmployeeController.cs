@@ -183,6 +183,7 @@ namespace HRsystem.Controllers
             using var ms = new MemoryStream();
             using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, true))
             {
+                var usedNames = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
                 foreach (var file in files)
                 {
                     var filePath = Path.Combine(
@@ -193,7 +194,20 @@ namespace HRsystem.Controllers
 
                     if (System.IO.File.Exists(filePath))
                     {
-                        var entry = zip.CreateEntry(file.FileName);
+                        var entryName = file.FileName;
+                        if (usedNames.ContainsKey(entryName))
+                        {
+                            usedNames[entryName]++;
+                            var ext = Path.GetExtension(entryName);
+                            var nameWithoutExt = Path.GetFileNameWithoutExtension(entryName);
+                            entryName = $"{nameWithoutExt}_{usedNames[entryName]}{ext}";
+                        }
+                        else
+                        {
+                            usedNames[entryName] = 1;
+                        }
+
+                        var entry = zip.CreateEntry(entryName);
                         using var entryStream = entry.Open();
                         using var fileStream = System.IO.File.OpenRead(filePath);
                         fileStream.CopyTo(entryStream);

@@ -48,6 +48,10 @@
                                            class="nav-link  @(currentController == "Penalty" ? "active" : "")">الجزاءات</a></li>
                                     <li><a href="/reports"
                                                class="nav-link  @(currentController == "Report" ? "active" : "")">التقارير</a></li>
+                                        @if (User.IsInRole("HR") || User.IsInRole("Admin"))
+                                        {
+                                            <li><a href="/requests/pending" class="nav-link @(currentController == "Request" ? "active" : "")">الطلبات</a></li>
+                                        }
                                         @if (User.IsInRole("Admin"))
                                         {
                                             <li><a href="/admin/dashboard" class="nav-link">الادمن</a></li>
@@ -55,8 +59,14 @@
                                     </ul>
 
                                     <!-- Right Side Info -->
-                                    <div class="hidden min-[1450px]:flex items-center">
-                                        <div class="bg-color1 text-color5 font-bold m-2 p-2 rounded-lg">
+                                    <div class="hidden min-[1450px]:flex items-center gap-2 me-4">
+                                        <!-- Notification Bell -->
+                                        @if (User.Identity?.IsAuthenticated == true)
+                                        {
+                                            @await Html.PartialAsync("_NotificationBell")
+                                        }
+
+                                        <div class="bg-color1 text-color5 font-semibold px-3 py-1.5 rounded-lg whitespace-nowrap">
                                             @User.Identity?.Name
                                             @if (User.IsInRole("Admin"))
                                             {
@@ -64,16 +74,17 @@
                                             }
                                         </div>
 
-                                        <form method="post" action="/logout">
+                                        <form method="post" action="/logout" class="ms-1">
                                             @Html.AntiForgeryToken()
-                                            <button class="col-button-dark m-2 p-1 text-[12px]">
+                                            <button class="col-button-dark px-3 py-1.5 text-[12px] whitespace-nowrap">
+                                                <i class="bi bi-box-arrow-right me-1"></i>
                                                 تسجيل الخروج
                                             </button>
                                         </form>
                                     </div>
 
                                     <!-- Hamburger Button -->
-                                    <button onclick="toggleMenu()" class="min-[1450px]:hidden text-2xl mr-2">
+                                    <button onclick="toggleMenu()" class="min-[1450px]:hidden text-2xl me-2 ms-auto">
                                         ☰
                                     </button>
 
