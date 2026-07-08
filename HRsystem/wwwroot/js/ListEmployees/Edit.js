@@ -91,50 +91,92 @@ function switchTab(tab) {
 // ✅ expose functions to global scope so onclick can find them
 window.switchTab = switchTab;
 window.closeModal = closeModal;
-window.closeModalCreate = closeModalCreate;
 window.deleteFile = deleteFile;
+window.openImage = openImage;
+window.openPdf = openPdf;
+window.closePdf = closePdf;
 // ...existing code...
 
 async function getEmployeeFiles(emp) {
-  console.log("Getting files for employee:", emp);
-  // ✅ Fetch employee files dynamically
+  console.log("🔍 getEmployeeFiles called for employee:", emp?.Id, emp?.Name);
   const filesList = document.querySelector("#tab-content-files ul");
+  if (!filesList) {
+    console.error("❌ Files list not found!");
+    return;
+  }
+  
   filesList.innerHTML = `
-            <div class="flex flex-col justify-center items-center py-4">
-                <div class="loader border-4 border-blue-500 border-t-transparent rounded-full w-8 h-8 animate-spin mb-2"></div>
-                <p class="text-gray-600 text-sm">جارٍ تحميل الملفات...</p>
-            </div>
-        `;
+    <div class="flex flex-col justify-center items-center py-4">
+      <div class="loader border-4 border-blue-500 border-t-transparent rounded-full w-8 h-8 animate-spin mb-2"></div>
+      <p class="text-gray-600 text-sm">جارٍ تحميل الملفات...</p>
+    </div>
+  `;
 
   try {
     const res = await fetch(`/employees/files/${emp.Id}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const files = await res.json();
-    console.log("Fetched files:");
-    console.log(files);
+    console.log("✅ Fetched files:", files);
 
     if (files.length === 0) {
-      filesList.innerHTML =
-        "<p class='text-gray-500'>لا توجد ملفات لهذا الموظف.</p>";
-    } else {
-      filesList.innerHTML = files
-        .map(
-          (file) => `
-            <li class="file-item flex flex-col justify-center align-items-center">
-                <label class="max-w-[280px] truncate block">${file.FileName}</label>
-                <div class="img-wrapper position-relative">
-                    <img src="${file.Url}" alt="${file.FileName}" class="imgFile rounded transition-opacity" onclick="openImage(this.src)">
-                    <button class="hover-button btn btn-danger btn-sm" onclick="deleteFile(${file.Id})">✕</button>
-                </div>
-                <a href="${file.Url}" download class="col-button-dark m-1 py-1">تحميل</a>
-            </li>
-        `,
-        )
-        .join("");
+      filesList.innerHTML = "<p class='text-gray-500'>لا توجد ملفات لهذا الموظف.</p>";
+      return;
     }
+
+    let html = '';
+    files.forEach((file) => {
+      const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(file.FileName);
+      const isPdf = /\.pdf$/i.test(file.FileName);
+      
+      if (isPdf) {
+        const encodedUrl = encodeURI(file.Url);
+        const encodedName = encodeURIComponent(file.FileName);
+        html += `
+          <li class="file-item flex flex-col items-center p-2 border rounded hover:shadow-md transition-shadow">
+            <label class="max-w-[280px] truncate block text-sm mb-2">${file.FileName}</label>
+            <div onclick="window.openPdf('${encodedUrl}', '${encodedName}')" 
+                 style="cursor: pointer; padding: 10px; background: #fee; border-radius: 8px; text-align: center; min-width: 150px;"
+                 title="Click to preview PDF">
+              <i class="bi bi-file-earmark-pdf-fill text-red-600" style="font-size: 48px;"></i>
+              <div style="margin-top: 8px; font-size: 12px; color: #666;">👆 معاينة</div>
+            </div>
+            <button onclick="event.stopPropagation(); deleteFile(${file.Id})" 
+                    style="margin-top: 8px;"
+                    class="btn btn-danger btn-sm">✕ حذف</button>
+          </li>`;
+      } else if (isImage) {
+        html += `
+          <li class="file-item flex flex-col items-center p-2 border rounded hover:shadow-md transition-shadow">
+            <label class="max-w-[280px] truncate block text-sm mb-2">${file.FileName}</label>
+            <img src="${file.Url}" alt="${file.FileName}" 
+                 onclick="window.openImage(this.src)"
+                 style="cursor: pointer; max-width: 150px; max-height: 150px; border-radius: 8px;"
+                 class="imgFile">
+            <button onclick="event.stopPropagation(); deleteFile(${file.Id})" 
+                    style="margin-top: 8px;"
+                    class="btn btn-danger btn-sm">✕ حذف</button>
+          </li>`;
+      } else {
+        html += `
+          <li class="file-item flex flex-col items-center p-2 border rounded">
+            <label class="max-w-[280px] truncate block text-sm mb-2">${file.FileName}</label>
+            <div style="padding: 20px; background: #f5f5f5; border-radius: 8px; text-align: center; min-width: 150px;">
+              <i class="bi bi-file-earmark-text-fill text-gray-400" style="font-size: 48px;"></i>
+            </div>
+            <button onclick="deleteFile(${file.Id})" 
+                    style="margin-top: 8px;"
+                    class="btn btn-danger btn-sm">✕ حذف</button>
+            <a href="${file.Url}" download class="col-button-light btn-sm mt-2 px-3 py-1 rounded">تحميل</a>
+          </li>`;
+      }
+    });
+    
+    filesList.innerHTML = html;
+    console.log("✅ Files rendered to DOM");
+
   } catch (err) {
-    console.error(err);
-    filesList.innerHTML =
-      "<p class='text-red-600'>حدث خطأ أثناء تحميل الملفات.</p>";
+    console.error("❌ Error fetching files:", err);
+    filesList.innerHTML = `<p class='text-red-600'>حدث خطأ أثناء تحميل الملفات: ${err.message}</p>`;
   }
 }
 document
@@ -309,6 +351,27 @@ function openImage(src) {
   lightbox.classList.remove("hidden");
   lightbox.classList.add("flex");
   setTimeout(() => img.classList.add("scale-100"), 10); // smooth zoom-in
+}
+
+function openPdf(url, fileName) {
+  console.log("openPdf called with:", url, fileName);
+  const pdfModal = document.getElementById("pdfLightbox");
+  const iframe = document.getElementById("pdfViewer");
+  const title = document.getElementById("pdfTitle");
+
+  iframe.src = url;
+  title.textContent = fileName || "معاينة PDF";
+  pdfModal.classList.remove("hidden");
+  pdfModal.classList.add("flex");
+}
+
+function closePdf() {
+  const pdfModal = document.getElementById("pdfLightbox");
+  const iframe = document.getElementById("pdfViewer");
+
+  pdfModal.classList.add("hidden");
+  pdfModal.classList.remove("flex");
+  iframe.src = ""; // unload PDF to free memory
 }
 
 document.getElementById("imageLightbox").addEventListener("click", function () {

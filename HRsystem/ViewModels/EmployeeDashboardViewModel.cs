@@ -3,10 +3,21 @@ namespace HRsystem.ViewModels;
 public class EmployeeDashboardViewModel
 {
     public string EmployeeName { get; set; } = string.Empty;
+    
+    // All 9 leave type balances
     public int AnnualBalance { get; set; }
     public int CasualBalance { get; set; }
-    public int OffBalance { get; set; }
+    public int SickBalance { get; set; }
+    public int HajjBalance { get; set; }
+    public int MaternityBalance { get; set; }
+    public int UnpaidBalance { get; set; }
     public int CompensatoryBalance { get; set; }
+    public int OfficialHolidayBalance { get; set; }
+    public int ExamBalance { get; set; }
+    
+    // Keep old name for backward compatibility
+    public int OffBalance { get; set; } // for unpaid leave
+    
     public int ActivePenaltiesCount { get; set; }
     public int TotalPenaltyPoints { get; set; }
     public decimal BasicSalary { get; set; }

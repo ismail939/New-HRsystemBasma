@@ -36,6 +36,12 @@ namespace HRsystem.ViewModels
             LeaveType.Casual => "عارضة",
             LeaveType.Annual => "سنوية",
             LeaveType.Sick => "مرضية",
+            LeaveType.Hajj => "حج",
+            LeaveType.Maternity => "أمومة",
+            LeaveType.Unpaid => "بدون راتب",
+            LeaveType.Compensatory => "تعويضي",
+            LeaveType.OfficialHoliday => "رسمية",
+            LeaveType.Exam => "اختبارات",
             _ => ""
         };
 
@@ -88,6 +94,12 @@ namespace HRsystem.ViewModels
             LeaveType.Casual => "عارضة",
             LeaveType.Annual => "سنوية",
             LeaveType.Sick => "مرضية",
+            LeaveType.Hajj => "حج",
+            LeaveType.Maternity => "أمومة",
+            LeaveType.Unpaid => "بدون راتب",
+            LeaveType.Compensatory => "تعويضي",
+            LeaveType.OfficialHoliday => "رسمية",
+            LeaveType.Exam => "اختبارات",
             _ => ""
         };
     }

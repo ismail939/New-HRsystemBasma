@@ -108,5 +108,14 @@ namespace HRsystem.Data
         // New entities
         public DbSet<Request> Requests { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+
+        // Payroll entities
+        public DbSet<SalaryComponent> SalaryComponents { get; set; }
+        public DbSet<EmployeeSalary> EmployeeSalaries { get; set; }
+        public DbSet<SalaryHistory> SalaryHistories { get; set; }
+        public DbSet<Payroll> Payrolls { get; set; }
+        public DbSet<PayrollDetail> PayrollDetails { get; set; }
+        public DbSet<PayrollEarning> PayrollEarnings { get; set; }
+        public DbSet<PayrollDeduction> PayrollDeductions { get; set; }
     }
 }

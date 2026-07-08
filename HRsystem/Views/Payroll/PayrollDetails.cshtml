@@ -1,0 +1,162 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "تفاصيل كشف الراتب";
+    var payroll = ViewBag.Payroll;
+    var monthName = new System.Globalization.CultureInfo("ar-SA").DateTimeFormat.GetMonthName(payroll.Month);
+}
+
+<h2 class="fs-3 text-center p-4 m-2 text-color3 shadow-lg">تفاصيل كشف الراتب - @monthName @payroll.Year</h2>
+
+<div class="flex flex-wrap gap-2 justify-center mb-4">
+    <span class="px-4 py-2 rounded-lg font-semibold 
+        @(payroll.Status == "Draft" ? "bg-yellow-100 text-yellow-700" :
+          payroll.Status == "Reviewed" ? "bg-blue-100 text-blue-700" :
+          payroll.Status == "Approved" ? "bg-green-100 text-green-700" :
+          "bg-red-100 text-red-700")">
+        @(payroll.Status == "Draft" ? "مسودة" :
+          payroll.Status == "Reviewed" ? "مراجع" :
+          payroll.Status == "Approved" ? "معتمد" :
+          "مقفل")
+    </span>
+
+    @if (payroll.Status == "Draft")
+    {
+        <button onclick="updateStatus(@payroll.Id, 'Reviewed')" class="col-button-dark px-4 py-2 rounded">تحديث إلى مراجع</button>
+    }
+    @if (payroll.Status == "Reviewed")
+    {
+        <button onclick="updateStatus(@payroll.Id, 'Approved')" class="col-button-dark px-4 py-2 rounded">اعتماد</button>
+    }
+    @if (payroll.Status == "Approved")
+    {
+        <button onclick="updateStatus(@payroll.Id, 'Locked')" class="col-button-dark px-4 py-2 rounded">قفل كشف الراتب</button>
+    }
+    <button onclick="editNotes()" class="col-button-light px-4 py-2 rounded">تعديل الملاحظات</button>
+</div>
+
+<div id="tableResponsive" class="tableContainer">
+    <table class="table-base min-w-full border-separate border-spacing-0">
+        <thead class="table-dark col-table-header sticky top-0 z-10">
+            <tr>
+                <th>الموظف</th>
+                <th>الراتب الأساسي</th>
+                <th>الإضافات</th>
+                <th>الخصومات</th>
+                <th>الإجمالي</th>
+                <th>الصافي</th>
+                <th>حضور</th>
+                <th>غياب</th>
+                <th>تأخير (د)</th>
+                <th>إضافي (س)</th>
+                <th>إجازات مدفوعة</th>
+                <th>إجازات غير مدفوعة</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var detail in Model)
+            {
+                <tr>
+                    <td class="font-semibold">@detail.EmployeeName</td>
+                    <td>@detail.BasicSalary.ToString("N2")</td>
+                    <td class="text-green-600">@detail.TotalEarnings.ToString("N2")</td>
+                    <td class="text-red-600">@detail.TotalDeductions.ToString("N2")</td>
+                    <td>@detail.GrossSalary.ToString("N2")</td>
+                    <td class="font-bold">@detail.NetSalary.ToString("N2")</td>
+                    <td>@detail.PresentDays</td>
+                    <td class="text-red-600">@detail.AbsentDays</td>
+                    <td>@detail.LateMinutes.ToString("N0")</td>
+                    <td>@detail.OvertimeHours.ToString("N1")</td>
+                    <td>@detail.PaidLeaves</td>
+                    <td class="text-red-600">@detail.UnpaidLeaves</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot class="font-bold bg-gray-100">
+            @{
+                var totalBasic = ViewBag.TotalBasic ?? 0m;
+                var totalEarnings = ViewBag.TotalEarnings ?? 0m;
+                var totalDeductions = ViewBag.TotalDeductions ?? 0m;
+                var totalGross = ViewBag.TotalGross ?? 0m;
+                var totalNet = ViewBag.TotalNet ?? 0m;
+            }
+            <tr>
+                <td>الإجمالي</td>
+                <td>@totalBasic.ToString("N2")</td>
+                <td class="text-green-600">@totalEarnings.ToString("N2")</td>
+                <td class="text-red-600">@totalDeductions.ToString("N2")</td>
+                <td>@totalGross.ToString("N2")</td>
+                <td class="font-bold text-lg">@totalNet.ToString("N2")</td>
+                <td colspan="6"></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<!-- Notes Modal -->
+<div id="notesModal" class="hidden fixed inset-0 bg-black/30 z-50 items-center justify-center">
+    <div class="col-modal relative p-6 rounded-2xl shadow-xl w-full md:w-1/2">
+        <button onclick="closeNotesModal()" class="absolute top-2 left-2 text-[25px]">
+            <i class="bi bi-x-square-fill"></i>
+        </button>
+        <h3 class="text-lg font-bold mb-3">ملاحظات كشف الراتب</h3>
+        <textarea id="payrollNotes" rows="4" class="w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]">@payroll.Notes</textarea>
+        <button onclick="saveNotes()" class="col-button-dark px-6 py-2 rounded mt-2">حفظ</button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function updateStatus(id, status) {
+            if (!confirm('هل أنت متأكد من تحديث حالة كشف الراتب؟')) return;
+
+            const formData = new FormData();
+            formData.append('id', id);
+            formData.append('status', status);
+
+            fetch('/payroll/update-status', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message || 'حدث خطأ');
+                }
+            });
+        }
+
+        function editNotes() {
+            document.getElementById('notesModal').classList.remove('hidden');
+            document.getElementById('notesModal').classList.add('flex');
+        }
+
+        function closeNotesModal() {
+            document.getElementById('notesModal').classList.add('hidden');
+            document.getElementById('notesModal').classList.remove('flex');
+        }
+
+        function saveNotes() {
+            const id = @payroll.Id;
+            const notes = document.getElementById('payrollNotes').value;
+
+            const formData = new FormData();
+            formData.append('id', id);
+            formData.append('notes', notes);
+
+            fetch('/payroll/update-notes', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message || 'حدث خطأ');
+                }
+            });
+        }
+    </script>
+}

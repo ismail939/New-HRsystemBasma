@@ -28,20 +28,6 @@
             <div class="mb-6">
                 <label class="block text-sm font-semibold text-gray-700 mb-3">نوع الإجازة</label>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <!-- Casual Leave -->
-                    <label class="relative cursor-pointer">
-                        <input type="radio" asp-for="LeaveType" value="@((int)LeaveType.Casual)" class="peer sr-only" />
-                        <div class="p-4 rounded-xl border-2 border-gray-200 bg-white peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:shadow-md transition-all duration-200 hover:shadow-md">
-                            <div class="flex flex-col items-center text-center">
-                                <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mb-2">
-                                    <i class="bi bi-sun text-yellow-600 text-lg"></i>
-                                </div>
-                                <span class="font-semibold text-gray-800">إجازة عارضة</span>
-                                <span class="text-xs text-gray-500 mt-1">لأسباب طارئة</span>
-                            </div>
-                        </div>
-                    </label>
-
                     <!-- Annual Leave -->
                     <label class="relative cursor-pointer">
                         <input type="radio" asp-for="LeaveType" value="@((int)LeaveType.Annual)" class="peer sr-only" />
@@ -51,7 +37,21 @@
                                     <i class="bi bi-calendar-check text-green-600 text-lg"></i>
                                 </div>
                                 <span class="font-semibold text-gray-800">إجازة سنوية</span>
-                                <span class="text-xs text-gray-500 mt-1">إجازة مدفوعة</span>
+                                <span class="text-xs text-gray-500 mt-1">21-30 يوم مدفوعة</span>
+                            </div>
+                        </div>
+                    </label>
+
+                    <!-- Casual Leave -->
+                    <label class="relative cursor-pointer">
+                        <input type="radio" asp-for="LeaveType" value="@((int)LeaveType.Casual)" class="peer sr-only" />
+                        <div class="p-4 rounded-xl border-2 border-gray-200 bg-white peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:shadow-md transition-all duration-200 hover:shadow-md">
+                            <div class="flex flex-col items-center text-center">
+                                <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mb-2">
+                                    <i class="bi bi-sun text-yellow-600 text-lg"></i>
+                                </div>
+                                <span class="font-semibold text-gray-800">إجازة عارضة</span>
+                                <span class="text-xs text-gray-500 mt-1">زواج/وفاة/مولود</span>
                             </div>
                         </div>
                     </label>
@@ -66,6 +66,90 @@
                                 </div>
                                 <span class="font-semibold text-gray-800">إجازة مرضية</span>
                                 <span class="text-xs text-gray-500 mt-1">بشهادة طبية</span>
+                            </div>
+                        </div>
+                    </label>
+
+                    <!-- Hajj Leave -->
+                    <label class="relative cursor-pointer">
+                        <input type="radio" asp-for="LeaveType" value="@((int)LeaveType.Hajj)" class="peer sr-only" />
+                        <div class="p-4 rounded-xl border-2 border-gray-200 bg-white peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:shadow-md transition-all duration-200 hover:shadow-md">
+                            <div class="flex flex-col items-center text-center">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mb-2">
+                                    <i class="bi bi-building text-purple-600 text-lg"></i>
+                                </div>
+                                <span class="font-semibold text-gray-800">إجازة حج</span>
+                                <span class="text-xs text-gray-500 mt-1">10-15 يوم</span>
+                            </div>
+                        </div>
+                    </label>
+
+                    <!-- Maternity Leave -->
+                    <label class="relative cursor-pointer">
+                        <input type="radio" asp-for="LeaveType" value="@((int)LeaveType.Maternity)" class="peer sr-only" />
+                        <div class="p-4 rounded-xl border-2 border-gray-200 bg-white peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:shadow-md transition-all duration-200 hover:shadow-md">
+                            <div class="flex flex-col items-center text-center">
+                                <div class="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center mb-2">
+                                    <i class="bi bi-gender-female text-pink-600 text-lg"></i>
+                                </div>
+                                <span class="font-semibold text-gray-800">إجازة أمومة</span>
+                                <span class="text-xs text-gray-500 mt-1">12 أسبوع مدفوعة</span>
+                            </div>
+                        </div>
+                    </label>
+
+                    <!-- Unpaid Leave -->
+                    <label class="relative cursor-pointer">
+                        <input type="radio" asp-for="LeaveType" value="@((int)LeaveType.Unpaid)" class="peer sr-only" />
+                        <div class="p-4 rounded-xl border-2 border-gray-200 bg-white peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:shadow-md transition-all duration-200 hover:shadow-md">
+                            <div class="flex flex-col items-center text-center">
+                                <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mb-2">
+                                    <i class="bi bi-currency-exchange text-gray-600 text-lg"></i>
+                                </div>
+                                <span class="font-semibold text-gray-800">بدون راتب</span>
+                                <span class="text-xs text-gray-500 mt-1">إجازة غير مدفوعة</span>
+                            </div>
+                        </div>
+                    </label>
+
+                    <!-- Compensatory Leave -->
+                    <label class="relative cursor-pointer">
+                        <input type="radio" asp-for="LeaveType" value="@((int)LeaveType.Compensatory)" class="peer sr-only" />
+                        <div class="p-4 rounded-xl border-2 border-gray-200 bg-white peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:shadow-md transition-all duration-200 hover:shadow-md">
+                            <div class="flex flex-col items-center text-center">
+                                <div class="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center mb-2">
+                                    <i class="bi bi-arrow-repeat text-teal-600 text-lg"></i>
+                                </div>
+                                <span class="font-semibold text-gray-800">إجازة تعويضي</span>
+                                <span class="text-xs text-gray-500 mt-1">بدل عطلة وطنية</span>
+                            </div>
+                        </div>
+                    </label>
+
+                    <!-- Official Holiday Leave -->
+                    <label class="relative cursor-pointer">
+                        <input type="radio" asp-for="LeaveType" value="@((int)LeaveType.OfficialHoliday)" class="peer sr-only" />
+                        <div class="p-4 rounded-xl border-2 border-gray-200 bg-white peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:shadow-md transition-all duration-200 hover:shadow-md">
+                            <div class="flex flex-col items-center text-center">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mb-2">
+                                    <i class="bi bi-flag text-blue-600 text-lg"></i>
+                                </div>
+                                <span class="font-semibold text-gray-800">إجازة رسمية</span>
+                                <span class="text-xs text-gray-500 mt-1">أعياد/مناسبات</span>
+                            </div>
+                        </div>
+                    </label>
+
+                    <!-- Exam Leave -->
+                    <label class="relative cursor-pointer">
+                        <input type="radio" asp-for="LeaveType" value="@((int)LeaveType.Exam)" class="peer sr-only" />
+                        <div class="p-4 rounded-xl border-2 border-gray-200 bg-white peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:shadow-md transition-all duration-200 hover:shadow-md">
+                            <div class="flex flex-col items-center text-center">
+                                <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center mb-2">
+                                    <i class="bi bi-book text-orange-600 text-lg"></i>
+                                </div>
+                                <span class="font-semibold text-gray-800">إجازة اختبارات</span>
+                                <span class="text-xs text-gray-500 mt-1">للطلاب الموظفين</span>
                             </div>
                         </div>
                     </label>

@@ -1,0 +1,311 @@
+@model List<HRsystem.Models.SalaryComponent>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "مكونات الراتب";
+}
+
+<h2 class="fs-3 text-center p-4 m-2 text-color3 shadow-lg">إدارة مكونات الراتب</h2>
+
+<div class="flex justify-center mb-4">
+    <button id="addComponentBtn" class="cursor-pointer mx-1 col-button-dark px-4 py-2 rounded">
+        إضافة مكون جديد
+    </button>
+</div>
+
+<div id="tableResponsive" class="tableContainer">
+    @if (Model.Count == 0)
+    {
+        <div class="shadow-lg flex justify-center items-center flex-col p-3">
+            <div id="noDataDiv" class="text-center p-4 m-2 text-[40px]">لا توجد مكونات راتب</div>
+            <img src="~/images/noEmp2.png" style="width:200px;height:200px" />
+        </div>
+    }
+    else
+    {
+        <table class="table-base min-w-full border-separate border-spacing-0" id="componentsTable">
+            <thead class="table-dark col-table-header sticky top-0 z-10">
+                <tr>
+                    <th>الاسم (عربي)</th>
+                    <th>الاسم (إنجليزي)</th>
+                    <th>النوع</th>
+                    <th>طريقة الحساب</th>
+                    <th>القيمة الافتراضية</th>
+                    <th>الحالة</th>
+                    <th>الوصف</th>
+                    <th>إجراءات</th>
+                </tr>
+            </thead>
+            <tbody id="componentsBody" class="mt-3">
+                @foreach (var component in Model)
+                {
+                    <tr id="row-@component.Id" class="snap-start">
+                        <td>@component.NameAr</td>
+                        <td>@component.Name</td>
+                        <td>
+                            @if (component.Type == "Earning")
+                            {
+                                <span class="text-green-600 font-semibold">إضافة</span>
+                            }
+                            else
+                            {
+                                <span class="text-red-600 font-semibold">خصم</span>
+                            }
+                        </td>
+                        <td>
+                            @if (component.CalculationMethod == "FixedAmount")
+                            {
+                                <span>قيمة ثابتة</span>
+                            }
+                            else
+                            {
+                                <span>نسبة مئوية</span>
+                            }
+                        </td>
+                        <td>@(component.DefaultAmount?.ToString("N2") ?? "-")</td>
+                        <td>
+                            @if (component.IsActive)
+                            {
+                                <span class="text-green-600 font-semibold">نشط</span>
+                            }
+                            else
+                            {
+                                <span class="text-red-600 font-semibold">غير نشط</span>
+                            }
+                        </td>
+                        <td>@(component.Description ?? "-")</td>
+                        <td>
+                            <button class="editBtn col-button-dark text-[11px] rounded" data-id="@component.Id">
+                                تعديل
+                            </button>
+                            <button class="toggleBtn col-button-light text-[11px] rounded mt-1" data-id="@component.Id">
+                                @(component.IsActive ? "تعطيل" : "تفعيل")
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+<!-- Add Modal -->
+<div id="addModal" class="hidden fixed inset-0 bg-black/30 z-50 items-center justify-center">
+    <div class="col-modal relative p-6 rounded-2xl shadow-xl text-center w-full md:w-1/2">
+        <button onclick="closeAddModal()" class="absolute top-2 left-2 text-[25px]">
+            <i class="bi bi-x-square-fill"></i>
+        </button>
+        <h3 class="text-lg font-bold mb-3">إضافة مكون راتب جديد</h3>
+        <form id="addComponentForm" class="space-y-3 text-right">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">الاسم (عربي) *</label>
+                    <input type="text" name="NameAr" required
+                           class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">الاسم (إنجليزي) *</label>
+                    <input type="text" name="Name" required
+                           class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">النوع</label>
+                    <select name="Type"
+                            class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]">
+                        <option value="Earning">إضافة (Earning)</option>
+                        <option value="Deduction">خصم (Deduction)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">طريقة الحساب</label>
+                    <select name="CalculationMethod"
+                            class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]">
+                        <option value="FixedAmount">قيمة ثابتة</option>
+                        <option value="Percentage">نسبة مئوية</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">القيمة الافتراضية</label>
+                    <input type="number" step="0.01" name="DefaultAmount"
+                           class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">الحالة</label>
+                    <select name="IsActive"
+                            class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]">
+                        <option value="true">نشط</option>
+                        <option value="false">غير نشط</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">الوصف</label>
+                <textarea name="Description" rows="2"
+                          class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]"></textarea>
+            </div>
+            <button type="submit" class="col-button-dark px-6 py-2 rounded">حفظ</button>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div id="editModal" class="hidden fixed inset-0 bg-black/30 z-50 items-center justify-center">
+    <div class="col-modal relative p-6 rounded-2xl shadow-xl text-center w-full md:w-1/2">
+        <button onclick="closeEditModal()" class="absolute top-2 left-2 text-[25px]">
+            <i class="bi bi-x-square-fill"></i>
+        </button>
+        <h3 class="text-lg font-bold mb-3">تعديل مكون الراتب</h3>
+        <form id="editComponentForm" class="space-y-3 text-right">
+            <input type="hidden" name="Id" id="editId" />
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">الاسم (عربي) *</label>
+                    <input type="text" name="NameAr" id="editNameAr" required
+                           class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">الاسم (إنجليزي) *</label>
+                    <input type="text" name="Name" id="editName" required
+                           class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">النوع</label>
+                    <select name="Type" id="editType"
+                            class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]">
+                        <option value="Earning">إضافة (Earning)</option>
+                        <option value="Deduction">خصم (Deduction)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">طريقة الحساب</label>
+                    <select name="CalculationMethod" id="editCalcMethod"
+                            class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]">
+                        <option value="FixedAmount">قيمة ثابتة</option>
+                        <option value="Percentage">نسبة مئوية</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">القيمة الافتراضية</label>
+                    <input type="number" step="0.01" name="DefaultAmount" id="editDefaultAmount"
+                           class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">الحالة</label>
+                    <select name="IsActive" id="editIsActive"
+                            class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]">
+                        <option value="true">نشط</option>
+                        <option value="false">غير نشط</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">الوصف</label>
+                <textarea name="Description" id="editDescription" rows="2"
+                          class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]"></textarea>
+            </div>
+            <button type="submit" class="col-button-dark px-6 py-2 rounded">حفظ التعديلات</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // ========== ADD ==========
+        document.getElementById('addComponentBtn')?.addEventListener('click', function() {
+            document.getElementById('addModal').classList.remove('hidden');
+            document.getElementById('addModal').classList.add('flex');
+        });
+
+        function closeAddModal() {
+            document.getElementById('addModal').classList.add('hidden');
+            document.getElementById('addModal').classList.remove('flex');
+        }
+
+        document.getElementById('addComponentForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = this;
+            const formData = new FormData(form);
+
+            fetch('/payroll/salary-components/add', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message || 'حدث خطأ');
+                }
+            });
+        });
+
+        // ========== EDIT ==========
+        document.querySelectorAll('.editBtn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.dataset.id;
+                fetch(`/payroll/salary-components/get?id=${id}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            const c = data.data;
+                            document.getElementById('editId').value = c.Id;
+                            document.getElementById('editNameAr').value = c.NameAr;
+                            document.getElementById('editName').value = c.Name;
+                            document.getElementById('editType').value = c.Type;
+                            document.getElementById('editCalcMethod').value = c.CalculationMethod;
+                            document.getElementById('editDefaultAmount').value = c.DefaultAmount || '';
+                            document.getElementById('editIsActive').value = c.IsActive ? 'true' : 'false';
+                            document.getElementById('editDescription').value = c.Description || '';
+                            document.getElementById('editModal').classList.remove('hidden');
+                            document.getElementById('editModal').classList.add('flex');
+                        }
+                    });
+            });
+        });
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+            document.getElementById('editModal').classList.remove('flex');
+        }
+
+        document.getElementById('editComponentForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = this;
+            const formData = new FormData(form);
+
+            fetch('/payroll/salary-components/edit', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message || 'حدث خطأ');
+                }
+            });
+        });
+
+        // ========== TOGGLE ==========
+        document.querySelectorAll('.toggleBtn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.dataset.id;
+                fetch('/payroll/salary-components/toggle', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `id=${id}`
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message || 'حدث خطأ');
+                    }
+                });
+            });
+        });
+    </script>
+}

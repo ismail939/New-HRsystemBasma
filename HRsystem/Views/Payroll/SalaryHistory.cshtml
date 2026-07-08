@@ -1,0 +1,79 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "سجل تعديلات الرواتب";
+}
+
+<h2 class="fs-3 text-center p-4 m-2 text-color3 shadow-lg">سجل تعديلات الرواتب</h2>
+
+<div class="flex justify-center mb-4">
+    <select id="employeeSelect" class="border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]">
+        <option value="">اختر الموظف</option>
+        @foreach (var emp in Model)
+        {
+            <option value="@emp.Id">@emp.Name</option>
+        }
+    </select>
+</div>
+
+<div id="tableResponsive" class="tableContainer">
+    <table class="table-base min-w-full border-separate border-spacing-0">
+        <thead class="table-dark col-table-header sticky top-0 z-10">
+            <tr>
+                <th>التاريخ</th>
+                <th>المكون</th>
+                <th>القيمة القديمة</th>
+                <th>القيمة الجديدة</th>
+                <th>الفرق</th>
+                <th>تاريخ التفعيل</th>
+                <th>السبب</th>
+                <th>تم بواسطة</th>
+            </tr>
+        </thead>
+        <tbody id="historyBody">
+            <tr><td colspan="8" class="text-center p-4">يرجى اختيار موظف لعرض السجل</td></tr>
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('employeeSelect')?.addEventListener('change', function() {
+            const employeeId = this.value;
+            if (!employeeId) {
+                document.getElementById('historyBody').innerHTML = '<tr><td colspan="8" class="text-center p-4">يرجى اختيار موظف</td></tr>';
+                return;
+            }
+
+            fetch(`/payroll/salary-history/get?employeeId=${employeeId}`)
+                .then(r => r.json())
+                .then(data => {
+                    const tbody = document.getElementById('historyBody');
+                    tbody.innerHTML = '';
+
+                    if (!data.success || data.history.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="8" class="text-center p-4">لا يوجد سجل تعديلات</td></tr>';
+                        return;
+                    }
+
+                    data.history.forEach(h => {
+                        const tr = document.createElement('tr');
+                        const diff = h.newValue - (h.previousValue || 0);
+                        const diffClass = diff >= 0 ? 'text-green-600' : 'text-red-600';
+                        const diffSign = diff >= 0 ? '+' : '';
+
+                        tr.innerHTML = `
+                            <td>${new Date(h.createdDate).toLocaleDateString('ar-SA')}</td>
+                            <td>${h.componentName}</td>
+                            <td>${h.previousValue != null ? Number(h.previousValue).toFixed(2) : '-'}</td>
+                            <td>${Number(h.newValue).toFixed(2)}</td>
+                            <td class="${diffClass}">${diffSign}${diff.toFixed(2)}</td>
+                            <td>${new Date(h.effectiveDate).toLocaleDateString('ar-SA')}</td>
+                            <td>${h.reason || '-'}</td>
+                            <td>${h.changedBy}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                });
+        });
+    </script>
+}

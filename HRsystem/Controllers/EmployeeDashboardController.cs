@@ -1,7 +1,8 @@
- using System.Diagnostics;
+using System.Diagnostics;
 using System.Security.Claims;
 using HRsystem.Data;
 using HRsystem.Models;
+using HRsystem.Services;
 using HRsystem.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -14,17 +15,22 @@ namespace HRsystem.Controllers
     {
         private readonly ILogger<EmployeeDashboardController> _logger;
         private readonly AppDbContext _context;
+        private readonly IOffDayBalanceAutoService _balanceService;
 
-        public EmployeeDashboardController(ILogger<EmployeeDashboardController> logger, AppDbContext context)
+        public EmployeeDashboardController(
+            ILogger<EmployeeDashboardController> logger, 
+            AppDbContext context,
+            IOffDayBalanceAutoService balanceService)
         {
             _logger = logger;
             _context = context;
+            _balanceService = balanceService;
         }
 
         [Authorize(Roles = "Employee")]
         [HttpGet]
         [Route("/employee-dashboard")]
-        public IActionResult Dashboard()
+        public async Task<IActionResult> Dashboard()
         {
             string nationalId = User.FindFirst("NationalId")?.Value ?? "";
             var employee = _context.HREmployees.FirstOrDefault(e => e.NationalId == nationalId);
@@ -37,7 +43,8 @@ namespace HRsystem.Controllers
                 });
             }
 
-            var offDayBalances = _context.HROffDayBalances.FirstOrDefault(b => b.EmployeeId == employee.Id);
+            // Get or auto-calculate balance
+            var offDayBalances = await _balanceService.GetOrCalculateBalanceAsync(employee.Id);
             var penalties = _context.HREmployeePenalties.Where(p => p.EmployeeId == employee.Id && p.IsActive).ToList();
             var offDays = _context.HREmployeeOffDays.Where(o => o.EmployeeId == employee.Id).ToList();
 
@@ -62,10 +69,16 @@ namespace HRsystem.Controllers
             var vm = new EmployeeDashboardViewModel
             {
                 EmployeeName = employee.Name,
-                AnnualBalance = offDayBalances?.Annual ?? 0,
-                CasualBalance = offDayBalances?.Casual ?? 0,
-                OffBalance = offDayBalances?.Off ?? 0,
-                CompensatoryBalance = offDayBalances?.CompensatoryOfNationalHoliday ?? 0,
+                AnnualBalance = offDayBalances.Annual,
+                CasualBalance = offDayBalances.Casual,
+                SickBalance = offDayBalances.Sick,
+                HajjBalance = offDayBalances.Hajj,
+                MaternityBalance = offDayBalances.Maternity,
+                UnpaidBalance = offDayBalances.Unpaid,
+                CompensatoryBalance = offDayBalances.Compensatory,
+                OfficialHolidayBalance = offDayBalances.OfficialHoliday,
+                ExamBalance = offDayBalances.Exam,
+                OffBalance = offDayBalances.Unpaid, // backward compat
                 ActivePenaltiesCount = penalties.Count,
                 TotalPenaltyPoints = penalties.Sum(p => p.PenaltyPoints),
                 BasicSalary = basicSalary,

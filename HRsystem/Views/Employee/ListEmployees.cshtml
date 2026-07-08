@@ -561,11 +561,26 @@
     </div>
 </div>
 
-<!-- ✅ The lightbox -->
+<!-- ✅ Image lightbox -->
 <div id="imageLightbox"
      class="fixed inset-0 w-full h-full bg-black bg-opacity-50 hidden items-center justify-center z-50">
     <img id="lightboxImage"
          class="max-w-3xl max-h-[90vh] rounded-2xl shadow-2xl transition-transform duration-300 scale-95" />
+</div>
+
+<!-- ✅ PDF lightbox -->
+<div id="pdfLightbox"
+     class="fixed inset-0 w-full h-full bg-black bg-opacity-50 hidden items-center justify-center z-50"
+     onclick="if(event.target===this) closePdf()">
+    <div class="relative bg-white rounded-2xl shadow-2xl w-11/12 h-[90vh] p-4 flex flex-col">
+        <div class="flex justify-between items-center mb-2">
+            <h3 id="pdfTitle" class="font-bold text-lg truncate">معاينة PDF</h3>
+            <button onclick="closePdf()" class="text-[25px] leading-none">
+                <i class="bi bi-x-square-fill text-gray-600 hover:text-red-600"></i>
+            </button>
+        </div>
+        <iframe id="pdfViewer" class="w-full flex-1 rounded border" frameborder="0"></iframe>
+    </div>
 </div>
 
 @section Scripts {

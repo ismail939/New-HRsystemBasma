@@ -33,7 +33,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie(options =>
     {
         options.LoginPath = "/";
-        options.AccessDeniedPath = "/accessDenied";
+        options.AccessDeniedPath = "/access-denied";
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
         options.SlidingExpiration = true;
     });
@@ -52,6 +52,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Register Notification Service
 builder.Services.AddScoped<INotificationService, NotificationService>();
+
+// Register OffDay Balance Auto Service
+builder.Services.AddScoped<IOffDayBalanceAutoService, OffDayBalanceAutoService>();
 
 var app = builder.Build();
 

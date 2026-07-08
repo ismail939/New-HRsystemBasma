@@ -1,0 +1,235 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "إدارة الرواتب";
+}
+
+<h2 class="fs-3 text-center p-4 m-2 text-color3 shadow-lg">إدارة رواتب الموظفين</h2>
+
+<div id="tableResponsive" class="tableContainer">
+    <table class="table-base min-w-full border-separate border-spacing-0" id="employeesTable">
+        <thead class="table-dark col-table-header sticky top-0 z-10">
+            <tr>
+                <th>الاسم</th>
+                <th>المسمى الوظيفي</th>
+                <th>الإجراءات</th>
+            </tr>
+        </thead>
+        <tbody id="employeesBody" class="mt-3">
+            @foreach (var emp in Model)
+            {
+                <tr class="snap-start">
+                    <td>@emp.Name</td>
+                    <td>@emp.JobName</td>
+                    <td>
+                        <button class="col-button-dark text-[11px] rounded editSalaryBtn" data-id="@emp.Id">
+                            إدارة الراتب
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Salary Management Modal -->
+<div id="salaryModal" class="hidden fixed inset-0 bg-black/30 z-50 items-center justify-center">
+    <div class="col-modal relative p-6 rounded-2xl shadow-xl w-full md:w-3/4 max-h-[90vh] overflow-y-auto">
+        <button onclick="closeSalaryModal()" class="absolute top-2 left-2 text-[25px]">
+            <i class="bi bi-x-square-fill"></i>
+        </button>
+        <h3 id="salaryModalTitle" class="text-lg font-bold mb-3 text-center"></h3>
+
+        <!-- Add new salary component form -->
+        <div class="bg-color1 p-3 rounded-lg mb-4 border border-color3">
+            <h4 class="font-semibold mb-2">إضافة مكون راتب</h4>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+                <input type="hidden" id="salaryEmployeeId" />
+                <select id="newComponentId" class="border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]">
+                    <option value="">اختر المكون</option>
+                </select>
+                <input type="number" step="0.01" id="newComponentAmount" placeholder="المبلغ"
+                       class="border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                <input type="text" id="newComponentNotes" placeholder="ملاحظات"
+                       class="border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                <button onclick="addSalaryComponent()" class="col-button-dark px-4 py-2 rounded">إضافة</button>
+            </div>
+        </div>
+
+        <!-- Current salary components -->
+        <div id="salaryComponentsList">
+            <table class="table-base min-w-full border-separate border-spacing-0">
+                <thead class="col-table-header">
+                    <tr>
+                        <th>المكون</th>
+                        <th>النوع</th>
+                        <th>المبلغ</th>
+                        <th>الحالة</th>
+                        <th>ملاحظات</th>
+                        <th>إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="salaryComponentsBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Load active components for dropdown
+        let activeComponents = [];
+
+        fetch('/payroll/salary-components/active')
+            .then(r => r.json())
+            .then(data => {
+                activeComponents = data;
+                const select = document.getElementById('newComponentId');
+                data.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = `${c.nameAr} (${c.type === 'Earning' ? 'إضافة' : 'خصم'})`;
+                    select.appendChild(opt);
+                });
+            });
+
+        // Open salary modal
+        document.querySelectorAll('.editSalaryBtn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const empId = this.dataset.id;
+                loadEmployeeSalaries(empId);
+            });
+        });
+
+        function loadEmployeeSalaries(employeeId) {
+            document.getElementById('salaryEmployeeId').value = employeeId;
+            document.getElementById('salaryModal').classList.remove('hidden');
+            document.getElementById('salaryModal').classList.add('flex');
+
+            fetch(`/payroll/salaries/get-employee?employeeId=${employeeId}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.success) return;
+                    document.getElementById('salaryModalTitle').textContent =
+                        `إدارة راتب: ${data.employee.name} - ${data.employee.jobName}`;
+
+                    const tbody = document.getElementById('salaryComponentsBody');
+                    tbody.innerHTML = '';
+
+                    if (data.salaries.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" class="text-center p-4">لا توجد مكونات راتب لهذا الموظف</td></tr>';
+                        return;
+                    }
+
+                    data.salaries.forEach(s => {
+                        const tr = document.createElement('tr');
+                        const typeText = s.componentType === 'Earning' ? 'إضافة' : 'خصم';
+                        const typeClass = s.componentType === 'Earning' ? 'text-green-600' : 'text-red-600';
+                        const activeText = s.isActive ? 'نشط' : 'غير نشط';
+                        const activeClass = s.isActive ? 'text-green-600' : 'text-red-600';
+
+                        tr.innerHTML = `
+                            <td>${s.componentNameAr}</td>
+                            <td class="${typeClass} font-semibold">${typeText}</td>
+                            <td>
+                                <input type="number" step="0.01" id="amount-${s.id}" value="${s.amount}"
+                                       class="border rounded p-1 w-24 text-center" />
+                            </td>
+                            <td class="${activeClass} font-semibold">${activeText}</td>
+                            <td>
+                                <input type="text" id="notes-${s.id}" value="${s.notes || ''}"
+                                       class="border rounded p-1 w-32" />
+                            </td>
+                            <td>
+                                <button onclick="editSalary(${s.id})" class="col-button-dark text-[11px] rounded px-2 py-1">حفظ</button>
+                                <button onclick="toggleSalary(${s.id})" class="col-button-light text-[11px] rounded px-2 py-1 mt-1">
+                                    ${s.isActive ? 'تعطيل' : 'تفعيل'}
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                });
+        }
+
+        function closeSalaryModal() {
+            document.getElementById('salaryModal').classList.add('hidden');
+            document.getElementById('salaryModal').classList.remove('flex');
+        }
+
+        function addSalaryComponent() {
+            const employeeId = document.getElementById('salaryEmployeeId').value;
+            const componentId = document.getElementById('newComponentId').value;
+            const amount = document.getElementById('newComponentAmount').value;
+            const notes = document.getElementById('newComponentNotes').value;
+
+            if (!componentId || !amount) {
+                alert('الرجاء اختيار المكون وإدخال المبلغ');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('employeeId', employeeId);
+            formData.append('salaryComponentId', componentId);
+            formData.append('amount', amount);
+            formData.append('notes', notes);
+
+            fetch('/payroll/salaries/add', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('newComponentId').value = '';
+                    document.getElementById('newComponentAmount').value = '';
+                    document.getElementById('newComponentNotes').value = '';
+                    loadEmployeeSalaries(employeeId);
+                } else {
+                    alert(data.message || 'حدث خطأ');
+                }
+            });
+        }
+
+        function editSalary(id) {
+            const amount = document.getElementById(`amount-${id}`).value;
+            const notes = document.getElementById(`notes-${id}`).value;
+            const employeeId = document.getElementById('salaryEmployeeId').value;
+
+            const formData = new FormData();
+            formData.append('id', id);
+            formData.append('amount', amount);
+            formData.append('notes', notes);
+
+            fetch('/payroll/salaries/edit', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    loadEmployeeSalaries(employeeId);
+                } else {
+                    alert(data.message || 'حدث خطأ');
+                }
+            });
+        }
+
+        function toggleSalary(id) {
+            const employeeId = document.getElementById('salaryEmployeeId').value;
+            const formData = new FormData();
+            formData.append('id', id);
+
+            fetch('/payroll/salaries/toggle', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    loadEmployeeSalaries(employeeId);
+                }
+            });
+        }
+    </script>
+}

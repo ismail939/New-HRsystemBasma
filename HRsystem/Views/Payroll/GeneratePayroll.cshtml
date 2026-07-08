@@ -1,0 +1,79 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "إنشاء كشف راتب";
+}
+
+<h2 class="fs-3 text-center p-4 m-2 text-color3 shadow-lg">إنشاء كشف راتب جديد</h2>
+
+<div class="flex justify-center">
+    <div class="col-modal p-6 rounded-2xl shadow-xl w-full md:w-1/2">
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">الشهر</label>
+                <select id="monthSelect" class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]">
+                    @foreach (var m in ViewBag.Months)
+                    {
+                        <option value="@m.Value">@m.Text</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">السنة</label>
+                <select id="yearSelect" class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]">
+                    @foreach (var y in ViewBag.Years)
+                    {
+                        <option value="@y">@y</option>
+                    }
+                </select>
+            </div>
+            <div class="text-center">
+                <button onclick="runPayrollGeneration()" class="col-button-dark px-8 py-2 rounded text-lg">
+                    إنشاء كشف الراتب
+                </button>
+            </div>
+            <div id="generationResult" class="hidden text-center p-4 rounded-lg"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function runPayrollGeneration() {
+            const month = document.getElementById('monthSelect').value;
+            const year = document.getElementById('yearSelect').value;
+            const resultDiv = document.getElementById('generationResult');
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = 'جاري الإنشاء...';
+
+            const formData = new FormData();
+            formData.append('month', month);
+            formData.append('year', year);
+
+            fetch('/payroll/generate/run', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                resultDiv.classList.remove('hidden');
+                if (data.success) {
+                    resultDiv.className = 'text-center p-4 rounded-lg bg-green-100 text-green-700';
+                    resultDiv.innerHTML = `تم إنشاء كشف الراتب بنجاح. <a href="/payroll/details/${data.payrollId}" class="underline font-bold">عرض التفاصيل</a>`;
+                } else {
+                    resultDiv.className = 'text-center p-4 rounded-lg bg-red-100 text-red-700';
+                    resultDiv.textContent = data.message || 'حدث خطأ أثناء إنشاء كشف الراتب';
+                }
+            })
+            .catch(err => {
+                resultDiv.classList.remove('hidden');
+                resultDiv.className = 'text-center p-4 rounded-lg bg-red-100 text-red-700';
+                resultDiv.textContent = 'حدث خطأ في الاتصال';
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.textContent = 'إنشاء كشف الراتب';
+            });
+        }
+    </script>
+}

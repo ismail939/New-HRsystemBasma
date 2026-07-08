@@ -117,6 +117,13 @@ namespace HRsystem.Controllers
             return RedirectToAction("ListEmployees", "Employee");
         }
 
+        [HttpGet]
+        [Route("/access-denied")]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("/logout")]

@@ -60,7 +60,7 @@
         <input type="hidden" id="empId">
 
         <!-- Dates -->
-        <div class="w-full relative shadow-lg p-4 flex flex-row items-center justify-start gap-3 mt-6" id="dateInputs">
+        <div class="w-full relative shadow-lg px-4 py-1 flex flex-row items-center justify-start gap-3 mt-6" id="dateInputs">
             <label>من</label>
             <input class="border p-2  rounded  focus:outline-none focus:ring focus:ring-[#7B9669]" placeholder="البداية"
                 type="date" id="from" />
@@ -68,46 +68,83 @@
             <input class="border p-2  rounded  focus:outline-none focus:ring focus:ring-[#7B9669]" placeholder="النهاية"
                 type="date" id="to" disabled />
             <button onclick="loadDays()" class="col-button-dark ">بحث</button>
-            <div id="offdaysBalance" class="hidden p-1 m-2 gap-2  flex-row justify-end items-center absolute left-3 ">
-                <span class="font-extrabold">الرصيد المتبقي</span>
-                <table class="table-base">
-                    <thead class="table-dark col-table-header">
-                        <tr>
-                            <th>سنوي</th>
-                            <th>عارضة</th>
-                            <th>راحة</th>
-                            <th>بدل اجازة</th>
-                        </tr>
-                    </thead>
-                    <tbody id="balancesBody">
-                        <tr style="background-color:white !important">
-                            <td>
-                                <input disabled type="number" 
-                                    class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " 
-                                    id="annualBalance" />
-                            </td>
-                            <td>
-                                <input disabled type="number" 
-                                    class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " 
-                                    id="casualBalance" />
-                            </td>
-                            <td>
-                                <input disabled type="number" 
-                                    class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " 
-                                    id="offBalance" />
-                            </td>
-                            <td>
-                                <input disabled type="number" 
-                                    class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" " 
-                                    id="insteadBalance" />
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div id="offdaysBalance" class=" w-full p-4">
+                <div class="flex flex-col items-center gap-3">
+                    <span class="font-extrabold text-nowrap">الرصيد المتبقي</span>
+                    
+                    <div class="overflow-x-auto">
+                    <table class="table-base text-xs">
+                        <thead class="table-dark col-table-header">
+                            <tr>
+                                <th>سنوي</th>
+                                <th>عارضة</th>
+                                <th>مرضي</th>
+                                <th>حج</th>
+                                <th>أمومة</th>
+                                <th>بدون راتب</th>
+                                <th>تعويضي</th>
+                                <th>رسمية</th>
+                                <th>اختبارات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="balancesBody">
+                            <tr style="background-color:white !important">
+                                <td>
+                                    <input disabled type="number" 
+                                        class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" 
+                                        id="annualBalance" />
+                                </td>
+                                <td>
+                                    <input disabled type="number" 
+                                        class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" 
+                                        id="casualBalance" />
+                                </td>
+                                <td>
+                                    <input disabled type="number" 
+                                        class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" 
+                                        id="sickBalance" />
+                                </td>
+                                <td>
+                                    <input disabled type="number" 
+                                        class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" 
+                                        id="hajjBalance" />
+                                </td>
+                                <td>
+                                    <input disabled type="number" 
+                                        class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" 
+                                        id="maternityBalance" />
+                                </td>
+                                <td>
+                                    <input disabled type="number" 
+                                        class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" 
+                                        id="unpaidBalance" />
+                                </td>
+                                <td>
+                                    <input disabled type="number" 
+                                        class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" 
+                                        id="compensatoryBalance" />
+                                </td>
+                                <td>
+                                    <input disabled type="number" 
+                                        class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" 
+                                        id="officialHolidayBalance" />
+                                </td>
+                                <td>
+                                    <input disabled type="number" 
+                                        class="border m-1 !bg-color1 w-12 text-center rounded p-1 focus:outline-none focus:ring focus:ring-[#7B9669]" 
+                                        id="examBalance" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </div>
 
-                <button id="editBalancesBtn" class="col-button-dark !h-[50%]">تعديل</button>
-                <button id="saveBalancesBtn" class="hidden col-button-dark !h-[50%]">حفظ</button>
-                <button onclick="openNotesModal()" class="col-button-light !h-[50%]">الملاحظات</button>
+                    <div class="flex flex-row gap-2 items-center">
+                        <button id="editBalancesBtn" class="col-button-dark px-3 py-1 text-sm">تعديل</button>
+                        <button id="saveBalancesBtn" class="hidden col-button-dark px-3 py-1 text-sm">حفظ</button>
+                        <button onclick="openNotesModal()" class="col-button-light px-3 py-1 text-sm">الملاحظات</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -154,10 +191,16 @@
 
         <select id="popupSelect" class="w-full border rounded-lg p-2 text-right">
             <option class="dropdown-item" value="">اختر نوع الإجازة</option>
-            <option class="dropdown-item" value="راحة">راحة</option>
             <option class="dropdown-item" value="سنوي">سنوي</option>
             <option class="dropdown-item" value="عارضة">عارضة</option>
             <option class="dropdown-item" value="مرضي">مرضي</option>
+            <option class="dropdown-item" value="حج">حج</option>
+            <option class="dropdown-item" value="أمومة">أمومة</option>
+            <option class="dropdown-item" value="بدون راتب">بدون راتب</option>
+            <option class="dropdown-item" value="تعويضي">تعويضي</option>
+            <option class="dropdown-item" value="رسمية">رسمية</option>
+            <option class="dropdown-item" value="اختبارات">اختبارات</option>
+            <option class="dropdown-item" value="راحة">راحة</option>
             <option class="dropdown-item" value="أخرى">أخرى</option>
         </select>
         <input id="otherInput" type="text"

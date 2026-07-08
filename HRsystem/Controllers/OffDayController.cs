@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using HRsystem.Data;
 using HRsystem.Models;
+using HRsystem.Models.Enums;
+using HRsystem.Services;
 using HRsystem.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +13,16 @@ namespace HRsystem.Controllers
     {
         private readonly ILogger<OffDayController> _logger;
         private readonly AppDbContext _context;
-        public OffDayController(ILogger<OffDayController> logger, AppDbContext context)
+        private readonly IOffDayBalanceAutoService _balanceService;
+
+        public OffDayController(
+            ILogger<OffDayController> logger, 
+            AppDbContext context,
+            IOffDayBalanceAutoService balanceService)
         {
             _logger = logger;
             _context = context;
+            _balanceService = balanceService;
         }
 
         [Authorize(Roles = "Admin,HR")]
@@ -80,7 +88,7 @@ namespace HRsystem.Controllers
         [Authorize(Roles = "Admin,HR")]
         [HttpPost]
         [Route("/employees/offdays/edit")]
-        public IActionResult Edit([FromBody] EditOffDaysRequest request)
+        public async Task<IActionResult> Edit([FromBody] EditOffDaysRequest request)
         {
             foreach (var d in request.Days)
             {
@@ -102,6 +110,17 @@ namespace HRsystem.Controllers
                         OffDayDate = date,
                         OffDayType = d.OffDayType
                     });
+                    
+                    // Deduct 1 day from the corresponding balance (force deduct for HR)
+                    var leaveType = MapArabicOffDayTypeToLeaveType(d.OffDayType);
+                    if (leaveType != null)
+                    {
+                        await _balanceService.ForceDeductBalanceAsync(request.EmployeeId, leaveType.Value, 1);
+                        _context.HRLogs.Add(new HRLog
+                        {
+                            Action = $"User ({User.Identity.Name}) manually added off day ({d.OffDayType}) for employeeId ({request.EmployeeId}) on {date:yyyy-MM-dd} - deducted 1 day from balance"
+                        });
+                    }
                 }
                 else
                 {
@@ -111,22 +130,74 @@ namespace HRsystem.Controllers
                                           && x.OffDayDate.Date == date.Date);
 
                     if (existing != null)
+                    {
+                        var removedType = existing.OffDayType; // save before removing
                         _context.HREmployeeOffDays.Remove(existing);
+                        
+                        // Add back 1 day to the corresponding balance
+                        var leaveType = MapArabicOffDayTypeToLeaveType(removedType);
+                        if (leaveType != null)
+                        {
+                            // Add back by calling a service method (or directly)
+                            var balance = _context.HROffDayBalances
+                                .FirstOrDefault(b => b.EmployeeId == request.EmployeeId);
+                            if (balance != null)
+                            {
+                                AddToBalance(balance, leaveType.Value, 1);
+                                _context.HRLogs.Add(new HRLog
+                                {
+                                    Action = $"User ({User.Identity.Name}) manually removed off day ({removedType}) for employeeId ({request.EmployeeId}) on {date:yyyy-MM-dd} - added back 1 day to balance"
+                                });
+                            }
+                        }
+                    }
                 }
             }
-            _context.HRLogs.Add(new HRLog
-            {
-                Action = $"User ({User.Identity.Name}) edited off days for employeeId ({request.EmployeeId}) for {request.Days.Count} days"
-            });
+            
             _context.SaveChanges();
 
             return Ok("Done");
+        }
+        
+        private LeaveType? MapArabicOffDayTypeToLeaveType(string? arabicType)
+        {
+            if (string.IsNullOrEmpty(arabicType)) return null;
+            return arabicType switch
+            {
+                "سنوي" => LeaveType.Annual,
+                "عارضة" => LeaveType.Casual,
+                "مرضي" => LeaveType.Sick,
+                "حج" => LeaveType.Hajj,
+                "أمومة" => LeaveType.Maternity,
+                "بدون راتب" => LeaveType.Unpaid,
+                "تعويضي" => LeaveType.Compensatory,
+                "رسمية" => LeaveType.OfficialHoliday,
+                "اختبارات" => LeaveType.Exam,
+                "راحة" => LeaveType.Unpaid, // treat rest days as unpaid
+                _ => null // "أخرى" or unknown types won't deduct
+            };
+        }
+        
+        private void AddToBalance(HROffDayBalance balance, LeaveType leaveType, int days)
+        {
+            switch (leaveType)
+            {
+                case LeaveType.Annual: balance.Annual += days; break;
+                case LeaveType.Casual: balance.Casual += days; break;
+                case LeaveType.Sick: balance.Sick += days; break;
+                case LeaveType.Hajj: balance.Hajj += days; break;
+                case LeaveType.Maternity: balance.Maternity += days; break;
+                case LeaveType.Unpaid: balance.Unpaid += days; break;
+                case LeaveType.Compensatory: balance.Compensatory += days; break;
+                case LeaveType.OfficialHoliday: balance.OfficialHoliday += days; break;
+                case LeaveType.Exam: balance.Exam += days; break;
+            }
         }
 
         [Authorize(Roles = "Admin,HR")]
         [HttpGet]
         [Route("/offdays/balance/add")]
-        public IActionResult AddOffDayBalance(int employeeId)
+        public async Task<IActionResult> AddOffDayBalance(int employeeId)
         {
             Console.WriteLine("Adding off day balance for employeeId:❎ " + employeeId);
             var existing = _context.HROffDayBalances
@@ -138,27 +209,33 @@ namespace HRsystem.Controllers
             {
                 annualBalance = existing.Annual,
                 casualBalance = existing.Casual,
-                offBalance = existing.Off,
-                insteadBalance = existing.CompensatoryOfNationalHoliday
+                sickBalance = existing.Sick,
+                hajjBalance = existing.Hajj,
+                maternityBalance = existing.Maternity,
+                unpaidBalance = existing.Unpaid,
+                compensatoryBalance = existing.Compensatory,
+                officialHolidayBalance = existing.OfficialHoliday,
+                examBalance = existing.Exam,
+                isAutoCalculated = existing.IsAutoCalculated,
+                notes = existing.Notes
             });
             }
-            var balance = new HROffDayBalance
-            {
-                EmployeeId = employeeId,
-                Annual = 0,
-                Casual = 0,
-                Off = 0,
-                CompensatoryOfNationalHoliday = 0,
-                Notes = ""
-            };
-            _context.HROffDayBalances.Add(balance);
-            _context.SaveChanges();
+            // Try auto-calculate first
+            var balance = await _balanceService.CalculateAndSaveBalanceAsync(employeeId);
+            
             return Json(new
             {
                 annualBalance = balance.Annual,
                 casualBalance = balance.Casual,
-                offBalance = balance.Off,
-                insteadBalance = balance.CompensatoryOfNationalHoliday
+                sickBalance = balance.Sick,
+                hajjBalance = balance.Hajj,
+                maternityBalance = balance.Maternity,
+                unpaidBalance = balance.Unpaid,
+                compensatoryBalance = balance.Compensatory,
+                officialHolidayBalance = balance.OfficialHoliday,
+                examBalance = balance.Exam,
+                isAutoCalculated = balance.IsAutoCalculated,
+                notes = balance.Notes
             });
         }
 
@@ -182,19 +259,22 @@ namespace HRsystem.Controllers
         public IActionResult EditOffDayBalance([FromBody] BalanceEditRequest request)
         {
             int employeeId = request.EmployeeId;
-            int annual = request.Annual;
-            int casual = request.Casual;
-            int off = request.Off;
-            int instead = request.Instead;
             Console.WriteLine("Editing off day balance for employeeId: " + employeeId);
             var balance = _context.HROffDayBalances
                 .FirstOrDefault(x => x.EmployeeId == employeeId);
             if (balance != null)
             {
-                balance.Annual = annual;
-                balance.Casual = casual;
-                balance.Off = off;
-                balance.CompensatoryOfNationalHoliday = instead;
+                balance.Annual = request.Annual;
+                balance.Casual = request.Casual;
+                balance.Sick = request.Sick;
+                balance.Hajj = request.Hajj;
+                balance.Maternity = request.Maternity;
+                balance.Unpaid = request.Unpaid;
+                balance.Compensatory = request.Compensatory;
+                balance.OfficialHoliday = request.OfficialHoliday;
+                balance.Exam = request.Exam;
+                balance.IsAutoCalculated = false; // manual edit override
+                balance.LastUpdated = DateTime.UtcNow;
                 _context.HROffDayBalances.Update(balance);
             }
             else
@@ -202,11 +282,18 @@ namespace HRsystem.Controllers
                 balance = new HROffDayBalance
                 {
                     EmployeeId = employeeId,
-                    Annual = annual,
-                    Casual = casual,
-                    Off = off,
-                    CompensatoryOfNationalHoliday = instead,
-                    Notes = ""
+                    Annual = request.Annual,
+                    Casual = request.Casual,
+                    Sick = request.Sick,
+                    Hajj = request.Hajj,
+                    Maternity = request.Maternity,
+                    Unpaid = request.Unpaid,
+                    Compensatory = request.Compensatory,
+                    OfficialHoliday = request.OfficialHoliday,
+                    Exam = request.Exam,
+                    Notes = "",
+                    IsAutoCalculated = false,
+                    LastUpdated = DateTime.UtcNow
                 };
                 _context.HROffDayBalances.Add(balance);
             }
@@ -215,8 +302,13 @@ namespace HRsystem.Controllers
             {
                 annualBalance = balance.Annual,
                 casualBalance = balance.Casual,
-                offBalance = balance.Off,
-                insteadBalance = balance.CompensatoryOfNationalHoliday
+                sickBalance = balance.Sick,
+                hajjBalance = balance.Hajj,
+                maternityBalance = balance.Maternity,
+                unpaidBalance = balance.Unpaid,
+                compensatoryBalance = balance.Compensatory,
+                officialHolidayBalance = balance.OfficialHoliday,
+                examBalance = balance.Exam
             });
         }
 
@@ -239,9 +331,16 @@ namespace HRsystem.Controllers
                     EmployeeId = employeeId,
                     Annual = 0,
                     Casual = 0,
-                    Off = 0,
-                    CompensatoryOfNationalHoliday = 0,
-                    Notes = request.Notes
+                    Sick = 0,
+                    Hajj = 0,
+                    Maternity = 0,
+                    Unpaid = 0,
+                    Compensatory = 0,
+                    OfficialHoliday = 0,
+                    Exam = 0,
+                    Notes = request.Notes,
+                    IsAutoCalculated = false,
+                    LastUpdated = DateTime.UtcNow
                 };
                 _context.HROffDayBalances.Add(balance);
             }

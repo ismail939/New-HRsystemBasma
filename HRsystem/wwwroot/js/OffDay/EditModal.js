@@ -1,17 +1,102 @@
 // ⭐ Open Modal 
 function openModal(empId, empName) {
     document.getElementById("empName").textContent = empName;
-    // fetch(`/offdays/balance/add?employeeId=${empId}`).then(res => res.json()).then(data => {
-    //     console.log(data);
-    //     document.getElementById("annualBalance").value = data.annualBalance;
-    //     document.getElementById("casualBalance").value = data.casualBalance;
-    //     document.getElementById("offBalance").value = data.offBalance;
-    //     document.getElementById("insteadBalance").value = data.insteadBalance;
-    // });
     document.getElementById('tableResponsive').classList.add('hidden');
     showDivFlex("editModal");
     
     document.getElementById("empId").value = empId;
+    
+    // Load balance data for all 9 types
+    fetch(`/offdays/balance/add?employeeId=${empId}`).then(res => res.json()).then(data => {
+        console.log(data);
+        document.getElementById("annualBalance").value = data.annualBalance || 0;
+        document.getElementById("casualBalance").value = data.casualBalance || 0;
+        document.getElementById("sickBalance").value = data.sickBalance || 0;
+        document.getElementById("hajjBalance").value = data.hajjBalance || 0;
+        document.getElementById("maternityBalance").value = data.maternityBalance || 0;
+        document.getElementById("unpaidBalance").value = data.unpaidBalance || 0;
+        document.getElementById("compensatoryBalance").value = data.compensatoryBalance || 0;
+        document.getElementById("officialHolidayBalance").value = data.officialHolidayBalance || 0;
+        document.getElementById("examBalance").value = data.examBalance || 0;
+        
+        // Store original balances in session for live updating
+        sessionStorage.setItem("liveBalances", JSON.stringify({
+            annual: data.annualBalance || 0,
+            casual: data.casualBalance || 0,
+            sick: data.sickBalance || 0,
+            hajj: data.hajjBalance || 0,
+            maternity: data.maternityBalance || 0,
+            unpaid: data.unpaidBalance || 0,
+            compensatory: data.compensatoryBalance || 0,
+            officialHoliday: data.officialHolidayBalance || 0,
+            exam: data.examBalance || 0
+        }));
+    });
+}
+
+// ⭐ Update balance display from session storage (live update without saving)
+function updateBalancesDisplay() {
+    const balances = loadLiveBalances();
+    document.getElementById("annualBalance").value = balances.annual;
+    document.getElementById("casualBalance").value = balances.casual;
+    document.getElementById("sickBalance").value = balances.sick;
+    document.getElementById("hajjBalance").value = balances.hajj;
+    document.getElementById("maternityBalance").value = balances.maternity;
+    document.getElementById("unpaidBalance").value = balances.unpaid;
+    document.getElementById("compensatoryBalance").value = balances.compensatory;
+    document.getElementById("officialHolidayBalance").value = balances.officialHoliday;
+    document.getElementById("examBalance").value = balances.exam;
+}
+
+function loadLiveBalances() {
+    let data = sessionStorage.getItem("liveBalances");
+    return data ? JSON.parse(data) : {
+        annual: 0, casual: 0, sick: 0, hajj: 0, maternity: 0,
+        unpaid: 0, compensatory: 0, officialHoliday: 0, exam: 0
+    };
+}
+
+function saveLiveBalances(balances) {
+    sessionStorage.setItem("liveBalances", JSON.stringify(balances));
+}
+
+// ⭐ Map Arabic offday type to balance field name
+function mapOffDayTypeToBalanceField(arabicType) {
+    const map = {
+        "سنوي": "annual",
+        "عارضة": "casual",
+        "مرضي": "sick",
+        "حج": "hajj",
+        "أمومة": "maternity",
+        "بدون راتب": "unpaid",
+        "تعويضي": "compensatory",
+        "رسمية": "officialHoliday",
+        "اختبارات": "exam",
+        "راحة": "unpaid"
+    };
+    return map[arabicType] || null;
+}
+
+// ⭐ Deduct 1 from live balance for a given type
+function deductLiveBalance(arabicType) {
+    const field = mapOffDayTypeToBalanceField(arabicType);
+    if (!field) return;
+    const balances = loadLiveBalances();
+    if (balances[field] > 0) {
+        balances[field]--;
+    }
+    saveLiveBalances(balances);
+    updateBalancesDisplay();
+}
+
+// ⭐ Add 1 to live balance for a given type
+function addToLiveBalance(arabicType) {
+    const field = mapOffDayTypeToBalanceField(arabicType);
+    if (!field) return;
+    const balances = loadLiveBalances();
+    balances[field]++;
+    saveLiveBalances(balances);
+    updateBalancesDisplay();
 }
 
 // ⭐ Close Modal
@@ -22,13 +107,15 @@ function closeModal() {
     clearFlatpickrInModal('dateInputs');
     const modal = document.getElementById('editModal');
    
-
     modal.classList.add("hidden");
     
     document.getElementById('tableResponsive').classList.remove('hidden');
     document.getElementById("daysContainer").innerHTML = "";
     document.getElementById("daysContainer").classList.add("hidden");
     hideSaveButton();
+    
+    // Clear live balances
+    sessionStorage.removeItem("liveBalances");
 }
 
 function makeOffDay() {
@@ -55,6 +142,9 @@ function makeOffDay() {
     console.log(JSON.stringify(item) + "  💕after");
     highlightCard(dateValue, item.OffDayType);
     closeTypePopup();
+    
+    // 🆕 Update live balance: deduct 1 from the selected type
+    deductLiveBalance(item.OffDayType);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -114,6 +204,9 @@ async function loadDays() {
     console.log(`FROM: ${from} to: ${to}`)
     showSaveButton();
     renderDays(days, from, to);
+    
+    // Show balance section
+    document.getElementById("offdaysBalance").classList.remove("hidden");
 }
 
 
@@ -168,6 +261,9 @@ function renderDays(existingDays, from, to) {
             let item = daysArray.find(d => d.OffDayDate === iso);
             console.log(item + "🔴");
             if (item.isOffDay) {
+                // 🆕 Before removing, add back to balance
+                addToLiveBalance(item.OffDayType);
+                
                 item.isOffDay = false;
                 item.OffDayType = "";
                 saveDaysToSession(daysArray);
@@ -184,6 +280,9 @@ function renderDays(existingDays, from, to) {
             daysArray.push({ OffDayDate: iso, isOffDay: true, OffDayType: match["OffDayType"] });
             console.log(`type-${currentDate.toISOString().split("T")[0]}` + "⭐");
             highlightCard(iso, match["OffDayType"]);
+            
+            // 🆕 If existing offday was loaded from server, deduct from live balance
+            // We reload balance from server fresh anyway, so no double-deduct
         }
         else {
             daysArray.push({ OffDayDate: iso, isOffDay: false });
@@ -241,54 +340,88 @@ editModal.addEventListener('click', function (e) {
 
 
 document.getElementById("editBalancesBtn").addEventListener("click", function () {
+    // Enable all 9 balance inputs
     document.getElementById("annualBalance").removeAttribute("disabled");
     document.getElementById("casualBalance").removeAttribute("disabled");
-    document.getElementById("offBalance").removeAttribute("disabled");
-    document.getElementById("insteadBalance").removeAttribute("disabled");
+    document.getElementById("sickBalance").removeAttribute("disabled");
+    document.getElementById("hajjBalance").removeAttribute("disabled");
+    document.getElementById("maternityBalance").removeAttribute("disabled");
+    document.getElementById("unpaidBalance").removeAttribute("disabled");
+    document.getElementById("compensatoryBalance").removeAttribute("disabled");
+    document.getElementById("officialHolidayBalance").removeAttribute("disabled");
+    document.getElementById("examBalance").removeAttribute("disabled");
     hideDiv("editBalancesBtn");
     showDiv("saveBalancesBtn");
 });
 
 document.getElementById("saveBalancesBtn").addEventListener("click", function () {
+    // Disable all 9 balance inputs
     document.getElementById("annualBalance").setAttribute("disabled", "disabled");
     document.getElementById("casualBalance").setAttribute("disabled", "disabled");
-    document.getElementById("offBalance").setAttribute("disabled", "disabled");
-    document.getElementById("insteadBalance").setAttribute("disabled", "disabled");
+    document.getElementById("sickBalance").setAttribute("disabled", "disabled");
+    document.getElementById("hajjBalance").setAttribute("disabled", "disabled");
+    document.getElementById("maternityBalance").setAttribute("disabled", "disabled");
+    document.getElementById("unpaidBalance").setAttribute("disabled", "disabled");
+    document.getElementById("compensatoryBalance").setAttribute("disabled", "disabled");
+    document.getElementById("officialHolidayBalance").setAttribute("disabled", "disabled");
+    document.getElementById("examBalance").setAttribute("disabled", "disabled");
+    
     console.log("Saving balances...");
-    console.log(` EmployeeId: ${document.getElementById("empId").value},
-     Annual: ${document.getElementById("annualBalance").value},
-      Casual: ${document.getElementById("casualBalance").value},
-       Off: ${document.getElementById("offBalance").value},
-        Instead: ${document.getElementById("insteadBalance").value}`);
     let empIdInput = document.getElementById("empId");
     let annualBalanceInput = document.getElementById("annualBalance");
     let casualBalanceInput = document.getElementById("casualBalance");
-    let offBalanceInput = document.getElementById("offBalance");
-    let insteadBalanceInput = document.getElementById("insteadBalance");
+    let sickBalanceInput = document.getElementById("sickBalance");
+    let hajjBalanceInput = document.getElementById("hajjBalance");
+    let maternityBalanceInput = document.getElementById("maternityBalance");
+    let unpaidBalanceInput = document.getElementById("unpaidBalance");
+    let compensatoryBalanceInput = document.getElementById("compensatoryBalance");
+    let officialHolidayBalanceInput = document.getElementById("officialHolidayBalance");
+    let examBalanceInput = document.getElementById("examBalance");
+    
     fetch(`/offdays/balance/edit`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            EmployeeId: empIdInput.value,
-            Annual: parseInt(annualBalanceInput.value),
-            Casual: parseInt(casualBalanceInput.value),
-            Off: parseInt(offBalanceInput.value),
-            Instead: parseInt(insteadBalanceInput.value)
+            EmployeeId: parseInt(empIdInput.value),
+            Annual: parseInt(annualBalanceInput.value) || 0,
+            Casual: parseInt(casualBalanceInput.value) || 0,
+            Sick: parseInt(sickBalanceInput.value) || 0,
+            Hajj: parseInt(hajjBalanceInput.value) || 0,
+            Maternity: parseInt(maternityBalanceInput.value) || 0,
+            Unpaid: parseInt(unpaidBalanceInput.value) || 0,
+            Compensatory: parseInt(compensatoryBalanceInput.value) || 0,
+            OfficialHoliday: parseInt(officialHolidayBalanceInput.value) || 0,
+            Exam: parseInt(examBalanceInput.value) || 0
         })
     }).then(res => res.json()).then(data => {
-        if (data.success) {
-            console.log("Balances saved successfully");
-            annualBalanceInput.value = res.annualBalance;
-            casualBalanceInput.value = res.casualBalance;
-            offBalanceInput.value = res.offBalance;
-            insteadBalanceInput.value = res.insteadBalance;
-        } else {
-            console.log("حدث خطأ أثناء الحفظ ❌");
-        }
+        console.log("Balances saved successfully");
+        annualBalanceInput.value = data.annualBalance;
+        casualBalanceInput.value = data.casualBalance;
+        sickBalanceInput.value = data.sickBalance;
+        hajjBalanceInput.value = data.hajjBalance;
+        maternityBalanceInput.value = data.maternityBalance;
+        unpaidBalanceInput.value = data.unpaidBalance;
+        compensatoryBalanceInput.value = data.compensatoryBalance;
+        officialHolidayBalanceInput.value = data.officialHolidayBalance;
+        examBalanceInput.value = data.examBalance;
+        
+        // Update live balances from server response
+        sessionStorage.setItem("liveBalances", JSON.stringify({
+            annual: data.annualBalance || 0,
+            casual: data.casualBalance || 0,
+            sick: data.sickBalance || 0,
+            hajj: data.hajjBalance || 0,
+            maternity: data.maternityBalance || 0,
+            unpaid: data.unpaidBalance || 0,
+            compensatory: data.compensatoryBalance || 0,
+            officialHoliday: data.officialHolidayBalance || 0,
+            exam: data.examBalance || 0
+        }));
+    }).catch(err => {
+        console.log("حدث خطأ أثناء الحفظ ❌", err);
     });
     hideDiv("saveBalancesBtn");
     showDiv("editBalancesBtn");
 });
-

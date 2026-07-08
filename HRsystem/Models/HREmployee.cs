@@ -40,4 +40,8 @@ public class HREmployee
     public int? HRDepartmentId { get; set; }   // Foreign Key
     [JsonIgnore]
     public virtual HRDepartment? HRDepartment { get; set; }
+
+    // Payroll navigation
+    [JsonIgnore]
+    public virtual ICollection<EmployeeSalary>? EmployeeSalaries { get; set; }
 }
