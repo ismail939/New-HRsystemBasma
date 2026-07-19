@@ -11,17 +11,17 @@
 <!--Choose Employee -->
 <div class="w-full rounded-lg shadow-md flex items-center justify-start gap-3 m-2 p-2">
     <select name="employee" id="chooseEmployee"
-        class="w-1/4 bg-color1 rounded-lg p-2 border-2 border-color3 focus:outline-color2 focus:ring focus:ring-color2">
+        class="w-1/4 rounded-lg p-2 border-2 border-color3 focus:outline-color2 focus:ring focus:ring-color2">
         <option value="">اختر موظف</option>
     </select>
     <div class="flex flex-row gap-2 justify-center items-center rounded-lg  border-color3">
-        <label for="monthPicker">من</label>
+        <label for="monthPicker" class="text-color4 font-semibold">من</label>
         <input type="date" placeholder="البداية" id="startDatePicker" disabled
-            class="bg-color1 border-2 p-2 border-color3 rounded-lg">
+            class="!text-white bg-color1 border-2 p-2 border-color3 rounded-lg">
 
-        <label for="monthPicker">إلي</label>
+        <label for="monthPicker" class="text-color4 font-semibold">إلي</label>
         <input type="date" placeholder="النهاية" id="endDatePicker" disabled
-            class="bg-color1 border-2 p-2 border-color3 rounded-lg">
+            class="!text-white bg-color1 border-2 p-2 border-color3 rounded-lg">
     </div>
 
     <button id="dataShowBtn" class="col-button-dark" onclick="toggleData()">بيانات الموظف</button>
@@ -29,56 +29,56 @@
 <!--fetch request -->
 <div class="rounded-lg shadow-sm text-center hidden p-3 m-3  grid-cols-3" id="dataDiv">
     <div class="m-1 p-1 rounded-sm">
-        <label for="">اسم الموظف:</label>
-        <span id="empInfoName" class="text-color3">حماده عبد الرحمن توفيق</span>
+        <label for="" class="text-color4 font-semibold">اسم الموظف:</label>
+        <span id="empInfoName" class="!text-white font-semibold">حماده عبد الرحمن توفيق</span>
     </div>
     <div class="m-1 p-1 rounded-sm">
-        <label for="">الرقم القومي:</label>
-        <span id="empInfoNationalId" class="text-color3">30012030102897</span>
+        <label for="" class="text-color4 font-semibold">الرقم القومي:</label>
+        <span id="empInfoNationalId" class="!text-white font-semibold">30012030102897</span>
     </div>
     <div class="m-1 p-1 rounded-sm">
-        <label for="">رقم التليفون:</label>
-        <span id="empInfoPhoneNumber" class="text-color3">01017645736</span>
+        <label for="" class="text-color4 font-semibold">رقم التليفون:</label>
+        <span id="empInfoPhoneNumber" class="!text-white font-semibold">01017645736</span>
     </div>
     <div class="m-1 p-1 rounded-sm">
-        <label for="">العنوان:</label>
-        <span id="empInfoAddress" class="text-color3">القاهرة</span>
+        <label for="" class="text-color4 font-semibold">العنوان:</label>
+        <span id="empInfoAddress" class="!text-white font-semibold">القاهرة</span>
     </div>
     <div class="m-1 p-1 rounded-sm">
-        <label for="">تاريخ الميلاد:</label>
-        <span id="empInfoBirthDate" class="text-color3">2000-12-03</span>
+        <label for="" class="text-color4 font-semibold">تاريخ الميلاد:</label>
+        <span id="empInfoBirthDate" class="!text-white font-semibold">2000-12-03</span>
     </div>
     <div class="m-1 p-1 rounded-sm">
-        <label for="">الديانة:</label>
-        <span id="empInfoReligion" class="text-color3">مسلم</span>
+        <label for="" class="text-color4 font-semibold">الديانة:</label>
+        <span id="empInfoReligion" class="!text-white font-semibold">مسلم</span>
     </div>
     <div class="m-1 p-1 rounded-sm">
-        <label for="">الحالة الاجتماعية:</label>
-        <span id="empInfoSocialStatus" class="text-color3">متزوج</span>
+        <label for="" class="text-color4 font-semibold">الحالة الاجتماعية:</label>
+        <span id="empInfoSocialStatus" class="!text-white font-semibold">متزوج</span>
     </div>
     <div class="m-1 p-1 rounded-sm">
-        <label for="">رقم التأمين:</label>
-        <span id="empInfoInsuranceNumber" class="text-color3">8383899</span>
+        <label for="" class="text-color4 font-semibold">رقم التأمين:</label>
+        <span id="empInfoInsuranceNumber" class="!text-white font-semibold">8383899</span>
     </div>
     <div class="m-1 p-1 rounded-sm">
-        <label for="">تاريخ التعيين:</label>
-        <span id="empInfoHireDate" class="text-color3">2024-11-03</span>
+        <label for="" class="text-color4 font-semibold">تاريخ التعيين:</label>
+        <span id="empInfoHireDate" class="!text-white font-semibold">2024-11-03</span>
     </div>
     <div class="m-1 p-1 rounded-sm">
-        <label for="">تاريخ الانتهاء:</label>
-        <span id="empInfoEndDate" class="text-color3"></span>
+        <label for="" class="text-color4 font-semibold">تاريخ الانتهاء:</label>
+        <span id="empInfoEndDate" class="!text-white font-semibold"></span>
     </div>
     <div class="m-1 p-1 rounded-sm">
-        <label for="">القسم:</label>
-        <span id="empInfoDepartment" class="text-color3">الصيانة</span>
+        <label for="" class="text-color4 font-semibold">القسم:</label>
+        <span id="empInfoDepartment" class="!text-white font-semibold">الصيانة</span>
     </div>
     <div class="m-1 p-1 rounded-sm">
-        <label for="">المسمي الوظيفي:</label>
-        <span id="empInfoJobName" class="text-color3">كهربائي</span>
+        <label for="" class="text-color4 font-semibold">المسمي الوظيفي:</label>
+        <span id="empInfoJobName" class="!text-white font-semibold">كهربائي</span>
     </div>
     <div class="m-1 p-1 rounded-sm">
-        <label for="">نوع العقد:</label>
-        <span id="empInfoContractType" class="text-color3">direct</span>
+        <label for="" class="text-color4 font-semibold">نوع العقد:</label>
+        <span id="empInfoContractType" class="!text-white font-semibold">direct</span>
     </div>
 </div>
 

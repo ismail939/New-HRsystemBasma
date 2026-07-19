@@ -1,3 +1,13 @@
+HR-Beloved Project:
+    ☐ Light, Dark color schemes with the ability to add more. today
+    ☐ Fake data then ensure payroll, basma, offdays, reports and everything works well. today
+    ☐ Validation and Error Handling and security.
+    ☐ Responsiveness on pc and tablet.
+    ☐ Dockerize all of that.
+
+ctrl enter new task
+alt d done
+alt c cancel
 npx tailwindcss -i ./wwwroot/css/site.css -o ./wwwroot/css/output.css --watch
 
 <button

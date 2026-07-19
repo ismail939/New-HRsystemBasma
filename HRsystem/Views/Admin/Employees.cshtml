@@ -1,67 +1,73 @@
 @model List<HRsystem.ViewModels.EmployeeViewModel>
 
-<div id="tableResponsive" class="tableContainer ">
-    @if (Model.Count == 0)
-    {
-        <div id="noDataDiv" class="text-center shadow-lg p-4 m-2 text-[40px]">لا يوجد موظفين</div>
-    }
-    else
-    {
-        <table class="table-base min-w-full border-separate border-spacing-0" id="employeesTable">
-            <thead class="table-dark listEmpTableThead col-table-header sticky top-0 z-10">
-                <tr>
-                    <th>الاسم</th>
-                    <th>الرقم القومي</th>
-                    <th>رقم الهاتف</th>
-                    <th>الحالة الاجتماعية</th>
-                    <th>الديانة</th>
-                    <th>تاريخ الميلاد</th>
-                    <th>رقم التأمين</th>
-                    <th>تاريخ التعيين</th>
-                    <th>تاريخ الانتهاء</th>
-                    <th>القسم</th>
-                    <th>المسمى الوظيفي</th>
-                    <th>نوع العقد</th>
-                    <th>حذف الموظف</th>
-                </tr>
-            </thead>
-            <tbody id="employeesBody" class="listEmpTableTbody mt-3">
-                @foreach (var employee in Model)
-                {
-                    <tr id="row-@employee.Id" class="snap-start">
-                        <td>@employee.Name</td>
-                        <td>@employee.NationalId</td>
-                        <td>@employee.PhoneNumber</td>
-                        <td>@employee.MarriageStatus</td>
-                        <td>@employee.Religion</td>
-                        <td>@employee.DateOfBirth.ToString("yyyy-MM-dd")</td>
-                        <td>@employee.InsuranceNumber</td>
-                        <td>@employee.HireDate.ToString("yyyy-MM-dd")</td>
-                        <td>@employee.EndDate?.ToString("yyyy-MM-dd")
-                        </td>
-                        <td>@employee.Department</td>
-                        <td>@employee.JobName</td>
-                        <td>@employee.ContractType</td>
-                        <td>
-                            <!-- Button to open modal -->
-                            <button onclick="openDeleteEmpModal(@employee.Id)" class="col-button-dark text-[19px] rounded"
-                                    index="@employee.Id">
-                                حذف
-                            </button>
-                        </td>
-                    </tr>
-                }
+<h2 class="fs-3 text-center p-4 m-2 text-color3 shadow-lg">إدارة الموظفين</h2>
 
-            </tbody>
-        </table>
-    }
-
+<div class="flex flex-col w-full">
+    <div class="mx-4">
+        <a href="/employees" class="col-button-dark px-4 py-2 rounded inline-block">
+            <i class="bi bi-arrow-right me-1"></i> الذهاب لإدارة الموظفين
+        </a>
+    </div>
+    <div class="mt-4 mx-4">
+        <div id="tableResponsive" class="tableContainer">
+            @if (Model.Count == 0)
+            {
+                <div id="noDataDiv" class="text-center shadow-lg p-4 m-2 text-[40px]">لا يوجد موظفين</div>
+            }
+            else
+            {
+                <table class="table-base min-w-full border-separate border-spacing-0" id="employeesTable">
+                    <thead class="table-dark listEmpTableThead col-table-header sticky top-0 z-10">
+                        <tr>
+                            <th>الاسم</th>
+                            <th>الرقم القومي</th>
+                            <th>رقم الهاتف</th>
+                            <th>الحالة الاجتماعية</th>
+                            <th>الديانة</th>
+                            <th>تاريخ الميلاد</th>
+                            <th>رقم التأمين</th>
+                            <th>تاريخ التعيين</th>
+                            <th>تاريخ الانتهاء</th>
+                            <th>القسم</th>
+                            <th>المسمى الوظيفي</th>
+                            <th>نوع العقد</th>
+                            <th>حذف الموظف</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeesBody" class="listEmpTableTbody mt-3">
+                        @foreach (var employee in Model)
+                        {
+                            <tr id="row-@employee.Id" class="snap-start">
+                                <td>@employee.Name</td>
+                                <td>@employee.NationalId</td>
+                                <td>@employee.PhoneNumber</td>
+                                <td>@employee.MarriageStatus</td>
+                                <td>@employee.Religion</td>
+                                <td>@employee.DateOfBirth.ToString("yyyy-MM-dd")</td>
+                                <td>@employee.InsuranceNumber</td>
+                                <td>@employee.HireDate.ToString("yyyy-MM-dd")</td>
+                                <td>@employee.EndDate?.ToString("yyyy-MM-dd")
+                                </td>
+                                <td>@employee.Department</td>
+                                <td>@employee.JobName</td>
+                                <td>@employee.ContractType</td>
+                                <td>
+                                    <button onclick="openDeleteEmpModal(@employee.Id)" class="col-button-dark text-[19px] rounded"
+                                            index="@employee.Id">
+                                        حذف
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
 </div>
 
 <!-- SMALL DROPDOWN POPUP -->
-<div id="deleteEmpModal" class="hidden fixed inset-0 bg-black/30  z-50
-    items-center justify-center">
-
+<div id="deleteEmpModal" class="hidden fixed inset-0 bg-black/30  z-50 items-center justify-center">
     <div id="" class="col-modal relative p-6 rounded-2xl shadow-xl !h-1/4 !w-1/2 text-center">
         <button onclick="closeDeleteEmpModal()" class="absolute top-3 left-3 text-[25px]">
             <i class="bi bi-x-square-fill"></i>
@@ -72,15 +78,12 @@
             <button type="button" onclick="deleteEmp()" class="py-2 px-4 rounded-lg col-button-dark">
                 تأكيد الحذف
             </button>
-            <button type="button" onclick="closeDeleteEmpModal()"   class="py-2 px-4 rounded-lg col-button-light">
+            <button type="button" onclick="closeDeleteEmpModal()" class="py-2 px-4 rounded-lg col-button-light">
                 إلغاء
             </button>
         </div>
     </div>
 </div>
-
-
-
 
 @section Scripts {
     <script>

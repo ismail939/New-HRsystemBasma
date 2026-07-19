@@ -15,9 +15,34 @@
     <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.css" />
     <link href="~/css/output.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/HRsystem.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/themes.css" asp-append-version="true" />
     <link rel="icon" href="~/images/logo2.png" sizes="96x96" type="image/png">
     </head>
 
+    <script>
+        (function () {
+            var STORAGE_KEY = 'hr-theme';
+            var DEFAULT_THEME = 'light';
+
+            function getSystemTheme() {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    return 'dark';
+                }
+                return DEFAULT_THEME;
+            }
+
+            function getStoredTheme() {
+                try {
+                    var stored = localStorage.getItem(STORAGE_KEY);
+                    if (stored === 'light' || stored === 'dark') return stored;
+                } catch (e) { }
+                return getSystemTheme();
+            }
+
+            var theme = getStoredTheme();
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
     <body id="" class="h-full w-full min-h-screen bg-color1">
 
 
@@ -29,15 +54,13 @@
                 <div class="w-full flex flex-row items-center justify-start h-full">
 
                     <!-- Logo -->
-                    <div class="flex items-center border-l-2 border-white h-full p-2">
+                    <div class="flex items-center border-l-2 border-white h-full pl-16 me-4 shrink-0">
                         <img src="/images/logo2.png" class="w-12 h-12" />                        
                         <span class="font-bold px-2 whitespace-nowrap">الموارد البشرية</span>
                     </div>
 
                     <!-- Desktop Menu -->
-                    <ul class="hidden min-[1450px]:flex flex-row gap-1 w-4/6 mx-4 h-full">
-                        @* <li><a href="/dashboard" class="nav-link  @(currentController == "Home" ? "active" : "")">تقرير
-                            اليوم</a></li> *@
+                    <ul class="hidden min-[1100px]:flex flex-row gap-1 flex-1 mx-4 h-full">
                             <li><a href="/employees"
                                        class="nav-link  @(currentController == "Employee" ? "active" : "")">الموظفين</a></li>
                                 <li><a href="/basma" class="nav-link  @(currentController == "Basma" ? "active" : "")">البصمة</a>
@@ -48,20 +71,26 @@
                                            class="nav-link  @(currentController == "Penalty" ? "active" : "")">الجزاءات</a></li>
                                     <li><a href="/payroll/salary-components"
                                                class="nav-link  @(currentController == "Payroll" ? "active" : "")">الرواتب</a></li>
-                                    <li><a href="/reports"
-                                               class="nav-link  @(currentController == "Report" ? "active" : "")">التقارير</a></li>
-                                        @if (User.IsInRole("HR") || User.IsInRole("Admin"))
-                                        {
-                                            <li><a href="/requests/pending" class="nav-link @(currentController == "Request" ? "active" : "")">الطلبات</a></li>
-                                        }
-                                        @if (User.IsInRole("Admin"))
-                                        {
-                                            <li><a href="/admin/dashboard" class="nav-link">الادمن</a></li>
-                                        }
+                                    <li class="relative" id="moreDropdown">
+                                        <a href="javascript:void(0)" onclick="toggleDropdown()" class="nav-link flex items-center gap-1">
+                                            المزيد <i id="moreArrow" class="bi bi-chevron-down text-[12px]"></i>
+                                        </a>
+                                        <div id="moreMenu" class="absolute top-full right-0 mt-0 bg-color2 rounded-b-lg shadow-xl z-50 min-w-[160px] hidden">
+                                            <a href="/reports" class="block !text-white px-6 py-3 hover:bg-color3 transition-colors text-right rounded-t-lg @(currentController == "Report" ? "bg-color3" : "")">التقارير</a>
+                                            @if (User.IsInRole("HR") || User.IsInRole("Admin"))
+                                            {
+                                                <a href="/requests/pending" class="block !text-white px-6 py-3 hover:bg-color3 transition-colors text-right @(currentController == "Request" ? "bg-color3" : "")">الطلبات</a>
+                                            }
+                                            @if (User.IsInRole("Admin"))
+                                            {
+                                                <a href="/admin/dashboard" class="block !text-white px-6 py-3 hover:bg-color3 transition-colors text-right rounded-b-lg">الإدارة</a>
+                                            }
+                                        </div>
+                                    </li>
                                     </ul>
 
                                     <!-- Right Side Info -->
-                                    <div class="hidden min-[1450px]:flex items-center gap-2 me-4">
+                                    <div class="hidden min-[1100px]:flex items-center gap-2 ms-auto me-4">
                                         <!-- Notification Bell -->
                                         @if (User.Identity?.IsAuthenticated == true)
                                         {
@@ -76,6 +105,13 @@
                                             }
                                         </div>
 
+                                        @if (User.Identity?.IsAuthenticated == true)
+                                        {
+                                            <button id="themeToggle" class="ms-2 text-xl px-2 py-1 rounded-lg border border-white/30 hover:bg-white/10 transition" title="تبديل المظهر">
+                                                <i id="themeIcon" class="bi bi-brightness-high-fill"></i>
+                                            </button>
+                                        }
+
                                         <form method="post" action="/logout" class="ms-1">
                                             @Html.AntiForgeryToken()
                                             <button class="col-button-dark px-3 py-1.5 text-[12px] whitespace-nowrap">
@@ -86,7 +122,7 @@
                                     </div>
 
                                     <!-- Hamburger Button -->
-                                    <button onclick="toggleMenu()" class="min-[1450px]:hidden text-2xl me-2 ms-auto">
+                                    <button onclick="toggleMenu()" class="min-[1100px]:hidden block text-2xl me-2 ms-auto">
                                         ☰
                                     </button>
 
@@ -173,15 +209,46 @@
 
                                                 document.body.classList.toggle("overflow-hidden"); // 🔥 important
                                         }
+
+                                        function toggleDropdown() {
+                                            const menu = document.getElementById("moreMenu");
+                                            const arrow = document.getElementById("moreArrow");
+                                            const isOpen = !menu.classList.contains("hidden");
+                                            menu.classList.toggle("hidden");
+                                            if (arrow) {
+                                                arrow.style.transform = isOpen ? "rotate(0deg)" : "rotate(180deg)";
+                                            }
+                                        }
+
+                                        document.addEventListener("click", function(e) {
+                                            const dropdown = document.getElementById("moreDropdown");
+                                            const menu = document.getElementById("moreMenu");
+                                            if (dropdown && menu && !dropdown.contains(e.target)) {
+                                                menu.classList.add("hidden");
+                                                const arrow = document.getElementById("moreArrow");
+                                                if (arrow) arrow.style.transform = "rotate(0deg)";
+                                            }
+                                        });
                         </script>
                         <script src="~/lib/jquery/dist/jquery.min.js"></script>
                         <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+                        <script src="~/js/theme.js" asp-append-version="true"></script>
                         <script src="~/js/site.js" asp-append-version="true"></script>
                         <link href="~/lib/flatpickr/dist/flatpickr.min.css" rel="stylesheet" />
                         <script src="~/lib/flatpickr/dist/flatpickr.min.js"></script>
                         <script src="~/lib/flatpickr/dist/l10n/ar.js"></script>
                         <script src="~/lib/alpinejs/dist/cdn.min.js" defer></script>
-
+                        <script src="~/js/apply-select-styles.js" asp-append-version="true"></script>
+                        <script>
+                            (function () {
+                                const btn = document.getElementById("themeToggle");
+                                if (btn) {
+                                    btn.addEventListener("click", function () {
+                                        window.HRTheme.toggle();
+                                    });
+                                }
+                            })();
+                        </script>
                         @await RenderSectionAsync("Scripts", required: false)
                     </body>
 

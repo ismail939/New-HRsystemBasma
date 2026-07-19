@@ -10,7 +10,7 @@
         <div class="space-y-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700">الشهر</label>
-                <select id="monthSelect" class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]">
+                <select id="monthSelect" class="mt-1 w-full border border-color3 rounded p-2 focus:outline-none focus:ring focus:ring-color3">
                     @foreach (var m in ViewBag.Months)
                     {
                         <option value="@m.Value">@m.Text</option>
@@ -19,7 +19,7 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700">السنة</label>
-                <select id="yearSelect" class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]">
+                <select id="yearSelect" class="mt-1 w-full border border-color3 rounded p-2 focus:outline-none focus:ring focus:ring-color3">
                     @foreach (var y in ViewBag.Years)
                     {
                         <option value="@y">@y</option>

@@ -22,8 +22,6 @@
 
 
 
-
-
 .img-wrapper {
   position: relative;
   display: inline-block;
@@ -71,7 +69,7 @@
 
 .upload-label {
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary, #333);
 }
 
 .upload-input {
@@ -82,8 +80,8 @@
   max-width: 280px;
   @apply border-2 border-dashed border-color3 !important;
   border-radius: 8px;
-  background-color: #f9fafb;
-  color: #555;
+  background-color: var(--bg-primary, #f9fafb);
+  color: var(--text-secondary, #555);
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -91,7 +89,7 @@
 /* When hovering */
 .upload-input:hover {
   @apply border-color3 !important;
-  background-color: #eff6ff;
+  background-color: var(--bg-primary, #eff6ff);
 }
 
 /* When a file is selected */
@@ -100,8 +98,6 @@
   @apply border-color3 !important;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
 }
-
-
 
 
 
@@ -156,8 +152,26 @@
   @apply text-color3 !important;
 }
 
-.col-modal input {
-  background-color: #fffffffc !important;
+.col-modal input,
+.col-modal select {
+  background-color: var(--select-bg) !important;
+  color: var(--input-text);
+  border: 1px solid var(--color3);
+}
+
+select {
+  background-color: var(--select-bg) !important;
+  color: var(--input-text) !important;
+  border-color: var(--color3) !important;
+}
+
+select.bg-white,
+select.bg-color1,
+select.bg-color2,
+select[class*="bg-white"],
+select[class*="bg-color1"] {
+  background-color: var(--select-bg) !important;
+  color: var(--input-text) !important;
 }
 
 .col-button-dark {
@@ -175,6 +189,15 @@
 
 .col-button-light:hover {
   @apply bg-color4 shadow-lg border-color3 !important;
+  transform: scale(1.02);
+}
+
+.col-button-darker {
+  @apply bg-color6 text-white font-bold py-1 px-2 rounded transition-all duration-100 text-center border border-transparent !important;
+}
+
+.col-button-darker:hover {
+  @apply bg-color4 shadow-sm border-color3 !important;
   transform: scale(1.02);
 }
 
@@ -213,7 +236,9 @@
 }
 
 .table-base th {
-  @apply bg-gray-100 text-gray-700 border;
+  background-color: var(--table-header-bg);
+  color: var(--table-header-text);
+  border: 1px solid var(--table-border);
   white-space: normal;
   text-align: center;
   vertical-align: middle;
@@ -225,12 +250,39 @@
   text-wrap: nowrap;
 }
 
+[data-theme="dark"] .table-base td {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .bg-color1.text-color5 {
+  color: #ffffff !important;
+}
+
+#themeIcon {
+  font-size: 1.4rem;
+  transition: color 0.3s ease;
+}
+
+[data-theme="light"] #themeIcon {
+  color: #ffd700;
+}
+
+[data-theme="dark"] #themeIcon {
+  color: #c9d946;
+}
+
 .table-base tr:hover {
-  @apply bg-gray-50;
+  background-color: var(--table-row-hover) !important;
 }
 
 .table-base tbody tr {
-  @apply odd:bg-white even:bg-[#dae0d7eb] hover:bg-color4 transition;
+  transition: background-color 0.2s ease;
+}
+.table-base tbody tr:nth-child(odd) {
+  background-color: var(--table-row-odd);
+}
+.table-base tbody tr:nth-child(even) {
+  background-color: var(--table-row-even);
 }
 
 .nav-link {
@@ -248,6 +300,10 @@
   @apply bg-color3;
   /* keep it elegant white */
   transition: width 0.5s ease-in-out 0.15s;
+}
+
+[data-theme="dark"] .nav-link::after {
+  @apply bg-white;
 }
 
 /* Hover effect */
@@ -276,17 +332,17 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #e5e7eb;
+  background: var(--scrollbar-track);
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #6C8480;
+  background: var(--scrollbar-thumb);
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #404E3B;
+  background: var(--color3);
 }
 
 input[type="date"] {
@@ -309,9 +365,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .flatpickr-day.selected,
 .flatpickr-day.selected:hover,
 .flatpickr-day.selected:focus {
-  background: #7B9669 !important;
+  background: var(--color2, #7B9669) !important;
   /* your custom color */
-  border-color: #7B9669 !important;
+  border-color: var(--color2, #7B9669) !important;
   color: #fff !important;
   /* text color */
 }
@@ -375,6 +431,8 @@ select.numInputWrapper {
   border-radius: 4px;
   font-size: 14px;
   font-family: inherit;
+  background-color: var(--select-bg) !important;
+  color: var(--input-text);
 }
 
 .flatpickr-year-select:focus {
@@ -419,11 +477,36 @@ html[lang="ar"],
 }
 
 .reportCard {
-  @apply p-5 my-2 text-lg border-2 border-transparent text-color3 shadow-sm bg-white rounded-lg transition-all duration-150 !important;
+  background-color: var(--reportcard-bg, var(--card-bg)) !important;
+  border: 2px solid var(--reportcard-border, var(--card-border)) !important;
+  color: var(--reportcard-text, var(--text-primary)) !important;
+  padding: 1.25rem;
+  margin: 0.5rem 0;
+  font-size: 1.125rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 0.5rem;
+  transition: all 0.15s ease;
+}
+
+/* Light mode - use light colors */
+[data-theme="light"] .reportCard,
+[data-theme="light"] a.reportCard {
+  background-color: #e8f0e3 !important;
+  color: #404E3B !important;
+  border-color: #c5d1bb !important;
+}
+
+/* Dark mode - use dark colors */
+[data-theme="dark"] .reportCard,
+[data-theme="dark"] a.reportCard {
+  background-color: #1a2419 !important;
+  color: #ffffff !important;
+  border-color: #2a3a2e !important;
 }
 
 .reportCard:hover {
-  @apply bg-opacity-80  border-color3 !important;
+  filter: brightness(1.1);
+  border-color: var(--reportcard-border, var(--card-border)) !important;
   transform: scale(1);
 }
 
@@ -473,8 +556,8 @@ th {
 .spinner {
   width: 60px;
   height: 60px;
-  border: 8px solid #eee;
-  border-top: 8px solid #7B9669;
+  border: 8px solid var(--spinner-track);
+  border-top: 8px solid var(--spinner-top);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -491,7 +574,7 @@ th {
 
 
 .tabs-container {
-  background: #c9d6be;
+  background: var(--color1, #c9d6be);
   border-radius: 14px;
   padding: 16px;
 }
@@ -499,7 +582,7 @@ th {
 .tabs {
   display: flex;
   gap: 8px;
-  background: #b6c4a4;
+  background: var(--color2, #b6c4a4);
   padding: 6px;
   border-radius: 12px;
 }
@@ -511,7 +594,7 @@ th {
   background: transparent;
   border: none;
   font-weight: 600;
-  color: #2f3e2f;
+  color: var(--text-primary, #2f3e2f);
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -528,7 +611,7 @@ th {
 
 .tab-content {
   margin-top: 16px;
-  background: #eef3e8;
+  background: var(--color1, #eef3e8);
   border-radius: 12px;
   padding: 16px;
 }
@@ -536,12 +619,13 @@ th {
 
 
 .stat-card {
-  background: #cdddc3;
+  background: var(--card-bg, #cdddc3);
   border-radius: 16px;
   padding: 5px;
   text-align: center;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border: 1px solid var(--card-border, transparent);
 }
 
 
@@ -554,12 +638,12 @@ th {
 .stat-value {
   font-size: 34px;
   font-weight: bold;
-  color: #3f5f3c;
+  color: var(--text-primary, #3f5f3c);
 }
 
 .stat-label {
   font-size: 14px;
-  color: #425c45;
+  color: var(--text-secondary, #425c45);
   margin-top: 4px;
 }
 
@@ -579,7 +663,7 @@ table tr input,
 
 table tr textarea {
   background-color: inherit;
-  border: 1px solid #999;
+  border: 1px solid var(--border, #999);
 }
 
 .shiftCard{
@@ -589,4 +673,47 @@ table tr textarea {
 input[type="time"] {
     direction: ltr !important;
     text-align: "left" !important;
+}
+
+/* Default input borders to use theme variable */
+input, select, textarea {
+  border-color: var(--input-border) !important;
+}
+
+/* Upload container backgrounds - must beat output.css */
+.upload-container,
+.upload-container + div,
+div[class*="upload-container"],
+.bg-gray-200:has(.upload-container),
+.bg-gray-200:has(input[type="file"]),
+div.bg-gray-200,
+div[class*="bg-gray-200"] {
+  background-color: #ffffff !important;
+}
+
+[data-theme="dark"] .upload-container,
+[data-theme="dark"] .upload-container + div,
+[data-theme="dark"] div[class*="upload-container"],
+[data-theme="dark"] .bg-gray-200:has(.upload-container),
+[data-theme="dark"] .bg-gray-200:has(input[type="file"]),
+[data-theme="dark"] div.bg-gray-200,
+[data-theme="dark"] div[class*="bg-gray-200"] {
+  background-color: #252e26 !important;
+}
+
+/* Tab active border in dark mode - must override inline border-[#404E3B] */
+[data-theme="dark"] #tab-info.active,
+[data-theme="dark"] #tab-files.active {
+  border-bottom-color: #1f2a1d !important;
+  border-color: #1f2a1d !important;
+}
+
+/* Reports panel cards - override bg-white in dark mode */
+[data-theme="dark"] .gap-5 > a {
+  background-color: #1a2419 !important;
+  border-color: #2a3a2e !important;
+}
+
+[data-theme="dark"] .gap-5 > a span {
+  color: #e5efe0 !important;
 }

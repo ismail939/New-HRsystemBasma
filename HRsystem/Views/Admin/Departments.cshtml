@@ -1,52 +1,53 @@
 @model IEnumerable<DepartmentViewModel>
+
 <h2 class="fs-3 text-center p-4 m-2 text-color3 shadow-lg">إدارة الأقسام</h2>
 
 <div class="flex flex-col w-full">
-    <a href="/createDepartment" class="col-button-dark m-2 w-1/6">
-        اضافة قسم
-    </a>
-    <div id="tableResponsive" class="tableContainer">
-        @if (Model.Count() == 0)
-        {
-            <div class="shadow-lg w-full my-3 h-1/2 flex justify-center items-center">
-                لا يوجد اقسام
-            </div>
-        }
-        else
-        {
-            <table class="table-base min-w-full border-separate border-spacing-0" id="departmentsTable">
-                <thead class="table-dark listEmpTableThead col-table-header sticky top-0 z-10">
-                    <tr>
-                        <th>الاسم</th>
-                        <th>الكود</th>
-                        <th>القسم العام</th>
-                        <th>مدير القسم</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody id="employeesBody" class="listEmpTableTbody mt-3">
-                    @foreach (var department in Model)
-                    {
-                        <tr id="row-@department.Id" class="snap-start">
-                            <td>@department.Name</td>
-                            <td>@department.Code</td>
-                            <td>@department.ParentDepartmentName</td>
-                            <td>@department.ManagerName</td>
-                            <td>
-                                <!-- Button to open modal -->
-                                <button onclick="openModal(@department.Id)" class="col-button-dark  text-[19px] rounded">
-                                    تعديل
-                                </button>
-                            </td>
-                        </tr>
-                    }
-
-                </tbody>
-            </table>
-        }
-
+    <div class="mx-4">
+        <a href="/createDepartment" class="col-button-dark px-4 py-2 rounded inline-block">
+            اضافة قسم
+        </a>
     </div>
-
+    <div class="mt-4 mx-4">
+        <div id="tableResponsive" class="tableContainer">
+            @if (Model.Count() == 0)
+            {
+                <div class="shadow-lg w-full my-3 h-1/2 flex justify-center items-center">
+                    لا يوجد اقسام
+                </div>
+            }
+            else
+            {
+                <table class="table-base min-w-full border-separate border-spacing-0" id="departmentsTable">
+                    <thead class="table-dark listEmpTableThead col-table-header sticky top-0 z-10">
+                        <tr>
+                            <th>الاسم</th>
+                            <th>الكود</th>
+                            <th>القسم العام</th>
+                            <th>مدير القسم</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeesBody" class="listEmpTableTbody mt-3">
+                        @foreach (var department in Model)
+                        {
+                            <tr id="row-@department.Id" class="snap-start">
+                                <td>@department.Name</td>
+                                <td>@department.Code</td>
+                                <td>@department.ParentDepartmentName</td>
+                                <td>@department.ManagerName</td>
+                                <td>
+                                    <button onclick="openModal(@department.Id)" class="col-button-dark  text-[19px] rounded">
+                                        تعديل
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
 </div>
 
 
@@ -86,7 +87,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700">القسم العام</label>
                     <select id="departmentIdSelect" name="parentDepartmentId"
-                            class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]">
+                            class="mt-1 w-full border border-color3 rounded p-2 focus:outline-none focus:ring focus:ring-color3">
 
                     </select>
                 </div>
@@ -94,11 +95,9 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700">مدير القسم</label>
                     <select name="managerId" id="managerIdSelect"
-                            class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]">
+                            class="mt-1 w-full border border-color3 rounded p-2 focus:outline-none focus:ring focus:ring-color3">
                     </select>
                 </div>
-
-
 
                 <!-- Submit Button -->
                 <div class="col-span-3 text-center mt-4">

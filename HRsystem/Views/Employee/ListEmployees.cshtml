@@ -15,7 +15,7 @@
                class="cursor-pointer flex items-center justify-center mx-1 col-button-dark px-4 py-2 rounded">
             الأقسام
         </a>
-        <select id="departmentFilter" class="mx-1 bg-white px-4 py-2 rounded">
+        <select id="departmentFilter" class="mx-1 px-4 py-2 rounded">
             <option value="">تصفية حسب القسم</option>
             @foreach (var dept in Model.Departments)
             {
@@ -119,7 +119,7 @@
                         </td> *@
                         <td>
                             <!-- Button to open modal -->
-                            <button class="col-button-light  text-[11px] rounded"
+                            <button class="col-button-darker  text-[11px] rounded"
                                     onclick="openRateModal('@employee.Name', @employee.Id)" index="@employee.Id">
                                 تقييم
                             </button>
@@ -186,7 +186,7 @@
                         <input dir="ltr" type="time" id="shiftEndTime" placeholder="وقت النهاية"
                                class="bg-color1 border-2 text-center border-color3 rounded-lg">
                         <input type="number" placeholder="عدد الساعات" id="shiftHours" class="hidden bg-color1 border-2 text-center border-color3 rounded-lg">
-                        <select id="shiftType" class="bg-color1 border-2 text-center border-color3 rounded-lg">
+                        <select id="shiftType" class="border-2 text-center border-color3 rounded-lg">
                             <option value="">نوع الشفت</option>
                             <option value="0">متغير</option>
                             <option value="2">ثابت</option>

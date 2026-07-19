@@ -1,0 +1,171 @@
+/* Theme Variables */
+:root,
+[data-theme="light"] {
+  --color1: #BAC8B1;
+  --color2: #7B9669;
+  --color3: #404E3B;
+  --color4: #c0c258;
+  --color5: #6C8480;
+  --color6: #1f2a1d;
+
+  /* Semantic tokens */
+  --bg-primary: #BAC8B1;
+  --bg-secondary: #7B9669;
+  --text-primary: #404E3B;
+  --text-secondary: #6C8480;
+  --accent: #c0c258;
+  --border: #6C8480;
+
+  /* Dropdown */
+  --dropdown-bg: #ffffff;
+  --dropdown-header-bg-start: #f8faf8;
+  --dropdown-header-bg-end: #ffffff;
+  --dropdown-text-primary: #404E3B;
+  --dropdown-text-secondary: #6C8480;
+  --dropdown-hover-bg: #f3f4f6;
+  --dropdown-unread-bg: rgba(123, 150, 105, 0.08);
+
+  /* Table */
+  --table-header-bg: #f3f4f6;
+  --table-header-text: #374151;
+  --table-row-hover: #fef9c3;
+  --table-row-odd: #ffffff;
+  --table-row-even: #dae0d7;
+  --table-border: #e5e7eb;
+
+  /* Card */
+  --card-bg: #ffffff;
+  --card-hover-bg: #f9fafb;
+  --card-border: #e5e7eb;
+
+  /* Report Card - Light Mode */
+  --reportcard-bg: #f0f4ec;
+  --reportcard-text: #404E3B;
+  --reportcard-border: #d0d8c8;
+
+  /* Input */
+  --input-bg: #ffffff;
+  --input-border: #7B9669;
+  --input-text: #111827;
+  --input-placeholder: #6b7280;
+  --input-focus-ring: rgba(59, 130, 246, 0.3);
+
+  /* Default input border color */
+  input, select, textarea {
+    border-color: var(--input-border) !important;
+  }
+
+  /* Upload area backgrounds - light mode only */
+  [data-theme="light"] .upload-container,
+  [data-theme="light"] .upload-container + div,
+  [data-theme="light"] div[class*="upload-container"],
+  [data-theme="light"] .bg-gray-200:has(.upload-container),
+  [data-theme="light"] .bg-gray-200:has(input[type="file"]) {
+    background-color: #ffffff !important;
+  }
+
+  /* Scrollbar */
+  --scrollbar-track: #f1f1f1;
+  --scrollbar-thumb: #888;
+
+  /* Misc */
+  --badge-bg: #dc2626;
+  --badge-text: #ffffff;
+  --select-bg: #ffffff;
+  --select-arrow: #374151;
+  --spinner-track: #eee;
+  --spinner-top: #7B9669;
+}
+
+[data-theme="dark"] {
+  --color1: #2a3530;
+  --color2: #1f2a1d;
+  --color3: #8fa583;
+  --color4: #c0c258;
+  --color5: #1f2a1d;
+  --color6: #5a6a4e;
+
+  /* Semantic tokens */
+  --bg-primary: #1a1f1c;
+  --bg-secondary: #2a3530;
+  --text-primary: #e5efe0;
+  --text-secondary: #bac8b1;
+  --accent: #c9d946;
+  --border: #8fa583;
+
+  /* Dropdown */
+  --dropdown-bg: #1f2a1d;
+  --dropdown-header-bg-start: #252e26;
+  --dropdown-header-bg-end: #1f2a1d;
+  --dropdown-text-primary: #e5efe0;
+  --dropdown-text-secondary: #bac8b1;
+  --dropdown-hover-bg: #2a352d;
+  --dropdown-unread-bg: rgba(143, 165, 131, 0.08);
+
+  /* Table */
+  --table-header-bg: #252e26;
+  --table-header-text: #d4e0d0;
+  --table-row-hover: #3a3520;
+  --table-row-odd: #1a2419;
+  --table-row-even: #2a3a2a;
+  --table-border: #3a4a3e;
+
+  /* Card */
+  --card-bg: #1f2a1d;
+  --card-hover-bg: #252e26;
+  --card-border: #3a4a3e;
+  --card-text: #bac8b1;
+
+  /* Report Card - Dark Mode */
+  --reportcard-bg: #0d120c;
+  --reportcard-text: #ffffff;
+  --reportcard-border: #1f2a1d;
+
+  /* Input */
+  --input-bg: #2a2f2b;
+  --input-border: #8fa583;
+  --input-text: #e5efe0;
+  --input-placeholder: #8fa583;
+  --input-focus-ring: rgba(143, 165, 131, 0.2);
+
+  /* Default input border color */
+  input, select, textarea {
+    border-color: var(--input-border) !important;
+  }
+
+  /* Upload area backgrounds - dark mode - direct overrides */
+  [data-theme="dark"] .upload-container,
+  [data-theme="dark"] .upload-container + div,
+  [data-theme="dark"] div[class*="upload-container"],
+  [data-theme="dark"] div.bg-gray-200,
+  [data-theme="dark"] div[class*="bg-gray-200"] {
+    background-color: #252e26 !important;
+  }
+
+  /* Active tab border in dark mode - darker */
+  [data-theme="dark"] #tab-info.active,
+  [data-theme="dark"] #tab-files.active {
+    border-bottom-color: #1f2a1d !important;
+  }
+
+  /* Ensure active tab border overrides Tailwind arbitrary border-[#404E3B] color */
+  [data-theme="dark"] button#tab-info.active,
+  [data-theme="dark"] button#tab-files.active,
+  [data-theme="dark"] #tab-info.active,
+  [data-theme="dark"] #tab-files.active {
+    border-color: #1f2a1d !important;
+    border-bottom-color: #1f2a1d !important;
+  }
+
+  /* Scrollbar */
+  --scrollbar-track: #1a1f1c;
+  --scrollbar-thumb: #4a5a4e;
+
+  /* Misc */
+  --badge-bg: #ef4444;
+  --badge-text: #ffffff;
+  --select-bg: #1a1f1c;
+  --select-arrow: #d4e0d0;
+  --spinner-track: #2a2f2b;
+  --spinner-top: #c9d946;
+}
