@@ -29,6 +29,15 @@ namespace HRsystem.Models
 
         public bool IsActive { get; set; } = true;
 
+        /// <summary>هل هذا المكون يخضع للضريبة (Tax)؟</summary>
+        public bool IsTaxable { get; set; } = true;
+
+        /// <summary>هل هذا المكون يخضع للتأمينات الاجتماعية؟</summary>
+        public bool IsInsurable { get; set; } = true;
+
+        /// <summary>هل هذا المكون ثابت (يتكرر كل شهر)؟</summary>
+        public bool IsFixed { get; set; } = true;
+
         [StringLength(500)]
         public string? Description { get; set; }
 

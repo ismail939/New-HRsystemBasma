@@ -29,11 +29,24 @@ namespace HRsystem.Models
         public decimal GrossSalary { get; set; }
         public decimal NetSalary { get; set; }
 
+        // ===== Tax & Insurance =====
+        /// <summary>إجمالي المكونات الخاضعة للضريبة</summary>
+        public decimal TaxableAmount { get; set; }
+
+        /// <summary>إجمالي المكونات الخاضعة للتأمينات</summary>
+        public decimal InsurableAmount { get; set; }
+
+        /// <summary>قيمة ضريبة الدخل المستقطعة</summary>
+        public decimal TaxAmount { get; set; }
+
+        /// <summary>قيمة التأمينات الاجتماعية المستقطعة</summary>
+        public decimal InsuranceAmount { get; set; }
+
         // ===== Attendance =====
         public int PresentDays { get; set; }
         public int AbsentDays { get; set; }
-        public float LateMinutes { get; set; }
-        public float OvertimeHours { get; set; }
+        public double LateMinutes { get; set; }
+        public double OvertimeHours { get; set; }
         public int PaidLeaves { get; set; }
         public int UnpaidLeaves { get; set; }
         public int OfficialHolidays { get; set; }

@@ -19,6 +19,79 @@ namespace HRsystem.Controllers
             _context = context;
         }
 
+        // ============ PAYROLL INDEX (Landing Page) ============
+
+        [HttpGet]
+        [Route("/payroll")]
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        // ============ PLACE SALARIES (وضع الرواتب) ============
+
+        [HttpGet]
+        [Route("/payroll/place-salaries")]
+        public IActionResult PlaceSalaries()
+        {
+            var employees = _context.HREmployees
+                .OrderBy(e => e.Name)
+                .Select(e => new
+                {
+                    e.Id,
+                    e.Name,
+                    e.PhoneNumber,
+                    e.ContractType,
+                    e.NationalId,
+                    e.JobName,
+                    e.MarriageStatus,
+                    e.Religion,
+                    e.DateOfBirth,
+                    e.InsuranceNumber,
+                    e.Address,
+                    e.HireDate,
+                    e.EndDate,
+                    e.LeaveReason,
+                    e.BasmaId,
+                    e.HRDepartmentId
+                })
+                .ToList();
+            return View(employees);
+        }
+
+        [HttpGet]
+        [Route("/payroll/place-salaries/get-employee-detail")]
+        public IActionResult GetEmployeeDetail(int employeeId)
+        {
+            var emp = _context.HREmployees
+                .Where(e => e.Id == employeeId)
+                .Select(e => new
+                {
+                    e.Id,
+                    e.Name,
+                    e.NationalId,
+                    e.PhoneNumber,
+                    e.MarriageStatus,
+                    e.Religion,
+                    e.DateOfBirth,
+                    e.InsuranceNumber,
+                    e.Address,
+                    e.HireDate,
+                    e.EndDate,
+                    e.LeaveReason,
+                    e.JobName,
+                    e.ContractType,
+                    e.BasmaId,
+                    DepartmentName = e.HRDepartment != null ? e.HRDepartment.Name : null
+                })
+                .FirstOrDefault();
+
+            if (emp == null)
+                return Json(new { success = false });
+
+            return Json(new { success = true, data = emp });
+        }
+
         // ============ SALARY COMPONENTS ============
 
         [HttpGet]
@@ -67,6 +140,9 @@ namespace HRsystem.Controllers
             component.CalculationMethod = updated.CalculationMethod;
             component.DefaultAmount = updated.DefaultAmount;
             component.IsActive = updated.IsActive;
+            component.IsTaxable = updated.IsTaxable;
+            component.IsInsurable = updated.IsInsurable;
+            component.IsFixed = updated.IsFixed;
             component.Description = updated.Description;
 
             _context.HRLogs.Add(new HRLog
@@ -250,6 +326,27 @@ namespace HRsystem.Controllers
         }
 
         [HttpPost]
+        [Route("/payroll/salaries/delete")]
+        public IActionResult DeleteEmployeeSalary(int id)
+        {
+            var salary = _context.EmployeeSalaries.Find(id);
+            if (salary == null)
+            {
+                return Json(new { success = false, message = "المكون غير موجود" });
+            }
+
+            _context.EmployeeSalaries.Remove(salary);
+
+            _context.HRLogs.Add(new HRLog
+            {
+                Action = $"User ({User.Identity.Name}) deleted employee salary (id:{id}) for employee ({salary.EmployeeId})"
+            });
+            _context.SaveChanges();
+
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
         [Route("/payroll/salaries/toggle")]
         public IActionResult ToggleEmployeeSalary(int id)
         {
@@ -296,7 +393,7 @@ namespace HRsystem.Controllers
                     Id = p.Id,
                     Month = p.Month,
                     Year = p.Year,
-                    MonthName = new System.Globalization.CultureInfo("ar-SA").DateTimeFormat.GetMonthName(p.Month),
+                    MonthName = new System.Globalization.CultureInfo("en-US").DateTimeFormat.GetMonthName(p.Month),
                     Status = p.Status,
                     GeneratedDate = p.GeneratedDate,
                     GeneratedBy = p.GeneratedBy ?? "",
@@ -381,7 +478,7 @@ namespace HRsystem.Controllers
                 var presentDays = attendanceRecords.Count(b => b.Status == 1);
                 var absentDays = attendanceRecords.Count(b => b.Status == 0 || b.Status == 3);
                 var lateMinutes = attendanceRecords.Sum(b => b.LateMinutes ?? 0);
-                var overtimeHours = attendanceRecords.Sum(b => b.OvertimeMinutes ?? 0) / 60f;
+                var overtimeHours = attendanceRecords.Sum(b => b.OvertimeMinutes ?? 0) / 60.0;
 
                 // Leave stats
                 var paidLeaves = attendanceRecords.Count(b => b.OffDayType == "annual" || b.OffDayType == "sick");
@@ -390,6 +487,15 @@ namespace HRsystem.Controllers
 
                 // Daily salary rate
                 var dailySalaryRate = workingDays > 0 ? basicSalary / workingDays : 0;
+
+                // Calculate Taxable & Insurable amounts from component flags
+                var taxableAmount = salaryComponents
+                    .Where(s => s.SalaryComponent.Type == "Earning" && s.SalaryComponent.IsTaxable)
+                    .Sum(s => s.Amount);
+
+                var insurableAmount = salaryComponents
+                    .Where(s => s.SalaryComponent.Type == "Earning" && s.SalaryComponent.IsInsurable)
+                    .Sum(s => s.Amount);
 
                 var grossSalary = totalEarnings;
                 var netSalary = grossSalary - totalDeductions;
@@ -403,6 +509,10 @@ namespace HRsystem.Controllers
                     TotalDeductions = totalDeductions,
                     GrossSalary = grossSalary,
                     NetSalary = netSalary,
+                    TaxableAmount = taxableAmount,
+                    InsurableAmount = insurableAmount,
+                    TaxAmount = 0, // يتم حساب الضريبة لاحقاً حسب الشرائح
+                    InsuranceAmount = 0, // يتم حساب التأمينات لاحقاً حسب النسبة
                     PresentDays = presentDays,
                     AbsentDays = absentDays,
                     LateMinutes = lateMinutes,
@@ -423,7 +533,9 @@ namespace HRsystem.Controllers
                         PayrollDetailId = detail.Id,
                         SalaryComponentId = comp.SalaryComponentId,
                         Name = comp.SalaryComponent.NameAr,
-                        Amount = comp.Amount
+                        Amount = comp.Amount,
+                        IsTaxable = comp.SalaryComponent.IsTaxable,
+                        IsInsurable = comp.SalaryComponent.IsInsurable
                     });
                 }
 
@@ -435,7 +547,9 @@ namespace HRsystem.Controllers
                         PayrollDetailId = detail.Id,
                         SalaryComponentId = comp.SalaryComponentId,
                         Name = comp.SalaryComponent.NameAr,
-                        Amount = comp.Amount
+                        Amount = comp.Amount,
+                        IsTaxable = comp.SalaryComponent.IsTaxable,
+                        IsInsurable = comp.SalaryComponent.IsInsurable
                     });
                 }
             }
@@ -484,6 +598,10 @@ namespace HRsystem.Controllers
                     d.TotalDeductions,
                     d.GrossSalary,
                     d.NetSalary,
+                    d.TaxableAmount,
+                    d.InsurableAmount,
+                    d.TaxAmount,
+                    d.InsuranceAmount,
                     d.PresentDays,
                     d.AbsentDays,
                     d.LateMinutes,
@@ -500,6 +618,10 @@ namespace HRsystem.Controllers
             var totalDeductions = details.Sum(d => d.TotalDeductions);
             var totalGross = details.Sum(d => d.GrossSalary);
             var totalNet = details.Sum(d => d.NetSalary);
+            var totalTaxable = details.Sum(d => d.TaxableAmount);
+            var totalInsurable = details.Sum(d => d.InsurableAmount);
+            var totalTax = details.Sum(d => d.TaxAmount);
+            var totalInsurance = details.Sum(d => d.InsuranceAmount);
 
             ViewBag.Payroll = payroll;
             ViewBag.TotalBasic = totalBasic;
@@ -507,6 +629,10 @@ namespace HRsystem.Controllers
             ViewBag.TotalDeductions = totalDeductions;
             ViewBag.TotalGross = totalGross;
             ViewBag.TotalNet = totalNet;
+            ViewBag.TotalTaxable = totalTaxable;
+            ViewBag.TotalInsurable = totalInsurable;
+            ViewBag.TotalTax = totalTax;
+            ViewBag.TotalInsurance = totalInsurance;
             return View(details);
         }
 

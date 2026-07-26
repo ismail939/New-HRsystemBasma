@@ -1,6 +1,8 @@
 HR-Beloved Project:
-    ☐ Light, Dark color schemes with the ability to add more. today
-    ☐ Fake data then ensure payroll, basma, offdays, reports and everything works well. today
+    ✔ Light, Dark color schemes with the ability to add more. today @done (7/23/2026, 5:40:40 AM)
+    ☐ Salaries and payroll calculations.
+    ☐ reports and analytics.
+    ☐ Fake data then ensure payroll, basma, offdays, reports and everything works well.
     ☐ Validation and Error Handling and security.
     ☐ Responsiveness on pc and tablet.
     ☐ Dockerize all of that.

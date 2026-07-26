@@ -4,11 +4,11 @@
     ViewData["Title"] = "الرئيسية";
 }
 
-<div class="p-4 md:p-6 space-y-6" dir="rtl">
+<div class="p-4 md:p-6 space-y-6 employee-dashboard" dir="rtl">
     <!-- Welcome Header - Centered with name -->
     <div class="w-full md:w-2/3 mx-auto">
         <div
-            class="bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-sm rounded-3xl shadow-2xl p-6 md:p-8 text-center border border-color3/10 relative overflow-hidden">
+            class="bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-sm rounded-3xl shadow-2xl p-6 md:p-8 text-center border border-color3/10 relative overflow-hidden welcome-card">
             <div class="absolute inset-0 bg-gradient-to-br from-color3/5 to-transparent pointer-events-none"></div>
             <h1 class="text-2xl md:text-3xl font-bold text-color3 relative">
                 مرحباً بك، @Model.EmployeeName
@@ -130,7 +130,7 @@
     </div>
 
     <!-- Days Scrollable Card - bigger cards, ~10 visible -->
-    <div class="bg-white/60 backdrop-blur-sm rounded-2xl shadow-xl p-4 md:p-6 border border-color3/20">
+    <div class="bg-white/60 backdrop-blur-sm rounded-2xl shadow-xl p-4 md:p-6 border border-color3/20 days-container">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-bold text-color3 flex items-center gap-2">
                 <i class="bi bi-calendar-week"></i>
@@ -198,10 +198,10 @@
 @functions {
     string GetDayCardClass(DayStatus day)
     {
-        if (day.IsToday) return "today bg-white border-2 border-color4 shadow-xl scale-110 z-20 relative";
-        if (day.IsOffDay) return "bg-green-50 border border-green-300";
-        if (day.IsPast) return "bg-white border border-gray-200";
-        return "bg-white/80 border border-dashed border-color5/40";
+        if (day.IsToday) return "today bg-white border-2 border-color4 shadow-xl scale-110 z-20 relative day-card-today";
+        if (day.IsOffDay) return "bg-green-50 border border-green-300 day-card-offday";
+        if (day.IsPast) return "bg-white border border-gray-200 day-card-past";
+        return "bg-white/80 border border-dashed border-color5/40 day-card-future";
     }
 
     string GetDayTextClass(DayStatus day)

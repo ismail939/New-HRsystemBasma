@@ -717,3 +717,71 @@ div[class*="bg-gray-200"] {
 [data-theme="dark"] .gap-5 > a span {
   color: #e5efe0 !important;
 }
+
+/* ===== Employee Dashboard Dark Mode Card Overrides ===== */
+
+/* Welcome card - softer dark gradient, not as dark as page bg */
+[data-theme="dark"] .employee-dashboard .welcome-card {
+  background: linear-gradient(135deg, #2a3530 0%, #252e26 100%) !important;
+  border-color: #3a4a3e !important;
+}
+
+/* Inner balance/salary value boxes - medium dark */
+[data-theme="dark"] .employee-dashboard .stat-card .bg-white {
+  background-color: #2a3530 !important;
+  border-color: #3a4a3e !important;
+}
+
+/* Days scroll container - semi-transparent dark */
+[data-theme="dark"] .employee-dashboard .days-container {
+  background-color: rgba(42, 53, 48, 0.7) !important;
+  border-color: #3a4a3e !important;
+}
+
+/* Day cards - today (accent border) */
+[data-theme="dark"] .employee-dashboard .day-card-today {
+  background-color: #252e26 !important;
+  border-color: #c9d946 !important;
+}
+
+/* Day cards - past */
+[data-theme="dark"] .employee-dashboard .day-card-past {
+  background-color: #2a3530 !important;
+  border-color: #3a4a3e !important;
+}
+
+/* Day cards - future (subtle) */
+[data-theme="dark"] .employee-dashboard .day-card-future {
+  background-color: rgba(42, 53, 48, 0.8) !important;
+  border-color: #5a6a4e !important;
+}
+
+/* Day cards - off-day (darker green) */
+[data-theme="dark"] .employee-dashboard .day-card-offday {
+  background-color: #1a2a1a !important;
+  border-color: #3a4a3e !important;
+}
+
+/* Fix text colors for day cards in dark mode - ensure readability */
+[data-theme="dark"] .employee-dashboard .day-card-offday .text-green-700,
+[data-theme="dark"] .employee-dashboard .day-card-offday .text-green-800 {
+  color: #8bc38b !important;
+}
+[data-theme="dark"] .employee-dashboard .day-card-past .text-gray-500,
+[data-theme="dark"] .employee-dashboard .day-card-past .text-gray-600 {
+  color: #8fa583 !important;
+}
+[data-theme="dark"] .employee-dashboard .day-card-future .text-color5 {
+  color: #5a6a4e !important;
+}
+
+/* Fix border colors for day card dividers in dark mode */
+[data-theme="dark"] .employee-dashboard .day-card-offday .border-green-300 {
+  border-color: #8bc38b !important;
+}
+[data-theme="dark"] .employee-dashboard .day-card-past .border-gray-300 {
+  border-color: #3a4a3e !important;
+}
+[data-theme="dark"] .employee-dashboard .day-card-future .border-color5\/30 {
+  border-color: #5a6a4e !important;
+}

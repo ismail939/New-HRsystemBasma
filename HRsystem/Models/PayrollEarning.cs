@@ -28,6 +28,12 @@ namespace HRsystem.Models
         [Required]
         public decimal Amount { get; set; }
 
+        /// <summary>هل هذا البند يخضع للضريبة؟</summary>
+        public bool IsTaxable { get; set; } = true;
+
+        /// <summary>هل هذا البند يخضع للتأمينات؟</summary>
+        public bool IsInsurable { get; set; } = true;
+
         [StringLength(500)]
         public string? Notes { get; set; }
     }

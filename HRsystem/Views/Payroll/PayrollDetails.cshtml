@@ -44,6 +44,10 @@
                 <th>الخصومات</th>
                 <th>الإجمالي</th>
                 <th>الصافي</th>
+                <th>خاضع للضريبة</th>
+                <th>خاضع للتأمينات</th>
+                <th>الضريبة</th>
+                <th>التأمينات</th>
                 <th>حضور</th>
                 <th>غياب</th>
                 <th>تأخير (د)</th>
@@ -62,6 +66,10 @@
                     <td class="text-red-600">@detail.TotalDeductions.ToString("N2")</td>
                     <td>@detail.GrossSalary.ToString("N2")</td>
                     <td class="font-bold">@detail.NetSalary.ToString("N2")</td>
+                    <td>@detail.TaxableAmount.ToString("N2")</td>
+                    <td>@detail.InsurableAmount.ToString("N2")</td>
+                    <td>@detail.TaxAmount.ToString("N2")</td>
+                    <td>@detail.InsuranceAmount.ToString("N2")</td>
                     <td>@detail.PresentDays</td>
                     <td class="text-red-600">@detail.AbsentDays</td>
                     <td>@detail.LateMinutes.ToString("N0")</td>
@@ -78,6 +86,10 @@
                 var totalDeductions = ViewBag.TotalDeductions ?? 0m;
                 var totalGross = ViewBag.TotalGross ?? 0m;
                 var totalNet = ViewBag.TotalNet ?? 0m;
+                var totalTaxable = ViewBag.TotalTaxable ?? 0m;
+                var totalInsurable = ViewBag.TotalInsurable ?? 0m;
+                var totalTax = ViewBag.TotalTax ?? 0m;
+                var totalInsurance = ViewBag.TotalInsurance ?? 0m;
             }
             <tr>
                 <td>الإجمالي</td>
@@ -86,6 +98,10 @@
                 <td class="text-red-600">@totalDeductions.ToString("N2")</td>
                 <td>@totalGross.ToString("N2")</td>
                 <td class="font-bold text-lg">@totalNet.ToString("N2")</td>
+                <td>@totalTaxable.ToString("N2")</td>
+                <td>@totalInsurable.ToString("N2")</td>
+                <td>@totalTax.ToString("N2")</td>
+                <td>@totalInsurance.ToString("N2")</td>
                 <td colspan="6"></td>
             </tr>
         </tfoot>

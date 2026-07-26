@@ -4,6 +4,7 @@ using HRsystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRsystem.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260725102334_fixPayrollDetailFloatToDouble")]
+    partial class fixPayrollDetailFloatToDouble
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -667,12 +670,6 @@ namespace HRsystem.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<bool>("IsInsurable")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsTaxable")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -720,12 +717,6 @@ namespace HRsystem.Migrations
                     b.Property<decimal>("GrossSalary")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("InsurableAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("InsuranceAmount")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<double>("LateMinutes")
                         .HasColumnType("float");
 
@@ -750,12 +741,6 @@ namespace HRsystem.Migrations
 
                     b.Property<int>("PresentDays")
                         .HasColumnType("int");
-
-                    b.Property<decimal>("TaxAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("TaxableAmount")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("TotalDeductions")
                         .HasColumnType("decimal(18,2)");
@@ -785,12 +770,6 @@ namespace HRsystem.Migrations
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("IsInsurable")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsTaxable")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -901,15 +880,6 @@ namespace HRsystem.Migrations
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsFixed")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsInsurable")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsTaxable")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")

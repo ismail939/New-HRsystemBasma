@@ -69,8 +69,8 @@
                                 </a></li>
                                 <li><a href="/penalties"
                                            class="nav-link  @(currentController == "Penalty" ? "active" : "")">الجزاءات</a></li>
-                                    <li><a href="/payroll/salary-components"
-                                               class="nav-link  @(currentController == "Payroll" ? "active" : "")">الرواتب</a></li>
+                                    <li><a href="/payroll"
+                                                class="nav-link  @(currentController == "Payroll" ? "active" : "")">الرواتب</a></li>
                                     <li class="relative" id="moreDropdown">
                                         <a href="javascript:void(0)" onclick="toggleDropdown()" class="nav-link flex items-center gap-1">
                                             المزيد <i id="moreArrow" class="bi bi-chevron-down text-[12px]"></i>
@@ -160,8 +160,8 @@
                                 </a></li>
                                 <li><a href="/penalties"
                                            class="!font-bold   @(currentController == "Penalty" ? "active-mobile" : "nav-mobile-link")">الجزاءات</a></li>
-                                    <li><a href="/payroll/salary-components"
-                                               class="!font-bold   @(currentController == "Payroll" ? "active-mobile" : "nav-mobile-link")">الرواتب</a></li>
+                                    <li><a href="/payroll"
+                                                class="!font-bold   @(currentController == "Payroll" ? "active-mobile" : "nav-mobile-link")">الرواتب</a></li>
                                     <li><a href="/reports"
                                                class="!font-bold   @(currentController == "Report" ? "active-mobile" : "nav-mobile-link")">التقارير</a></li>
                                         @if (User.IsInRole("Admin"))
