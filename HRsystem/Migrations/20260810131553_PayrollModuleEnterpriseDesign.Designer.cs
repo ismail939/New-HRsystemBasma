@@ -4,6 +4,7 @@ using HRsystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRsystem.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260810131553_PayrollModuleEnterpriseDesign")]
+    partial class PayrollModuleEnterpriseDesign
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -406,81 +409,6 @@ namespace HRsystem.Migrations
                     b.HasIndex("PayrollPolicyId");
 
                     b.ToTable("EmployeePayrollPolicies");
-                });
-
-            modelBuilder.Entity("HRsystem.Models.EmployeePenalty", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("ApprovedByUserId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("ApprovedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal?>("DeductionAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("DeductionDays")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("DeductionUnit")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("DeductionValue")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("IncidentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ManagerNotes")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int?>("PayrollItemId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("PenaltyEscalationId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("PenaltyLevelId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PenaltyRuleId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RejectedReason")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApprovedByUserId");
-
-                    b.HasIndex("PenaltyEscalationId");
-
-                    b.HasIndex("PenaltyLevelId");
-
-                    b.HasIndex("PenaltyRuleId");
-
-                    b.HasIndex("EmployeeId", "IncidentDate");
-
-                    b.HasIndex("EmployeeId", "Status");
-
-                    b.ToTable("EmployeePenalties");
                 });
 
             modelBuilder.Entity("HRsystem.Models.EmployeeSalary", b =>
@@ -1566,137 +1494,6 @@ namespace HRsystem.Migrations
                     b.ToTable("PayrollPolicies");
                 });
 
-            modelBuilder.Entity("HRsystem.Models.PenaltyEscalation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ActionRequired")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<decimal?>("DeductionAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("DeductionPercentage")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("DeductionUnit")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("DeductionValue")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("IsWarning")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("OccurrenceCount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PenaltyRuleId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PenaltyRuleId", "OccurrenceCount")
-                        .IsUnique();
-
-                    b.ToTable("PenaltyEscalations");
-                });
-
-            modelBuilder.Entity("HRsystem.Models.PenaltyLevel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal?>("DeductionAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("DeductionPercentage")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("DeductionUnit")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("DeductionValue")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("FromValue")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("IsWarning")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("PenaltyRuleId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SequenceOrder")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("ToValue")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("ValueType")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PenaltyRuleId", "SequenceOrder")
-                        .IsUnique();
-
-                    b.ToTable("PenaltyLevels");
-                });
-
-            modelBuilder.Entity("HRsystem.Models.PenaltyRule", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Category")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("NameAr")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Code")
-                        .IsUnique();
-
-                    b.ToTable("PenaltyRules");
-                });
-
             modelBuilder.Entity("HRsystem.Models.Request", b =>
                 {
                     b.Property<int>("RequestId")
@@ -2047,46 +1844,6 @@ namespace HRsystem.Migrations
                     b.Navigation("PayrollPolicy");
                 });
 
-            modelBuilder.Entity("HRsystem.Models.EmployeePenalty", b =>
-                {
-                    b.HasOne("HRsystem.Models.User", "ApprovedByUser")
-                        .WithMany()
-                        .HasForeignKey("ApprovedByUserId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("HRsystem.Models.HREmployee", "HREmployee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("HRsystem.Models.PenaltyEscalation", "PenaltyEscalation")
-                        .WithMany()
-                        .HasForeignKey("PenaltyEscalationId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("HRsystem.Models.PenaltyLevel", "PenaltyLevel")
-                        .WithMany()
-                        .HasForeignKey("PenaltyLevelId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("HRsystem.Models.PenaltyRule", "PenaltyRule")
-                        .WithMany("EmployeePenalties")
-                        .HasForeignKey("PenaltyRuleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("ApprovedByUser");
-
-                    b.Navigation("HREmployee");
-
-                    b.Navigation("PenaltyEscalation");
-
-                    b.Navigation("PenaltyLevel");
-
-                    b.Navigation("PenaltyRule");
-                });
-
             modelBuilder.Entity("HRsystem.Models.EmployeeSalary", b =>
                 {
                     b.HasOne("HRsystem.Models.HREmployee", "HREmployee")
@@ -2375,28 +2132,6 @@ namespace HRsystem.Migrations
                     b.Navigation("PayrollComponent");
                 });
 
-            modelBuilder.Entity("HRsystem.Models.PenaltyEscalation", b =>
-                {
-                    b.HasOne("HRsystem.Models.PenaltyRule", "PenaltyRule")
-                        .WithMany("Escalations")
-                        .HasForeignKey("PenaltyRuleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PenaltyRule");
-                });
-
-            modelBuilder.Entity("HRsystem.Models.PenaltyLevel", b =>
-                {
-                    b.HasOne("HRsystem.Models.PenaltyRule", "PenaltyRule")
-                        .WithMany("Levels")
-                        .HasForeignKey("PenaltyRuleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PenaltyRule");
-                });
-
             modelBuilder.Entity("HRsystem.Models.Request", b =>
                 {
                     b.HasOne("HRsystem.Models.User", "CreatedByUser")
@@ -2520,15 +2255,6 @@ namespace HRsystem.Migrations
                     b.Navigation("EmployeeAssignments");
 
                     b.Navigation("Payrolls");
-                });
-
-            modelBuilder.Entity("HRsystem.Models.PenaltyRule", b =>
-                {
-                    b.Navigation("EmployeePenalties");
-
-                    b.Navigation("Escalations");
-
-                    b.Navigation("Levels");
                 });
 
             modelBuilder.Entity("HRsystem.Models.Request", b =>

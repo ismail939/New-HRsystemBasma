@@ -1,5 +1,6 @@
 using HRsystem.Data;
 using HRsystem.Models;
+using HRsystem.Models.Enums;
 using HRsystem.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -385,7 +386,7 @@ namespace HRsystem.Controllers
                     p.GeneratedDate,
                     p.GeneratedBy,
                     p.Notes,
-                    EmployeeCount = p.PayrollDetails.Count
+                    EmployeeCount = p.PayrollItems.Count
                 })
                 .ToList()
                 .Select(p => new PayrollListViewModel
@@ -438,7 +439,7 @@ namespace HRsystem.Controllers
             {
                 Month = month,
                 Year = year,
-                Status = "Draft",
+                Status = PayrollStatus.Draft,
                 GeneratedDate = DateTime.Now,
                 GeneratedBy = userName
             };
@@ -646,13 +647,13 @@ namespace HRsystem.Controllers
                 return Json(new { success = false, message = "كشف الراتب غير موجود" });
             }
 
-            if (payroll.Status == "Locked")
+            if (payroll.Status == PayrollStatus.Locked)
             {
                 return Json(new { success = false, message = "لا يمكن تعديل كشف راتب مقفل" });
             }
 
             var userName = User.Identity?.Name ?? "System";
-            payroll.Status = status;
+            payroll.Status = Enum.Parse<PayrollStatus>(status);
 
             if (status == "Reviewed")
             {

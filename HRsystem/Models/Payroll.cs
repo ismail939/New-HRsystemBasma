@@ -1,4 +1,7 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+using HRsystem.Models.Enums;
 
 namespace HRsystem.Models
 {
@@ -13,10 +16,14 @@ namespace HRsystem.Models
         [Required]
         public int Year { get; set; }
 
-        /// <summary>Draft / Reviewed / Approved / Locked</summary>
         [Required]
-        [StringLength(20)]
-        public string Status { get; set; } = "Draft";
+        public PayrollStatus Status { get; set; } = PayrollStatus.Draft;
+
+        [ForeignKey(nameof(PayrollPolicy))]
+        public int? PayrollPolicyId { get; set; }
+
+        [JsonIgnore]
+        public virtual PayrollPolicy? PayrollPolicy { get; set; }
 
         public DateTime GeneratedDate { get; set; } = DateTime.Now;
 
@@ -33,10 +40,12 @@ namespace HRsystem.Models
         [StringLength(100)]
         public string? ApprovedBy { get; set; }
 
+        public DateTime? LockedDate { get; set; }
+
         [StringLength(500)]
         public string? Notes { get; set; }
 
         // Navigation
-        public virtual ICollection<PayrollDetail> PayrollDetails { get; set; } = new List<PayrollDetail>();
+        public virtual ICollection<PayrollItem> PayrollItems { get; set; } = new List<PayrollItem>();
     }
 }

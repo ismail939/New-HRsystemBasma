@@ -41,19 +41,19 @@
                 {
                     var statusClass = payroll.Status switch
                     {
-                        "Draft" => "text-yellow-600",
-                        "Reviewed" => "text-blue-600",
-                        "Approved" => "text-green-600",
-                        "Locked" => "text-red-600",
+                        HRsystem.Models.Enums.PayrollStatus.Draft => "text-yellow-600",
+                        HRsystem.Models.Enums.PayrollStatus.Reviewed => "text-blue-600",
+                        HRsystem.Models.Enums.PayrollStatus.Approved => "text-green-600",
+                        HRsystem.Models.Enums.PayrollStatus.Locked => "text-red-600",
                         _ => ""
                     };
                     var statusText = payroll.Status switch
                     {
-                        "Draft" => "مسودة",
-                        "Reviewed" => "مراجع",
-                        "Approved" => "معتمد",
-                        "Locked" => "مقفل",
-                        _ => payroll.Status
+                        HRsystem.Models.Enums.PayrollStatus.Draft => "مسودة",
+                        HRsystem.Models.Enums.PayrollStatus.Reviewed => "مراجع",
+                        HRsystem.Models.Enums.PayrollStatus.Approved => "معتمد",
+                        HRsystem.Models.Enums.PayrollStatus.Locked => "مقفل",
+                        _ => payroll.Status.ToString()
                     };
 
                     <tr>

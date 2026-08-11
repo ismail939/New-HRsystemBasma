@@ -9,25 +9,25 @@
 
 <div class="flex flex-wrap gap-2 justify-center mb-4">
     <span class="px-4 py-2 rounded-lg font-semibold 
-        @(payroll.Status == "Draft" ? "bg-yellow-100 text-yellow-700" :
-          payroll.Status == "Reviewed" ? "bg-blue-100 text-blue-700" :
-          payroll.Status == "Approved" ? "bg-green-100 text-green-700" :
+        @(payroll.Status == HRsystem.Models.Enums.PayrollStatus.Draft ? "bg-yellow-100 text-yellow-700" :
+          payroll.Status == HRsystem.Models.Enums.PayrollStatus.Reviewed ? "bg-blue-100 text-blue-700" :
+          payroll.Status == HRsystem.Models.Enums.PayrollStatus.Approved ? "bg-green-100 text-green-700" :
           "bg-red-100 text-red-700")">
-        @(payroll.Status == "Draft" ? "مسودة" :
-          payroll.Status == "Reviewed" ? "مراجع" :
-          payroll.Status == "Approved" ? "معتمد" :
+        @(payroll.Status == HRsystem.Models.Enums.PayrollStatus.Draft ? "مسودة" :
+          payroll.Status == HRsystem.Models.Enums.PayrollStatus.Reviewed ? "مراجع" :
+          payroll.Status == HRsystem.Models.Enums.PayrollStatus.Approved ? "معتمد" :
           "مقفل")
     </span>
 
-    @if (payroll.Status == "Draft")
+    @if (payroll.Status == HRsystem.Models.Enums.PayrollStatus.Draft)
     {
         <button onclick="updateStatus(@payroll.Id, 'Reviewed')" class="col-button-dark px-4 py-2 rounded">تحديث إلى مراجع</button>
     }
-    @if (payroll.Status == "Reviewed")
+    @if (payroll.Status == HRsystem.Models.Enums.PayrollStatus.Reviewed)
     {
         <button onclick="updateStatus(@payroll.Id, 'Approved')" class="col-button-dark px-4 py-2 rounded">اعتماد</button>
     }
-    @if (payroll.Status == "Approved")
+    @if (payroll.Status == HRsystem.Models.Enums.PayrollStatus.Approved)
     {
         <button onclick="updateStatus(@payroll.Id, 'Locked')" class="col-button-dark px-4 py-2 rounded">قفل كشف الراتب</button>
     }
