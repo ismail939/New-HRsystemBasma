@@ -8,6 +8,65 @@ namespace HRsystem.Data
     {
         public static async Task SeedAsync(AppDbContext context)
         {
+            // ===== Seed Payroll Components (payrollcomponents table) if empty =====
+            if (!await context.PayrollComponents.AnyAsync())
+            {
+                context.PayrollComponents.AddRange(new List<PayrollComponent>
+                {
+                    new() { Name = "Basic Salary", NameAr = "الراتب الأساسي", Code = "BASIC_SALARY", Category = PayrollComponentCategory.Salary, IsRecurring = true, CalculationMethod = CalculationMethod.FixedAmount, IsActive = true, IsTaxable = true, IsInsurable = true, SortOrder = 1, CreatedAt = DateTime.Now },
+                    new() { Name = "Transport Allowance", NameAr = "بدل انتقال", Code = "TRANSPORT", Category = PayrollComponentCategory.Allowance, IsRecurring = true, CalculationMethod = CalculationMethod.FixedAmount, IsActive = true, IsTaxable = true, IsInsurable = true, SortOrder = 2, CreatedAt = DateTime.Now },
+                    new() { Name = "Housing Allowance", NameAr = "بدل سكن", Code = "HOUSING", Category = PayrollComponentCategory.Allowance, IsRecurring = true, CalculationMethod = CalculationMethod.FixedAmount, IsActive = true, IsTaxable = true, IsInsurable = true, SortOrder = 3, CreatedAt = DateTime.Now },
+                    new() { Name = "Mobile Allowance", NameAr = "بدل موبايل", Code = "MOBILE", Category = PayrollComponentCategory.Allowance, IsRecurring = true, CalculationMethod = CalculationMethod.FixedAmount, IsActive = true, IsTaxable = true, IsInsurable = true, SortOrder = 4, CreatedAt = DateTime.Now },
+                    new() { Name = "Overtime", NameAr = "أجر إضافي", Code = "OVERTIME", Category = PayrollComponentCategory.Overtime, IsRecurring = true, CalculationMethod = CalculationMethod.FixedAmount, IsActive = true, IsTaxable = true, IsInsurable = true, SortOrder = 5, CreatedAt = DateTime.Now },
+                    new() { Name = "Commission", NameAr = "عمولة", Code = "COMMISSION", Category = PayrollComponentCategory.Commission, IsRecurring = false, CalculationMethod = CalculationMethod.FixedAmount, IsActive = true, IsTaxable = true, IsInsurable = true, SortOrder = 6, CreatedAt = DateTime.Now },
+                    new() { Name = "Productivity Incentive", NameAr = "حافز إنتاجية", Code = "INCENTIVE", Category = PayrollComponentCategory.Incentive, IsRecurring = false, CalculationMethod = CalculationMethod.FixedAmount, IsActive = true, IsTaxable = true, IsInsurable = true, SortOrder = 7, CreatedAt = DateTime.Now },
+                    new() { Name = "Absence Deduction", NameAr = "خصم غياب", Code = "ABSENCE", Category = PayrollComponentCategory.Deduction, IsRecurring = true, CalculationMethod = CalculationMethod.FixedAmount, IsActive = true, IsTaxable = false, IsInsurable = false, SortOrder = 8, CreatedAt = DateTime.Now },
+                    new() { Name = "Late Deduction", NameAr = "خصم تأخير", Code = "LATE", Category = PayrollComponentCategory.Deduction, IsRecurring = true, CalculationMethod = CalculationMethod.FixedAmount, IsActive = true, IsTaxable = false, IsInsurable = false, SortOrder = 9, CreatedAt = DateTime.Now },
+                    new() { Name = "Penalty", NameAr = "خصم جزائي", Code = "PENALTY", Category = PayrollComponentCategory.Deduction, IsRecurring = false, CalculationMethod = CalculationMethod.FixedAmount, IsActive = true, IsTaxable = false, IsInsurable = false, SortOrder = 10, CreatedAt = DateTime.Now }
+                });
+                await context.SaveChangesAsync();
+            }
+
+            // ===== Ensure "Penalty" (خصم جزائي) component exists =====
+            // Runs regardless of the block above so existing databases also get it.
+            // Approved penalties (الجزاءات المعتمدة) are posted to payroll under this component.
+            if (!await context.PayrollComponents.AnyAsync(pc => pc.Code == "PENALTY"))
+            {
+                context.PayrollComponents.Add(new PayrollComponent
+                {
+                    Name = "Penalty",
+                    NameAr = "خصم جزائي",
+                    Code = "PENALTY",
+                    Category = PayrollComponentCategory.Deduction,
+                    IsRecurring = false,
+                    CalculationMethod = CalculationMethod.FixedAmount,
+                    IsActive = true,
+                    IsTaxable = false,
+                    IsInsurable = false,
+                    SortOrder = 10,
+                    Description = "يُنشأ تلقائياً من الجزاءات المعتمدة (الخصم الجزائي)",
+                    CreatedAt = DateTime.Now
+                });
+                await context.SaveChangesAsync();
+            }
+
+            // ===== Seed Penalty Rules (penaltyrules table) if empty =====
+            if (!await context.PenaltyRules.AnyAsync())
+            {
+                context.PenaltyRules.AddRange(new List<PenaltyRule>
+                {
+                    new() { Name = "Late Arrival", NameAr = "تأخر صباحي", Code = "LATE_ARRIVAL", Category = PenaltyCategory.Attendance, IsActive = true, CreatedAt = DateTime.Now },
+                    new() { Name = "Early Leave", NameAr = "انصراف مبكر", Code = "EARLY_LEAVE", Category = PenaltyCategory.Attendance, IsActive = true, CreatedAt = DateTime.Now },
+                    new() { Name = "Unauthorized Absence", NameAr = "غياب غير مأذون", Code = "ABSENCE", Category = PenaltyCategory.Attendance, IsActive = true, CreatedAt = DateTime.Now },
+                    new() { Name = "No Uniform", NameAr = "عدم الالتزام بالزي الموحد", Code = "NO_UNIFORM", Category = PenaltyCategory.Behavior, IsActive = true, CreatedAt = DateTime.Now },
+                    new() { Name = "Smoking", NameAr = "التدخين", Code = "SMOKING", Category = PenaltyCategory.Behavior, IsActive = true, CreatedAt = DateTime.Now },
+                    new() { Name = "Safety Violation", NameAr = "مخالفة أمان", Code = "SAFETY", Category = PenaltyCategory.Safety, IsActive = true, CreatedAt = DateTime.Now },
+                    new() { Name = "Low Performance", NameAr = "ضعف أداء", Code = "LOW_PERFORMANCE", Category = PenaltyCategory.Performance, IsActive = true, CreatedAt = DateTime.Now },
+                    new() { Name = "Manual Violation", NameAr = "مخالفة يدوية", Code = "MANUAL", Category = PenaltyCategory.Other, IsActive = true, CreatedAt = DateTime.Now }
+                });
+                await context.SaveChangesAsync();
+            }
+
             // Only seed if no notifications exist
             if (await context.Notifications.AnyAsync())
                 return;

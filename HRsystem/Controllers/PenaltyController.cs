@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using HRsystem.Data;
 using HRsystem.Models;
+using HRsystem.Models.Enums;
 using HRsystem.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,17 +23,10 @@ namespace HRsystem.Controllers
         [Route("/penalties")]
         public IActionResult Penalties()
         {
-            Console.WriteLine("⭐Entered ListEmployees action");
             var employees = _context.HREmployees.ToList();
-            Console.WriteLine("here is the number of the items: " + employees.Count);
-            foreach (var emp in employees)
-            {
-                Console.WriteLine(emp.Name + " - " + emp.HRDepartmentId);
-            }
             var employeeVMs = new List<SimpleEmployeeViewModel>();
             foreach (var emp in employees)
             {
-                Console.WriteLine($"Processing employee: {emp.Name} with department ID: {emp.HRDepartmentId}");
                 var dep = _context.HRDepartments.FirstOrDefault(d => d.Id == emp.HRDepartmentId);
                 string depName = dep != null ? dep.Name : "";
                 employeeVMs.Add(new SimpleEmployeeViewModel
@@ -42,49 +36,62 @@ namespace HRsystem.Controllers
                     PhoneNumber = emp.PhoneNumber,
                     HireDate = emp.HireDate,
                     JobName = emp.JobName,
-                    Department = depName==""?"": depName
+                    Department = depName == "" ? "" : depName
                 });
             }
 
-            var penaltyList = _context.HREmployeePenalties.ToList();
-            Console.WriteLine("penaltyList.Count: " + penaltyList.Count);
-            foreach (var penalty in penaltyList)
-            {
-                Console.WriteLine($"🟢 Penalty ID: {penalty.Id}, Employee ID: {penalty.EmployeeId}, Decision: {penalty.Decision}, Date: {penalty.PenaltyDate}, Reason: {penalty.Reason}");
-            }
-        
             var list = new EmployeesNPenalties
             {
                 Employees = employeeVMs,
-                Penalties = penaltyList
+                Penalties = new List<object>()
             };
 
             return View(list);
         }
 
         [Authorize(Roles = "Admin,HR")]
+        [HttpGet]
+        [Route("/penalty/rules")]
+        public IActionResult GetRules()
+        {
+            var rules = _context.PenaltyRules
+                .Where(r => r.IsActive)
+                .OrderBy(r => r.NameAr)
+                .Select(r => new { r.Id, r.Name, r.NameAr, Category = (int)r.Category })
+                .ToList();
+            return Json(rules);
+        }
+
+        [Authorize(Roles = "Admin,HR")]
         [HttpPost]
         [Route("/employee/addPenalty")]
-        public IActionResult AddPenalty(string penalty, DateTime dayDate, string reason, int employeeId, int PenaltyPoints)
+        public IActionResult AddPenalty(int employeeId, int ruleId, DateTime incidentDate, int deductionUnit, decimal deductionValue, string? notes)
         {
-            Console.WriteLine($"🔵Received data - Penalty: {penalty}, Date: {dayDate}, Reason: {reason}, EmployeeId: {employeeId}");
-            if (string.IsNullOrEmpty(penalty) || string.IsNullOrEmpty(reason) || employeeId <= 0|| dayDate == default)
+            if (employeeId <= 0 || ruleId <= 0 || incidentDate == default)
             {
-                Console.WriteLine("🔴Invalid input data.");
                 return BadRequest("Invalid input data.");
             }
-            var newPenalty = new HREmployeePenalty
+            var rule = _context.PenaltyRules.Find(ruleId);
+            if (rule == null)
             {
-                Decision = penalty,
-                PenaltyDate = dayDate,
-                PenaltyPoints = PenaltyPoints,
-                Reason = reason,
-                EmployeeId = employeeId
+                return BadRequest("القاعدة غير موجودة.");
+            }
+
+            var newPenalty = new EmployeePenalty
+            {
+                EmployeeId = employeeId,
+                PenaltyRuleId = ruleId,
+                IncidentDate = incidentDate,
+                CreatedDate = DateTime.Now,
+                Status = PenaltyStatus.Draft,
+                DeductionUnit = (DeductionUnit)deductionUnit,
+                DeductionValue = deductionValue,
+                ManagerNotes = notes
             };
-            _context.HREmployeePenalties.Add(newPenalty);
+            _context.EmployeePenalties.Add(newPenalty);
             _context.HRLogs.Add(new HRLog
             {
-                Action = $"User ({User.Identity.Name}) added penalty ({penalty}) for employeeId ({employeeId}) with reason ({reason}) and points ({PenaltyPoints})"
+                Action = $"User ({User.Identity.Name}) added penalty rule ({rule.Name}) for employeeId ({employeeId}) on ({incidentDate:yyyy-MM-dd})"
             });
             _context.SaveChanges();
             return Ok("Penalty added successfully.");
@@ -95,8 +102,29 @@ namespace HRsystem.Controllers
         [Route("/employee/penalties/{employeeId}")]
         public IActionResult GetEmployeePenalties(int employeeId)
         {
-            var penalties = _context.HREmployeePenalties
+            var penalties = _context.EmployeePenalties
                 .Where(p => p.EmployeeId == employeeId)
+                .OrderByDescending(p => p.IncidentDate)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.EmployeeId,
+                    p.PenaltyRuleId,
+                    p.PenaltyLevelId,
+                    p.IncidentDate,
+                    p.CreatedDate,
+                    Status = (int)p.Status,
+                    DeductionUnit = (int)p.DeductionUnit,
+                    p.DeductionValue,
+                    p.DeductionDays,
+                    p.DeductionAmount,
+                    p.PayrollItemId,
+                    p.ManagerNotes,
+                    p.ApprovedDate,
+                    RuleNameAr = p.PenaltyRule.NameAr,
+                    RuleName = p.PenaltyRule.Name,
+                    IsActive = p.Status == PenaltyStatus.Approved
+                })
                 .ToList();
             return Json(penalties);
         }
@@ -106,23 +134,43 @@ namespace HRsystem.Controllers
         [Route("/employee/togglePenaltyActive")]
         public IActionResult TogglePenaltyActive([FromBody] PenaltyToggleRequest RequestBody)
         {
-            Console.WriteLine(RequestBody+"🔵 Received toggle request.");
             bool isActive = RequestBody.IsActive;
             int penaltyId = RequestBody.PenaltyId;
-            Console.WriteLine($"🔵 Toggling penalty ID {penaltyId} to active status: {isActive}");
-            var penalty = _context.HREmployeePenalties.Find(penaltyId);
+            var penalty = _context.EmployeePenalties.Find(penaltyId);
             if (penalty == null)
             {
                 return NotFound("Penalty not found.");
             }
-            penalty.IsActive = isActive;
+
+            if (isActive)
+            {
+                // Make eligible for payroll (Approved)
+                if (penalty.Status == PenaltyStatus.Draft || penalty.Status == PenaltyStatus.PendingApproval)
+                {
+                    penalty.Status = PenaltyStatus.Approved;
+                    penalty.ApprovedDate = DateTime.Now;
+                    var userName = User.Identity?.Name;
+                    var user = userName != null ? _context.Users.FirstOrDefault(u => u.Username == userName) : null;
+                    penalty.ApprovedByUserId = user?.Id;
+                }
+            }
+            else
+            {
+                // Deactivate -> back to Draft (no payroll impact)
+                if (penalty.Status == PenaltyStatus.Approved)
+                {
+                    penalty.Status = PenaltyStatus.Draft;
+                    penalty.ApprovedDate = null;
+                    penalty.ApprovedByUserId = null;
+                }
+            }
+
             _context.HRLogs.Add(new HRLog
             {
-                Action = $"User ({User.Identity.Name}) toggled penalty ID ({penaltyId}) active status to ({isActive}) for employeeId ({penalty.EmployeeId})"
+                Action = $"User ({User.Identity.Name}) set penalty ID ({penaltyId}) active status to ({isActive}) for employeeId ({penalty.EmployeeId})"
             });
             _context.SaveChanges();
             return Ok("Penalty active status updated.");
         }
-
     }
 }

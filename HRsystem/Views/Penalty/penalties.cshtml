@@ -71,14 +71,24 @@
         <div id="contentAdd" class="block" dir="rtl">
             <form class="space-y-4" id="addPenaltyForm">
                 <input type="hidden" id="employeeId" name="employeeId" value="" />
-                <input class="border p-2 w-full rounded  focus:outline-none focus:ring focus:ring-[#7B9669]"
-                       placeholder="القرار" name="penalty" />
-                <input class="border p-2 w-full rounded  focus:outline-none focus:ring focus:ring-[#7B9669]"
-                       placeholder="نقاط الجزاء" type="number" name="PenaltyPoints" />
-                <input class="border p-2 w-full rounded  focus:outline-none focus:ring focus:ring-[#7B9669]"
-                       placeholder="تاريخ اليوم" type="date" name="dayDate" />
-                <textarea class="border p-2 w-full rounded  focus:outline-none focus:ring focus:ring-[#7B9669]"
-                          placeholder="سبب الجزاء" name="reason"></textarea>
+                <select class="border p-2 w-full rounded focus:outline-none focus:ring focus:ring-[#7B9669]" id="ruleId" name="ruleId">
+                    <option value="">اختر نوع الجزاء</option>
+                </select>
+                <input class="border p-2 w-full rounded focus:outline-none focus:ring focus:ring-[#7B9669]"
+                       placeholder="تاريخ الواقعة" type="date" name="incidentDate" />
+                <div class="flex gap-2">
+                    <select class="border p-2 w-1/2 rounded focus:outline-none focus:ring focus:ring-[#7B9669]" name="deductionUnit" id="deductionUnit">
+                        <option value="1">ساعة</option>
+                        <option value="2">يوم</option>
+                        <option value="3">نسبة مئوية</option>
+                        <option value="0">مبلغ مالي</option>
+                        <option value="4">إنذار فقط</option>
+                    </select>
+                    <input class="border p-2 w-1/2 rounded focus:outline-none focus:ring focus:ring-[#7B9669]"
+                           type="number" step="0.01" name="deductionValue" id="deductionValue" value="0" />
+                </div>
+                <textarea class="border p-2 w-full rounded focus:outline-none focus:ring focus:ring-[#7B9669]"
+                          placeholder="ملاحظات" name="notes"></textarea>
                 <button class="col-button-light px-4 py-2" type="button" onclick="addPenalty()">
                     حفظ
                 </button>
@@ -87,15 +97,11 @@
 
         <!-- Tab Content: Penalties List -->
         <div id="contentList" class="hidden">
-            <div id="contentBody" class="overflow-y-auto max-h-64">
-            </div>
+            <div id="contentBody" class="overflow-y-auto max-h-64"></div>
         </div>
     </div>
 </div>
 
 @section Scripts {
-    <script src="~/js/Penalty/EditModal.js">
-        var penalties = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Penalties));
-        console.log(JSON.stringify(penalties.filter(p => p.EmployeeId == 2)) + "🟠");
-    </script>
+    <script src="~/js/Penalty/EditModal.js"></script>
 }

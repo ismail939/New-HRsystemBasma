@@ -87,8 +87,8 @@
                 const select = document.getElementById('newComponentId');
                 data.forEach(c => {
                     const opt = document.createElement('option');
-                    opt.value = c.id;
-                    opt.textContent = `${c.nameAr} (${c.type === 'Earning' ? 'إضافة' : 'خصم'})`;
+                    opt.value = c.Id;
+                    opt.textContent = `${c.NameAr} (${c.Category === 6 ? 'خصم' : 'إضافة'})`;
                     select.appendChild(opt);
                 });
             });
@@ -111,7 +111,7 @@
                 .then(data => {
                     if (!data.success) return;
                     document.getElementById('salaryModalTitle').textContent =
-                        `إدارة راتب: ${data.employee.name} - ${data.employee.jobName}`;
+                        `إدارة راتب: ${data.employee.Name} - ${data.employee.JobName}`;
 
                     const tbody = document.getElementById('salaryComponentsBody');
                     tbody.innerHTML = '';
@@ -123,27 +123,27 @@
 
                     data.salaries.forEach(s => {
                         const tr = document.createElement('tr');
-                        const typeText = s.componentType === 'Earning' ? 'إضافة' : 'خصم';
-                        const typeClass = s.componentType === 'Earning' ? 'text-green-600' : 'text-red-600';
-                        const activeText = s.isActive ? 'نشط' : 'غير نشط';
-                        const activeClass = s.isActive ? 'text-green-600' : 'text-red-600';
+                        const typeText = s.ComponentCategory === 6 ? 'خصم' : 'إضافة';
+                        const typeClass = s.ComponentCategory === 6 ? 'text-red-600' : 'text-green-600';
+                        const activeText = s.IsActive ? 'نشط' : 'غير نشط';
+                        const activeClass = s.IsActive ? 'text-green-600' : 'text-red-600';
 
                         tr.innerHTML = `
-                            <td>${s.componentNameAr}</td>
+                            <td>${s.ComponentNameAr}</td>
                             <td class="${typeClass} font-semibold">${typeText}</td>
                             <td>
-                                <input type="number" step="0.01" id="amount-${s.id}" value="${s.amount}"
+                                <input type="number" step="0.01" id="amount-${s.Id}" value="${s.Amount}"
                                        class="border rounded p-1 w-24 text-center" />
                             </td>
                             <td class="${activeClass} font-semibold">${activeText}</td>
                             <td>
-                                <input type="text" id="notes-${s.id}" value="${s.notes || ''}"
+                                <input type="text" id="notes-${s.Id}" value="${s.Notes || ''}"
                                        class="border rounded p-1 w-32" />
                             </td>
                             <td>
-                                <button onclick="editSalary(${s.id})" class="col-button-dark text-[11px] rounded px-2 py-1">حفظ</button>
-                                <button onclick="toggleSalary(${s.id})" class="col-button-light text-[11px] rounded px-2 py-1 mt-1">
-                                    ${s.isActive ? 'تعطيل' : 'تفعيل'}
+                                <button onclick="editSalary(${s.Id})" class="col-button-dark text-[11px] rounded px-2 py-1">حفظ</button>
+                                <button onclick="toggleSalary(${s.Id})" class="col-button-light text-[11px] rounded px-2 py-1 mt-1">
+                                    ${s.IsActive ? 'تعطيل' : 'تفعيل'}
                                 </button>
                             </td>
                         `;
@@ -170,7 +170,7 @@
 
             const formData = new FormData();
             formData.append('employeeId', employeeId);
-            formData.append('salaryComponentId', componentId);
+            formData.append('payrollComponentId', componentId);
             formData.append('amount', amount);
             formData.append('notes', notes);
 

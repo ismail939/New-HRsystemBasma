@@ -155,11 +155,17 @@ namespace HRsystem.Controllers
                 _context.HREmployeeOffDays.RemoveRange(items2);
                 _context.SaveChanges();
                 // delete all penalties
-                var penaltiesIds = _context.HREmployeePenalties.Where(b => b.EmployeeId == emp.Id).Select(b => b.Id).ToList();
-                var items3 = _context.HREmployeePenalties
+                var penaltiesIds = _context.EmployeePenalties.Where(b => b.EmployeeId == emp.Id).Select(b => b.Id).ToList();
+                var items3 = _context.EmployeePenalties
                     .Where(x => penaltiesIds.Contains(x.Id))
                     .ToList();
-                _context.HREmployeePenalties.RemoveRange(items3);
+                _context.EmployeePenalties.RemoveRange(items3);
+                _context.SaveChanges();
+                // delete payroll component assignments + history for this employee
+                var epcIds = _context.EmployeePayrollComponents.Where(c => c.EmployeeId == emp.Id).Select(c => c.Id).ToList();
+                _context.EmployeePayrollComponents.RemoveRange(_context.EmployeePayrollComponents.Where(c => epcIds.Contains(c.Id)));
+                var histIds = _context.PayrollComponentHistories.Where(h => h.EmployeeId == emp.Id).Select(h => h.Id).ToList();
+                _context.PayrollComponentHistories.RemoveRange(_context.PayrollComponentHistories.Where(h => histIds.Contains(h.Id)));
                 _context.SaveChanges();
                 // shift 
                 var shiftsId = _context.HREmployeeShift.Where(b => b.HREmployeeId == emp.Id).Select(b => b.Id).ToList();

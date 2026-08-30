@@ -43,5 +43,5 @@ public class HREmployee
 
     // Payroll navigation
     [JsonIgnore]
-    public virtual ICollection<EmployeeSalary>? EmployeeSalaries { get; set; }
+    public virtual ICollection<EmployeePayrollComponent>? EmployeePayrollComponents { get; set; }
 }

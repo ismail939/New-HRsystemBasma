@@ -2,7 +2,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "تفاصيل كشف الراتب";
     var payroll = ViewBag.Payroll;
-    var monthName = new System.Globalization.CultureInfo("ar-SA").DateTimeFormat.GetMonthName(payroll.Month);
+    var monthName = HRsystem.Helpers.MonthNamesHelper.GetGregorianMonthName(payroll.Month);
 }
 
 <h2 class="fs-3 text-center p-4 m-2 text-color3 shadow-lg">تفاصيل كشف الراتب - @monthName @payroll.Year</h2>

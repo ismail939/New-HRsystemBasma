@@ -3,5 +3,5 @@ namespace HRsystem.ViewModels;
 public class EmployeesNPenalties
 {
     public List<SimpleEmployeeViewModel> Employees { get; set; }           // your existing model
-    public List<HREmployeePenalty> Penalties { get; set; }  // the list you want to display
+    public List<object> Penalties { get; set; } = new();                    // penalty DTOs (fetched per employee client-side)
 }

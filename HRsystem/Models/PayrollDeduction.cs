@@ -16,11 +16,6 @@ namespace HRsystem.Models
         [JsonIgnore]
         public virtual PayrollDetail PayrollDetail { get; set; }
 
-        [ForeignKey(nameof(SalaryComponent))]
-        public int? SalaryComponentId { get; set; }
-
-        public virtual SalaryComponent? SalaryComponent { get; set; }
-
         [Required]
         [StringLength(100)]
         public string Name { get; set; } = string.Empty;

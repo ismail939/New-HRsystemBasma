@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Security.Claims;
 using HRsystem.Data;
+using HRsystem.Helpers;
 using HRsystem.Models;
 using HRsystem.Services;
 using HRsystem.ViewModels;
@@ -45,7 +46,7 @@ namespace HRsystem.Controllers
 
             // Get or auto-calculate balance
             var offDayBalances = await _balanceService.GetOrCalculateBalanceAsync(employee.Id);
-            var penalties = _context.HREmployeePenalties.Where(p => p.EmployeeId == employee.Id && p.IsActive).ToList();
+            var penalties = _context.EmployeePenalties.Where(p => p.EmployeeId == employee.Id && p.Status == HRsystem.Models.Enums.PenaltyStatus.Approved).ToList();
             var offDays = _context.HREmployeeOffDays.Where(o => o.EmployeeId == employee.Id).ToList();
 
             // Determine next month name in Arabic
@@ -80,7 +81,7 @@ namespace HRsystem.Controllers
                 ExamBalance = offDayBalances.Exam,
                 OffBalance = offDayBalances.Unpaid, // backward compat
                 ActivePenaltiesCount = penalties.Count,
-                TotalPenaltyPoints = penalties.Sum(p => p.PenaltyPoints),
+                TotalPenaltyPoints = penalties.Count,
                 BasicSalary = basicSalary,
                 NetSalary = netSalary,
                 YearToDateEarnings = netSalary * DateTime.Today.Month, // accumulated from Jan till now
@@ -93,11 +94,7 @@ namespace HRsystem.Controllers
             return View(vm);
         }
 
-        private string GetArabicMonthName(int month)
-        {
-            string[] arabicMonths = { "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر" };
-            return arabicMonths[month - 1];
-        }
+        private string GetArabicMonthName(int month) => MonthNamesHelper.GetGregorianMonthName(month);
 
         private List<DayStatus> GenerateDays(List<HREmployeeOffDay> offDays)
         {

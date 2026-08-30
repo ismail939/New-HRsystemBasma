@@ -1,4 +1,5 @@
 using HRsystem.Data;
+using HRsystem.Helpers;
 using HRsystem.Models;
 using HRsystem.Models.Enums;
 using HRsystem.ViewModels;
@@ -99,8 +100,8 @@ namespace HRsystem.Controllers
         [Route("/payroll/salary-components")]
         public IActionResult SalaryComponents()
         {
-            var components = _context.SalaryComponents
-                .OrderBy(c => c.Type)
+            var components = _context.PayrollComponents
+                .OrderBy(c => c.Category)
                 .ThenBy(c => c.Name)
                 .ToList();
             return View(components);
@@ -108,17 +109,27 @@ namespace HRsystem.Controllers
 
         [HttpPost]
         [Route("/payroll/salary-components/add")]
-        public IActionResult AddSalaryComponent(SalaryComponent component)
+        public IActionResult AddSalaryComponent(PayrollComponent component)
         {
             if (string.IsNullOrEmpty(component.Name) || string.IsNullOrEmpty(component.NameAr))
             {
                 return Json(new { success = false, message = "الاسم مطلوب" });
             }
+            if (string.IsNullOrEmpty(component.Code))
+            {
+                component.Code = component.Name.Replace(" ", "_").ToUpper();
+            }
 
-            _context.SalaryComponents.Add(component);
+            if (_context.PayrollComponents.Any(pc => pc.Code == component.Code))
+            {
+                return Json(new { success = false, message = $"الكود ({component.Code}) مستخدم من قبل بالفعل" });
+            }
+
+            component.CreatedAt = DateTime.Now;
+            _context.PayrollComponents.Add(component);
             _context.HRLogs.Add(new HRLog
             {
-                Action = $"User ({User.Identity.Name}) added salary component ({component.Name} / {component.NameAr})"
+                Action = $"User ({User.Identity.Name}) added payroll component ({component.Name} / {component.NameAr})"
             });
             _context.SaveChanges();
 
@@ -127,9 +138,9 @@ namespace HRsystem.Controllers
 
         [HttpPost]
         [Route("/payroll/salary-components/edit")]
-        public IActionResult EditSalaryComponent(SalaryComponent updated)
+        public IActionResult EditSalaryComponent(PayrollComponent updated)
         {
-            var component = _context.SalaryComponents.Find(updated.Id);
+            var component = _context.PayrollComponents.Find(updated.Id);
             if (component == null)
             {
                 return Json(new { success = false, message = "المكون غير موجود" });
@@ -137,18 +148,21 @@ namespace HRsystem.Controllers
 
             component.Name = updated.Name;
             component.NameAr = updated.NameAr;
-            component.Type = updated.Type;
+            component.Code = updated.Code;
+            component.Category = updated.Category;
             component.CalculationMethod = updated.CalculationMethod;
             component.DefaultAmount = updated.DefaultAmount;
+            component.DefaultPercentage = updated.DefaultPercentage;
             component.IsActive = updated.IsActive;
             component.IsTaxable = updated.IsTaxable;
             component.IsInsurable = updated.IsInsurable;
-            component.IsFixed = updated.IsFixed;
+            component.IsRecurring = updated.IsRecurring;
+            component.SortOrder = updated.SortOrder;
             component.Description = updated.Description;
 
             _context.HRLogs.Add(new HRLog
             {
-                Action = $"User ({User.Identity.Name}) edited salary component ({component.Name})"
+                Action = $"User ({User.Identity.Name}) edited payroll component ({component.Name})"
             });
             _context.SaveChanges();
 
@@ -159,7 +173,7 @@ namespace HRsystem.Controllers
         [Route("/payroll/salary-components/toggle")]
         public IActionResult ToggleSalaryComponent(int id)
         {
-            var component = _context.SalaryComponents.Find(id);
+            var component = _context.PayrollComponents.Find(id);
             if (component == null)
             {
                 return Json(new { success = false, message = "المكون غير موجود" });
@@ -168,7 +182,7 @@ namespace HRsystem.Controllers
             component.IsActive = !component.IsActive;
             _context.HRLogs.Add(new HRLog
             {
-                Action = $"User ({User.Identity.Name}) {(component.IsActive ? "activated" : "deactivated")} salary component ({component.Name})"
+                Action = $"User ({User.Identity.Name}) {(component.IsActive ? "activated" : "deactivated")} payroll component ({component.Name})"
             });
             _context.SaveChanges();
 
@@ -179,7 +193,7 @@ namespace HRsystem.Controllers
         [Route("/payroll/salary-components/get")]
         public IActionResult GetSalaryComponent(int id)
         {
-            var component = _context.SalaryComponents.Find(id);
+            var component = _context.PayrollComponents.Find(id);
             if (component == null)
             {
                 return Json(new { success = false });
@@ -191,11 +205,11 @@ namespace HRsystem.Controllers
         [Route("/payroll/salary-components/active")]
         public IActionResult GetActiveComponents()
         {
-            var components = _context.SalaryComponents
+            var components = _context.PayrollComponents
                 .Where(c => c.IsActive)
-                .OrderBy(c => c.Type)
+                .OrderBy(c => c.Category)
                 .ThenBy(c => c.Name)
-                .Select(c => new { c.Id, c.Name, c.NameAr, c.Type, c.CalculationMethod, c.DefaultAmount })
+                .Select(c => new { c.Id, c.Name, c.NameAr, c.Code, c.Category, c.CalculationMethod, c.DefaultAmount, c.DefaultPercentage })
                 .ToList();
             return Json(components);
         }
@@ -217,22 +231,23 @@ namespace HRsystem.Controllers
         [Route("/payroll/salaries/get-employee")]
         public IActionResult GetEmployeeSalaries(int employeeId)
         {
-            var salaries = _context.EmployeeSalaries
+            var salaries = _context.EmployeePayrollComponents
                 .Where(s => s.EmployeeId == employeeId)
                 .Select(s => new
                 {
                     s.Id,
                     s.Amount,
                     s.IsActive,
-                    s.EffectiveDate,
+                    s.StartDate,
+                    s.EndDate,
                     s.Notes,
-                    ComponentName = s.SalaryComponent.Name,
-                    ComponentNameAr = s.SalaryComponent.NameAr,
-                    ComponentType = s.SalaryComponent.Type,
-                    ComponentCalcMethod = s.SalaryComponent.CalculationMethod,
-                    ComponentId = s.SalaryComponentId
+                    ComponentName = s.PayrollComponent.Name,
+                    ComponentNameAr = s.PayrollComponent.NameAr,
+                    ComponentCategory = s.PayrollComponent.Category,
+                    ComponentCalcMethod = s.PayrollComponent.CalculationMethod,
+                    ComponentId = s.PayrollComponentId
                 })
-                .OrderBy(s => s.ComponentType)
+                .OrderBy(s => s.ComponentCategory)
                 .ThenBy(s => s.ComponentName)
                 .ToList();
 
@@ -246,45 +261,46 @@ namespace HRsystem.Controllers
 
         [HttpPost]
         [Route("/payroll/salaries/add")]
-        public IActionResult AddEmployeeSalary(int employeeId, int salaryComponentId, decimal amount, string? notes)
+        public IActionResult AddEmployeeSalary(int employeeId, int payrollComponentId, decimal amount, string? notes)
         {
-            // Check if this component already exists for this employee
-            var existing = _context.EmployeeSalaries
-                .FirstOrDefault(s => s.EmployeeId == employeeId && s.SalaryComponentId == salaryComponentId && s.IsActive);
+            var existing = _context.EmployeePayrollComponents
+                .FirstOrDefault(s => s.EmployeeId == employeeId && s.PayrollComponentId == payrollComponentId && s.IsActive);
 
             if (existing != null)
             {
                 return Json(new { success = false, message = "هذا المكون موجود بالفعل للموظف" });
             }
 
-            var salary = new EmployeeSalary
+            var salary = new EmployeePayrollComponent
             {
                 EmployeeId = employeeId,
-                SalaryComponentId = salaryComponentId,
+                PayrollComponentId = payrollComponentId,
                 Amount = amount,
                 Notes = notes,
                 IsActive = true,
-                EffectiveDate = DateTime.Now
+                StartDate = DateTime.Now
             };
 
-            _context.EmployeeSalaries.Add(salary);
+            _context.EmployeePayrollComponents.Add(salary);
+            _context.SaveChanges();
 
-            // Add salary history
-            _context.SalaryHistories.Add(new SalaryHistory
+            var currentUserName = User.Identity?.Name ?? "";
+            var changedByUser = _context.Users.FirstOrDefault(u => u.Username == currentUserName);
+            _context.PayrollComponentHistories.Add(new PayrollComponentHistory
             {
                 EmployeeId = employeeId,
-                SalaryComponentId = salaryComponentId,
-                PreviousValue = null,
-                NewValue = amount,
+                PayrollComponentId = payrollComponentId,
+                OldAmount = null,
+                NewAmount = amount,
                 EffectiveDate = DateTime.Now,
                 Reason = "إضافة مكون راتب جديد",
-                ChangedBy = User.Identity?.Name ?? "System",
-                CreatedDate = DateTime.Now
+                ChangedByUserId = changedByUser?.Id,
+                CreatedAt = DateTime.Now
             });
 
             _context.HRLogs.Add(new HRLog
             {
-                Action = $"User ({User.Identity.Name}) added salary component ({salaryComponentId}) for employee ({employeeId}) amount ({amount})"
+                Action = $"User ({User.Identity.Name}) added payroll component ({payrollComponentId}) for employee ({employeeId}) amount ({amount})"
             });
             _context.SaveChanges();
 
@@ -295,7 +311,7 @@ namespace HRsystem.Controllers
         [Route("/payroll/salaries/edit")]
         public IActionResult EditEmployeeSalary(int id, decimal amount, string? notes)
         {
-            var salary = _context.EmployeeSalaries.Find(id);
+            var salary = _context.EmployeePayrollComponents.Find(id);
             if (salary == null)
             {
                 return Json(new { success = false, message = "المكون غير موجود" });
@@ -305,16 +321,18 @@ namespace HRsystem.Controllers
             salary.Amount = amount;
             salary.Notes = notes;
 
-            _context.SalaryHistories.Add(new SalaryHistory
+            var currentUserName = User.Identity?.Name ?? "";
+            var changedByUser = _context.Users.FirstOrDefault(u => u.Username == currentUserName);
+            _context.PayrollComponentHistories.Add(new PayrollComponentHistory
             {
                 EmployeeId = salary.EmployeeId,
-                SalaryComponentId = salary.SalaryComponentId,
-                PreviousValue = previousValue,
-                NewValue = amount,
+                PayrollComponentId = salary.PayrollComponentId,
+                OldAmount = previousValue,
+                NewAmount = amount,
                 EffectiveDate = DateTime.Now,
                 Reason = "تعديل مكون راتب",
-                ChangedBy = User.Identity?.Name ?? "System",
-                CreatedDate = DateTime.Now
+                ChangedByUserId = changedByUser?.Id,
+                CreatedAt = DateTime.Now
             });
 
             _context.HRLogs.Add(new HRLog
@@ -330,13 +348,13 @@ namespace HRsystem.Controllers
         [Route("/payroll/salaries/delete")]
         public IActionResult DeleteEmployeeSalary(int id)
         {
-            var salary = _context.EmployeeSalaries.Find(id);
+            var salary = _context.EmployeePayrollComponents.Find(id);
             if (salary == null)
             {
                 return Json(new { success = false, message = "المكون غير موجود" });
             }
 
-            _context.EmployeeSalaries.Remove(salary);
+            _context.EmployeePayrollComponents.Remove(salary);
 
             _context.HRLogs.Add(new HRLog
             {
@@ -351,7 +369,7 @@ namespace HRsystem.Controllers
         [Route("/payroll/salaries/toggle")]
         public IActionResult ToggleEmployeeSalary(int id)
         {
-            var salary = _context.EmployeeSalaries.Find(id);
+            var salary = _context.EmployeePayrollComponents.Find(id);
             if (salary == null)
             {
                 return Json(new { success = false, message = "المكون غير موجود" });
@@ -394,7 +412,7 @@ namespace HRsystem.Controllers
                     Id = p.Id,
                     Month = p.Month,
                     Year = p.Year,
-                    MonthName = new System.Globalization.CultureInfo("en-US").DateTimeFormat.GetMonthName(p.Month),
+                    MonthName = MonthNamesHelper.GetGregorianMonthName(p.Month),
                     Status = p.Status,
                     GeneratedDate = p.GeneratedDate,
                     GeneratedBy = p.GeneratedBy ?? "",
@@ -413,7 +431,7 @@ namespace HRsystem.Controllers
             ViewBag.Months = Enumerable.Range(1, 12).Select(m => new
             {
                 Value = m,
-                Text = new System.Globalization.CultureInfo("ar-SA").DateTimeFormat.GetMonthName(m)
+                Text = MonthNamesHelper.GetGregorianMonthName(m)
             }).ToList();
 
             ViewBag.Years = Enumerable.Range(DateTime.Now.Year - 2, 5).ToList();
@@ -449,25 +467,33 @@ namespace HRsystem.Controllers
             var startDate = new DateTime(year, month, 1);
             var endDate = startDate.AddMonths(1).AddDays(-1);
             var workingDays = (endDate - startDate).Days + 1;
+            var workingHoursPerDay = 8m;
+
+            // Payroll component used to post approved disciplinary penalties (الجزاءات المعتمدة) as salary deductions
+            var penaltyComponent = _context.PayrollComponents
+                .FirstOrDefault(pc => pc.Code == "PENALTY");
 
             foreach (var emp in employees)
             {
-                // Get active salary components
-                var salaryComponents = _context.EmployeeSalaries
+                // Get active payroll components assigned to this employee
+                var salaryComponents = _context.EmployeePayrollComponents
                     .Where(s => s.EmployeeId == emp.Id && s.IsActive)
-                    .Include(s => s.SalaryComponent)
+                    .Include(s => s.PayrollComponent)
                     .ToList();
 
-                var basicSalary = salaryComponents
-                    .FirstOrDefault(s => s.SalaryComponent.Name == "Basic Salary")?.Amount ?? 0;
+                var basicComponent = salaryComponents
+                    .FirstOrDefault(s => s.PayrollComponent.Category == PayrollComponentCategory.Salary);
+                var basicSalary = basicComponent?.Amount ?? 0;
 
-                var totalEarnings = salaryComponents
-                    .Where(s => s.SalaryComponent.Type == "Earning")
-                    .Sum(s => s.Amount);
+                var earningComponents = salaryComponents
+                    .Where(s => s.PayrollComponent.Category != PayrollComponentCategory.Deduction)
+                    .ToList();
+                var deductionComponents = salaryComponents
+                    .Where(s => s.PayrollComponent.Category == PayrollComponentCategory.Deduction)
+                    .ToList();
 
-                var totalDeductions = salaryComponents
-                    .Where(s => s.SalaryComponent.Type == "Deduction")
-                    .Sum(s => s.Amount);
+                var totalEarnings = earningComponents.Sum(s => s.Amount);
+                var totalDeductions = deductionComponents.Sum(s => s.Amount);
 
                 // Attendance stats from Basma
                 var attendanceRecords = _context.HREmployeeBasmas
@@ -489,13 +515,76 @@ namespace HRsystem.Controllers
                 // Daily salary rate
                 var dailySalaryRate = workingDays > 0 ? basicSalary / workingDays : 0;
 
+                // ===== Approved Penalties → auto salary deductions =====
+                // Only approved penalties that belong to this month and were never
+                // posted to a payroll before (PayrollItemId == null) are converted.
+                var approvedPenalties = _context.EmployeePenalties
+                    .Where(p => p.EmployeeId == emp.Id
+                             && p.Status == PenaltyStatus.Approved
+                             && p.PayrollItemId == null
+                             && p.IncidentDate >= startDate
+                             && p.IncidentDate <= endDate)
+                    .Include(p => p.PenaltyRule)
+                    .ToList();
+
+                var penaltyEntries = new List<(EmployeePenalty Penalty, PayrollItem Item, decimal Amount, decimal Days)>();
+                if (penaltyComponent != null)
+                {
+                    foreach (var penalty in approvedPenalties)
+                    {
+                        if (penalty.DeductionUnit == DeductionUnit.WarningOnly)
+                            continue;
+
+                        decimal penaltyAmount = 0m;
+                        decimal penaltyDays = 0m;
+                        switch (penalty.DeductionUnit)
+                        {
+                            case DeductionUnit.Money:
+                                penaltyAmount = penalty.DeductionValue;
+                                break;
+                            case DeductionUnit.Hour:
+                                var hourlyRate = workingHoursPerDay > 0 ? dailySalaryRate / workingHoursPerDay : 0m;
+                                penaltyAmount = penalty.DeductionValue * hourlyRate;
+                                penaltyDays = workingHoursPerDay > 0 ? penalty.DeductionValue / workingHoursPerDay : 0m;
+                                break;
+                            case DeductionUnit.Day:
+                                penaltyAmount = penalty.DeductionValue * dailySalaryRate;
+                                penaltyDays = penalty.DeductionValue;
+                                break;
+                            case DeductionUnit.Percentage:
+                                penaltyAmount = (penalty.DeductionValue / 100m) * basicSalary;
+                                break;
+                        }
+
+                        if (penaltyAmount <= 0)
+                            continue;
+
+                        totalDeductions += penaltyAmount;
+
+                        penaltyEntries.Add((penalty, new PayrollItem
+                        {
+                            PayrollId = payroll.Id,
+                            EmployeeId = emp.Id,
+                            PayrollComponentId = penaltyComponent.Id,
+                            Amount = penaltyAmount,
+                            Quantity = penalty.DeductionValue,
+                            Rate = dailySalaryRate,
+                            IsManual = false,
+                            IsActive = true,
+                            SourceType = PayrollItemSourceType.Penalty,
+                            SourceId = penalty.Id,
+                            Notes = penalty.PenaltyRule?.NameAr ?? "خصم جزائي"
+                        }, penaltyAmount, penaltyDays));
+                    }
+                }
+
                 // Calculate Taxable & Insurable amounts from component flags
-                var taxableAmount = salaryComponents
-                    .Where(s => s.SalaryComponent.Type == "Earning" && s.SalaryComponent.IsTaxable)
+                var taxableAmount = earningComponents
+                    .Where(s => s.PayrollComponent.IsTaxable)
                     .Sum(s => s.Amount);
 
-                var insurableAmount = salaryComponents
-                    .Where(s => s.SalaryComponent.Type == "Earning" && s.SalaryComponent.IsInsurable)
+                var insurableAmount = earningComponents
+                    .Where(s => s.PayrollComponent.IsInsurable)
                     .Sum(s => s.Amount);
 
                 var grossSalary = totalEarnings;
@@ -526,32 +615,70 @@ namespace HRsystem.Controllers
                 _context.PayrollDetails.Add(detail);
                 _context.SaveChanges();
 
-                // Create individual earning records
-                foreach (var comp in salaryComponents.Where(s => s.SalaryComponent.Type == "Earning"))
+                // Create payroll item rows (new source of truth) + rollup rows (kept detail tables)
+                foreach (var comp in salaryComponents)
                 {
-                    _context.PayrollEarnings.Add(new PayrollEarning
+                    _context.PayrollItems.Add(new PayrollItem
                     {
-                        PayrollDetailId = detail.Id,
-                        SalaryComponentId = comp.SalaryComponentId,
-                        Name = comp.SalaryComponent.NameAr,
+                        PayrollId = payroll.Id,
+                        EmployeeId = emp.Id,
+                        PayrollComponentId = comp.PayrollComponentId,
                         Amount = comp.Amount,
-                        IsTaxable = comp.SalaryComponent.IsTaxable,
-                        IsInsurable = comp.SalaryComponent.IsInsurable
+                        IsManual = false,
+                        IsActive = true,
+                        SourceType = PayrollItemSourceType.Recurring,
+                        Notes = comp.Notes
                     });
+
+                    if (comp.PayrollComponent.Category != PayrollComponentCategory.Deduction)
+                    {
+                        _context.PayrollEarnings.Add(new PayrollEarning
+                        {
+                            PayrollDetailId = detail.Id,
+                            Name = comp.PayrollComponent.NameAr,
+                            Amount = comp.Amount,
+                            IsTaxable = comp.PayrollComponent.IsTaxable,
+                            IsInsurable = comp.PayrollComponent.IsInsurable
+                        });
+                    }
+                    else
+                    {
+                        _context.PayrollDeductions.Add(new PayrollDeduction
+                        {
+                            PayrollDetailId = detail.Id,
+                            Name = comp.PayrollComponent.NameAr,
+                            Amount = comp.Amount,
+                            IsTaxable = comp.PayrollComponent.IsTaxable,
+                            IsInsurable = comp.PayrollComponent.IsInsurable
+                        });
+                    }
                 }
 
-                // Create individual deduction records
-                foreach (var comp in salaryComponents.Where(s => s.SalaryComponent.Type == "Deduction"))
+                // ===== Post approved penalties as deduction rows + PayrollItems =====
+                if (penaltyEntries.Count > 0)
                 {
-                    _context.PayrollDeductions.Add(new PayrollDeduction
+                    foreach (var (penalty, item, amount, days) in penaltyEntries)
                     {
-                        PayrollDetailId = detail.Id,
-                        SalaryComponentId = comp.SalaryComponentId,
-                        Name = comp.SalaryComponent.NameAr,
-                        Amount = comp.Amount,
-                        IsTaxable = comp.SalaryComponent.IsTaxable,
-                        IsInsurable = comp.SalaryComponent.IsInsurable
-                    });
+                        _context.PayrollDeductions.Add(new PayrollDeduction
+                        {
+                            PayrollDetailId = detail.Id,
+                            Name = penalty.PenaltyRule?.NameAr ?? "خصم جزائي",
+                            Amount = amount,
+                            IsTaxable = false,
+                            IsInsurable = false
+                        });
+                    }
+
+                    // Save now to materialize PayrollItem.Id, then link each penalty back to its item
+                    _context.SaveChanges();
+                    foreach (var (penalty, item, amount, days) in penaltyEntries)
+                    {
+                        penalty.PayrollItemId = item.Id;
+                        penalty.DeductionAmount = amount;
+                        penalty.DeductionDays = (penalty.DeductionUnit == DeductionUnit.Day || penalty.DeductionUnit == DeductionUnit.Hour)
+                            ? days
+                            : null;
+                    }
                 }
             }
 
@@ -707,19 +834,19 @@ namespace HRsystem.Controllers
         [Route("/payroll/salary-history/get")]
         public IActionResult GetSalaryHistory(int employeeId)
         {
-            var history = _context.SalaryHistories
+            var history = _context.PayrollComponentHistories
                 .Where(h => h.EmployeeId == employeeId)
-                .OrderByDescending(h => h.CreatedDate)
+                .OrderByDescending(h => h.CreatedAt)
                 .Select(h => new
                 {
                     h.Id,
-                    h.PreviousValue,
-                    h.NewValue,
+                    PreviousValue = h.OldAmount,
+                    NewValue = h.NewAmount,
                     h.EffectiveDate,
                     h.Reason,
-                    h.ChangedBy,
-                    h.CreatedDate,
-                    ComponentName = h.SalaryComponent != null ? h.SalaryComponent.NameAr : "جميع المكونات"
+                    ChangedBy = h.ChangedByUser != null ? h.ChangedByUser.Username : "System",
+                    CreatedDate = h.CreatedAt,
+                    ComponentName = h.PayrollComponent != null ? h.PayrollComponent.NameAr : "جميع المكونات"
                 })
                 .ToList();
 

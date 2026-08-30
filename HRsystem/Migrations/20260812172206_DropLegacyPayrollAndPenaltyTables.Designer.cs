@@ -4,6 +4,7 @@ using HRsystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRsystem.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260812172206_DropLegacyPayrollAndPenaltyTables")]
+    partial class DropLegacyPayrollAndPenaltyTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -175,6 +178,19 @@ namespace HRsystem.Migrations
                     b.HasIndex("EmployeeId", "TransactionDate");
 
                     b.ToTable("CommissionTransactions");
+                });
+
+            modelBuilder.Entity("HRsystem.Models.DailyBasmaFlag", b =>
+                {
+                    b.Property<DateTime>("Day")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Taken")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Day");
+
+                    b.ToTable("DailyBasmaFlags");
                 });
 
             modelBuilder.Entity("HRsystem.Models.DeductionLimitPolicy", b =>

@@ -1,11 +1,30 @@
-@model List<HRsystem.Models.SalaryComponent>
+@model List<HRsystem.Models.PayrollComponent>
+@using HRsystem.Models.Enums
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = "مكونات الراتب";
+    ViewData["Title"] = "مكونات الرواتب";
+
+    string CategoryLabel(PayrollComponentCategory c) => c switch
+    {
+        PayrollComponentCategory.Salary => "الراتب الأساسي",
+        PayrollComponentCategory.Allowance => "بدل",
+        PayrollComponentCategory.Bonus => "مكافأة",
+        PayrollComponentCategory.Incentive => "حافز",
+        PayrollComponentCategory.Commission => "عمولة",
+        PayrollComponentCategory.Overtime => "أوفرتايم",
+        PayrollComponentCategory.Deduction => "خصم",
+        _ => "أخرى"
+    };
+    string CalcLabel(CalculationMethod m) => m switch
+    {
+        CalculationMethod.FixedAmount => "قيمة ثابتة",
+        CalculationMethod.Percentage => "نسبة مئوية",
+        _ => "معادلة"
+    };
 }
 
-<h2 class="fs-3 text-center p-4 m-2 text-color3 shadow-lg">إدارة مكونات الراتب</h2>
+<h2 class="fs-3 text-center p-4 m-2 text-color3 shadow-lg">إدارة مكونات الرواتب</h2>
 
 <div class="flex justify-center mb-4">
     <button id="addComponentBtn" class="cursor-pointer mx-1 col-button-dark px-4 py-2 rounded">
@@ -26,15 +45,16 @@
         <table class="table-base min-w-full border-separate border-spacing-0" id="componentsTable">
             <thead class="table-dark col-table-header sticky top-0 z-10">
                 <tr>
+                    <th>الكود</th>
                     <th>الاسم (عربي)</th>
                     <th>الاسم (إنجليزي)</th>
-                    <th>النوع</th>
+                    <th>الفئة</th>
                     <th>طريقة الحساب</th>
                     <th>القيمة الافتراضية</th>
+                    <th>متكرر</th>
                     <th>الحالة</th>
                     <th>ضريبة</th>
                     <th>تأمينات</th>
-                    <th>ثابت</th>
                     <th>الوصف</th>
                     <th>إجراءات</th>
                 </tr>
@@ -43,29 +63,44 @@
                 @foreach (var component in Model)
                 {
                     <tr id="row-@component.Id" class="snap-start">
+                        <td class="text-sm">@(component.Code ?? "-")</td>
                         <td>@component.NameAr</td>
                         <td>@component.Name</td>
                         <td>
-                            @if (component.Type == "Earning")
+                            @if (component.Category == PayrollComponentCategory.Deduction)
                             {
-                                <span class="text-green-600 font-semibold">إضافة</span>
+                                <span class="text-red-600 font-semibold">@CategoryLabel(component.Category)</span>
                             }
                             else
                             {
-                                <span class="text-red-600 font-semibold">خصم</span>
+                                <span class="text-green-600 font-semibold">@CategoryLabel(component.Category)</span>
+                            }
+                        </td>
+                        <td>@CalcLabel(component.CalculationMethod)</td>
+                        <td>
+                            @if (component.DefaultAmount.HasValue)
+                            {
+                                <span>@component.DefaultAmount.Value.ToString("N2")</span>
+                            }
+                            else if (component.DefaultPercentage.HasValue)
+                            {
+                                <span>@component.DefaultPercentage.Value.ToString("N2")%</span>
+                            }
+                            else
+                            {
+                                <span>-</span>
                             }
                         </td>
                         <td>
-                            @if (component.CalculationMethod == "FixedAmount")
+                            @if (component.IsRecurring)
                             {
-                                <span>قيمة ثابتة</span>
+                                <span class="text-green-600">✓</span>
                             }
                             else
                             {
-                                <span>نسبة مئوية</span>
+                                <span class="text-red-400">✗</span>
                             }
                         </td>
-                        <td>@(component.DefaultAmount?.ToString("N2") ?? "-")</td>
                         <td>
                             @if (component.IsActive)
                             {
@@ -96,22 +131,10 @@
                                 <span class="text-red-400">✗</span>
                             }
                         </td>
-                        <td>
-                            @if (component.IsFixed)
-                            {
-                                <span class="text-green-600">✓</span>
-                            }
-                            else
-                            {
-                                <span class="text-red-400">✗</span>
-                            }
-                        </td>
                         <td>@(component.Description ?? "-")</td>
                         <td>
-                            <button class="editBtn col-button-dark text-[11px] rounded" data-id="@component.Id">
-                                تعديل
-                            </button>
-                            <button class="toggleBtn col-button-light text-[11px] rounded mt-1" data-id="@component.Id">
+                            <button class="col-button-dark text-[11px] rounded px-2 py-1 editBtn" data-id="@component.Id">تعديل</button>
+                            <button class="col-button-light text-[11px] rounded px-2 py-1 mt-1 toggleBtn" data-id="@component.Id">
                                 @(component.IsActive ? "تعطيل" : "تفعيل")
                             </button>
                         </td>
@@ -121,15 +144,14 @@
         </table>
     }
 </div>
-
-<!-- Add Modal -->
+<!-- Add Component Modal -->
 <div id="addModal" class="hidden fixed inset-0 bg-black/30 z-50 items-center justify-center">
-    <div class="col-modal relative p-6 rounded-2xl shadow-xl text-center w-full md:w-1/2">
+    <div class="col-modal relative p-6 rounded-2xl shadow-xl w-full md:w-1/2 max-h-[90vh] overflow-y-auto">
         <button onclick="closeAddModal()" class="absolute top-2 left-2 text-[25px]">
             <i class="bi bi-x-square-fill"></i>
         </button>
-        <h3 class="text-lg font-bold mb-3">إضافة مكون راتب جديد</h3>
-        <form id="addComponentForm" class="space-y-3 text-right">
+        <h3 class="text-lg font-bold mb-3">إضافة مكون راتب</h3>
+        <form id="addComponentForm" class="space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                     <label class="block text-sm font-medium text-gray-700">الاسم (عربي) *</label>
@@ -142,19 +164,31 @@
                            class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">النوع</label>
-                    <select name="Type"
+                    <label class="block text-sm font-medium text-gray-700">الكود *</label>
+                    <input type="text" name="Code"
+                           class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">الفئة</label>
+                    <select name="Category"
                             class="mt-1 w-full border border-color3 rounded p-2 focus:outline-none focus:ring focus:ring-color3">
-                        <option value="Earning">إضافة (Earning)</option>
-                        <option value="Deduction">خصم (Deduction)</option>
+                        <option value="0">الراتب الأساسي</option>
+                        <option value="1" selected>بدل</option>
+                        <option value="2">مكافأة</option>
+                        <option value="3">حافز</option>
+                        <option value="4">عمولة</option>
+                        <option value="5">أوفرتايم</option>
+                        <option value="6">خصم</option>
+                        <option value="7">أخرى</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700">طريقة الحساب</label>
                     <select name="CalculationMethod"
                             class="mt-1 w-full border border-color3 rounded p-2 focus:outline-none focus:ring focus:ring-color3">
-                        <option value="FixedAmount">قيمة ثابتة</option>
-                        <option value="Percentage">نسبة مئوية</option>
+                        <option value="0" selected>قيمة ثابتة</option>
+                        <option value="1">نسبة مئوية</option>
+                        <option value="2">معادلة</option>
                     </select>
                 </div>
                 <div>
@@ -163,50 +197,45 @@
                            class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">الحالة</label>
-                    <select name="IsActive"
-                            class="mt-1 w-full border border-color3 rounded p-2 focus:outline-none focus:ring focus:ring-color3">
-                        <option value="true">نشط</option>
-                        <option value="false">غير نشط</option>
-                    </select>
+                    <label class="block text-sm font-medium text-gray-700">النسبة الافتراضية (%)</label>
+                    <input type="number" step="0.01" name="DefaultPercentage"
+                           class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">
-                        <input type="checkbox" name="IsTaxable" value="true" checked class="ml-1" />
-                        يخضع للضريبة
-                    </label>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">
-                        <input type="checkbox" name="IsInsurable" value="true" checked class="ml-1" />
-                        يخضع للتأمينات
-                    </label>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">
-                        <input type="checkbox" name="IsFixed" value="true" checked class="ml-1" />
-                        مكون ثابت
-                    </label>
-                </div>
+            </div>
+            <div class="flex flex-wrap gap-4 mt-2">
+                <label class="inline-flex items-center gap-1 text-sm">
+                    <input type="checkbox" name="IsActive" value="true" checked /> نشط
+                </label>
+                <label class="inline-flex items-center gap-1 text-sm">
+                    <input type="checkbox" name="IsRecurring" value="true" checked /> متكرر شهرياً
+                </label>
+                <label class="inline-flex items-center gap-1 text-sm">
+                    <input type="checkbox" name="IsTaxable" value="true" checked /> خاضع للضريبة
+                </label>
+                <label class="inline-flex items-center gap-1 text-sm">
+                    <input type="checkbox" name="IsInsurable" value="true" checked /> خاضع للتأمينات
+                </label>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700">الوصف</label>
                 <textarea name="Description" rows="2"
                           class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]"></textarea>
             </div>
-            <button type="submit" class="col-button-dark px-6 py-2 rounded">حفظ</button>
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="closeAddModal()" class="col-button-light px-4 py-2 rounded">إلغاء</button>
+                <button type="submit" class="col-button-dark px-4 py-2 rounded">حفظ</button>
+            </div>
         </form>
     </div>
 </div>
-
-<!-- Edit Modal -->
+<!-- Edit Component Modal -->
 <div id="editModal" class="hidden fixed inset-0 bg-black/30 z-50 items-center justify-center">
-    <div class="col-modal relative p-6 rounded-2xl shadow-xl text-center w-full md:w-1/2">
+    <div class="col-modal relative p-6 rounded-2xl shadow-xl w-full md:w-1/2 max-h-[90vh] overflow-y-auto">
         <button onclick="closeEditModal()" class="absolute top-2 left-2 text-[25px]">
             <i class="bi bi-x-square-fill"></i>
         </button>
-        <h3 class="text-lg font-bold mb-3">تعديل مكون الراتب</h3>
-        <form id="editComponentForm" class="space-y-3 text-right">
+        <h3 class="text-lg font-bold mb-3">تعديل مكون راتب</h3>
+        <form id="editComponentForm" class="space-y-4">
             <input type="hidden" name="Id" id="editId" />
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
@@ -220,19 +249,31 @@
                            class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">النوع</label>
-                    <select name="Type" id="editType"
+                    <label class="block text-sm font-medium text-gray-700">الكود *</label>
+                    <input type="text" name="Code" id="editCode"
+                           class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">الفئة</label>
+                    <select name="Category" id="editCategory"
                             class="mt-1 w-full border border-color3 rounded p-2 focus:outline-none focus:ring focus:ring-color3">
-                        <option value="Earning">إضافة (Earning)</option>
-                        <option value="Deduction">خصم (Deduction)</option>
+                        <option value="0">الراتب الأساسي</option>
+                        <option value="1">بدل</option>
+                        <option value="2">مكافأة</option>
+                        <option value="3">حافز</option>
+                        <option value="4">عمولة</option>
+                        <option value="5">أوفرتايم</option>
+                        <option value="6">خصم</option>
+                        <option value="7">أخرى</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700">طريقة الحساب</label>
                     <select name="CalculationMethod" id="editCalcMethod"
                             class="mt-1 w-full border border-color3 rounded p-2 focus:outline-none focus:ring focus:ring-color3">
-                        <option value="FixedAmount">قيمة ثابتة</option>
-                        <option value="Percentage">نسبة مئوية</option>
+                        <option value="0">قيمة ثابتة</option>
+                        <option value="1">نسبة مئوية</option>
+                        <option value="2">معادلة</option>
                     </select>
                 </div>
                 <div>
@@ -241,74 +282,59 @@
                            class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">الحالة</label>
-                    <select name="IsActive" id="editIsActive"
-                            class="mt-1 w-full border border-color3 rounded p-2 focus:outline-none focus:ring focus:ring-color3">
-                        <option value="true">نشط</option>
-                        <option value="false">غير نشط</option>
-                    </select>
+                    <label class="block text-sm font-medium text-gray-700">النسبة الافتراضية (%)</label>
+                    <input type="number" step="0.01" name="DefaultPercentage" id="editDefaultPercentage"
+                           class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]" />
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">
-                        <input type="checkbox" name="IsTaxable" id="editIsTaxable" value="true" class="ml-1" />
-                        يخضع للضريبة
-                    </label>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">
-                        <input type="checkbox" name="IsInsurable" id="editIsInsurable" value="true" class="ml-1" />
-                        يخضع للتأمينات
-                    </label>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">
-                        <input type="checkbox" name="IsFixed" id="editIsFixed" value="true" class="ml-1" />
-                        مكون ثابت
-                    </label>
-                </div>
+            </div>
+            <div class="flex flex-wrap gap-4 mt-2">
+                <label class="inline-flex items-center gap-1 text-sm">
+                    <input type="checkbox" name="IsActive" id="editIsActive" value="true" checked /> نشط
+                </label>
+                <label class="inline-flex items-center gap-1 text-sm">
+                    <input type="checkbox" name="IsRecurring" id="editIsRecurring" value="true" /> متكرر شهرياً
+                </label>
+                <label class="inline-flex items-center gap-1 text-sm">
+                    <input type="checkbox" name="IsTaxable" id="editIsTaxable" value="true" /> خاضع للضريبة
+                </label>
+                <label class="inline-flex items-center gap-1 text-sm">
+                    <input type="checkbox" name="IsInsurable" id="editIsInsurable" value="true" /> خاضع للتأمينات
+                </label>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700">الوصف</label>
                 <textarea name="Description" id="editDescription" rows="2"
                           class="mt-1 w-full border rounded p-2 focus:outline-none focus:ring focus:ring-[#7B9669]"></textarea>
             </div>
-            <button type="submit" class="col-button-dark px-6 py-2 rounded">حفظ التعديلات</button>
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="closeEditModal()" class="col-button-light px-4 py-2 rounded">إلغاء</button>
+                <button type="submit" class="col-button-dark px-4 py-2 rounded">حفظ</button>
+            </div>
         </form>
     </div>
 </div>
-
 @section Scripts {
     <script>
-        // ========== ADD ==========
+        function closeAddModal() {
+            document.getElementById('addModal').classList.add('hidden');
+            document.getElementById('addModal').classList.remove('flex');
+        }
         document.getElementById('addComponentBtn')?.addEventListener('click', function() {
             document.getElementById('addModal').classList.remove('hidden');
             document.getElementById('addModal').classList.add('flex');
         });
 
-        function closeAddModal() {
-            document.getElementById('addModal').classList.add('hidden');
-            document.getElementById('addModal').classList.remove('flex');
-        }
-
         document.getElementById('addComponentForm')?.addEventListener('submit', function(e) {
             e.preventDefault();
             const form = this;
             const formData = new FormData(form);
-
-            // Checkboxes: include value only if checked
-            if (!document.querySelector('#addComponentForm [name="IsTaxable"]').checked) {
-                formData.delete('IsTaxable');
-                formData.append('IsTaxable', 'false');
-            }
-            if (!document.querySelector('#addComponentForm [name="IsInsurable"]').checked) {
-                formData.delete('IsInsurable');
-                formData.append('IsInsurable', 'false');
-            }
-            if (!document.querySelector('#addComponentForm [name="IsFixed"]').checked) {
-                formData.delete('IsFixed');
-                formData.append('IsFixed', 'false');
-            }
-
+            ['IsActive', 'IsRecurring', 'IsTaxable', 'IsInsurable'].forEach(ck => {
+                const el = document.querySelector('#addComponentForm [name="' + ck + '"]');
+                if (el && !el.checked) {
+                    formData.delete(ck);
+                    formData.append(ck, 'false');
+                }
+            });
             fetch('/payroll/salary-components/add', {
                 method: 'POST',
                 body: formData
@@ -323,30 +349,30 @@
             });
         });
 
-        // ========== EDIT ==========
         document.querySelectorAll('.editBtn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const id = this.dataset.id;
-                fetch(`/payroll/salary-components/get?id=${id}`)
-                    .then(r => r.json())
-                    .then(data => {
-                        if (data.success) {
-                            const c = data.data;
-                            document.getElementById('editId').value = c.Id;
-                            document.getElementById('editNameAr').value = c.NameAr;
-                            document.getElementById('editName').value = c.Name;
-                            document.getElementById('editType').value = c.Type;
-                            document.getElementById('editCalcMethod').value = c.CalculationMethod;
-                            document.getElementById('editDefaultAmount').value = c.DefaultAmount || '';
-                            document.getElementById('editIsActive').value = c.IsActive ? 'true' : 'false';
-                            document.getElementById('editDescription').value = c.Description || '';
-                            document.getElementById('editIsTaxable').checked = c.IsTaxable;
-                            document.getElementById('editIsInsurable').checked = c.IsInsurable;
-                            document.getElementById('editIsFixed').checked = c.IsFixed;
-                            document.getElementById('editModal').classList.remove('hidden');
-                            document.getElementById('editModal').classList.add('flex');
-                        }
-                    });
+                fetch('/payroll/salary-components/get?id=' + id)
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.success) return;
+                    const c = data.data;
+                    document.getElementById('editId').value = c.Id;
+                    document.getElementById('editNameAr').value = c.NameAr;
+                    document.getElementById('editName').value = c.Name;
+                    document.getElementById('editCode').value = c.Code;
+                    document.getElementById('editCategory').value = c.Category;
+                    document.getElementById('editCalcMethod').value = c.CalculationMethod;
+                    document.getElementById('editDefaultAmount').value = c.DefaultAmount || '';
+                    document.getElementById('editDefaultPercentage').value = c.DefaultPercentage || '';
+                    document.getElementById('editIsActive').checked = c.IsActive;
+                    document.getElementById('editIsRecurring').checked = c.IsRecurring;
+                    document.getElementById('editIsTaxable').checked = c.IsTaxable;
+                    document.getElementById('editIsInsurable').checked = c.IsInsurable;
+                    document.getElementById('editDescription').value = c.Description || '';
+                    document.getElementById('editModal').classList.remove('hidden');
+                    document.getElementById('editModal').classList.add('flex');
+                });
             });
         });
 
@@ -359,21 +385,13 @@
             e.preventDefault();
             const form = this;
             const formData = new FormData(form);
-
-            // Checkboxes: include value only if checked
-            if (!document.getElementById('editIsTaxable').checked) {
-                formData.delete('IsTaxable');
-                formData.append('IsTaxable', 'false');
-            }
-            if (!document.getElementById('editIsInsurable').checked) {
-                formData.delete('IsInsurable');
-                formData.append('IsInsurable', 'false');
-            }
-            if (!document.getElementById('editIsFixed').checked) {
-                formData.delete('IsFixed');
-                formData.append('IsFixed', 'false');
-            }
-
+            ['IsActive', 'IsRecurring', 'IsTaxable', 'IsInsurable'].forEach(ck => {
+                const el = document.getElementById('edit' + ck[0].toUpperCase() + ck.slice(1));
+                if (el && !el.checked) {
+                    formData.delete(ck);
+                    formData.append(ck, 'false');
+                }
+            });
             fetch('/payroll/salary-components/edit', {
                 method: 'POST',
                 body: formData
@@ -388,14 +406,13 @@
             });
         });
 
-        // ========== TOGGLE ==========
         document.querySelectorAll('.toggleBtn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const id = this.dataset.id;
                 fetch('/payroll/salary-components/toggle', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `id=${id}`
+                    body: 'id=' + id
                 })
                 .then(r => r.json())
                 .then(data => {

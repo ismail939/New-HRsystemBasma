@@ -108,7 +108,7 @@ namespace HRsystem.Data
 
             modelBuilder.Entity<EmployeePayrollComponent>()
                 .HasOne(epc => epc.HREmployee)
-                .WithMany()
+                .WithMany(e => e.EmployeePayrollComponents)
                 .HasForeignKey(epc => epc.EmployeeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -409,14 +409,12 @@ namespace HRsystem.Data
         public DbSet<HREmployeeFile> HREmployeeFiles { get; set; }
         public DbSet<HREmployeeBasma> HREmployeeBasmas { get; set; }
         public DbSet<HREmployeeOffDay> HREmployeeOffDays { get; set; }
-        public DbSet<HREmployeePenalty> HREmployeePenalties { get; set; }
         public DbSet<HREmployeeRate> HREmployeeRates { get; set; }
         public DbSet<HRApplier> HRAppliers { get; set; }
         public DbSet<HRApplierFile> HRApplierFiles { get; set; }
         public DbSet<HREmployeeShift> HREmployeeShift { get; set; }
         public DbSet<HROffDayBalance> HROffDayBalances { get; set; }
         public DbSet<CheckInOut> CheckInOuts { get; set; }
-        public DbSet<DailyBasmaFlag> DailyBasmaFlags { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<HRDepartment> HRDepartments { get; set; }
         public DbSet<HRLog> HRLogs { get; set; }
@@ -428,9 +426,6 @@ namespace HRsystem.Data
         public DbSet<Notification> Notifications { get; set; }
 
         // Payroll entities
-        public DbSet<SalaryComponent> SalaryComponents { get; set; }
-        public DbSet<EmployeeSalary> EmployeeSalaries { get; set; }
-        public DbSet<SalaryHistory> SalaryHistories { get; set; }
         public DbSet<Payroll> Payrolls { get; set; }
         public DbSet<PayrollDetail> PayrollDetails { get; set; }
         public DbSet<PayrollEarning> PayrollEarnings { get; set; }

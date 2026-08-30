@@ -57,19 +57,19 @@
 
                     data.history.forEach(h => {
                         const tr = document.createElement('tr');
-                        const diff = h.newValue - (h.previousValue || 0);
+                        const diff = h.NewValue - (h.PreviousValue || 0);
                         const diffClass = diff >= 0 ? 'text-green-600' : 'text-red-600';
                         const diffSign = diff >= 0 ? '+' : '';
 
                         tr.innerHTML = `
-                            <td>${new Date(h.createdDate).toLocaleDateString('ar-SA')}</td>
-                            <td>${h.componentName}</td>
-                            <td>${h.previousValue != null ? Number(h.previousValue).toFixed(2) : '-'}</td>
-                            <td>${Number(h.newValue).toFixed(2)}</td>
+                            <td>${new Date(h.CreatedDate).toLocaleDateString('ar-SA')}</td>
+                            <td>${h.ComponentName}</td>
+                            <td>${h.PreviousValue != null ? Number(h.PreviousValue).toFixed(2) : '-'}</td>
+                            <td>${Number(h.NewValue).toFixed(2)}</td>
                             <td class="${diffClass}">${diffSign}${diff.toFixed(2)}</td>
-                            <td>${new Date(h.effectiveDate).toLocaleDateString('ar-SA')}</td>
-                            <td>${h.reason || '-'}</td>
-                            <td>${h.changedBy}</td>
+                            <td>${new Date(h.EffectiveDate).toLocaleDateString('ar-SA')}</td>
+                            <td>${h.Reason || '-'}</td>
+                            <td>${h.ChangedBy}</td>
                         `;
                         tbody.appendChild(tr);
                     });

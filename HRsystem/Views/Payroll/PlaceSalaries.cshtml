@@ -167,7 +167,7 @@
                 data.forEach(c => {
                     const opt = document.createElement('option');
                     opt.value = c.Id;
-                    opt.textContent = `${c.NameAr} (${c.Type === 'Earning' ? 'إضافة' : 'خصم'})`;
+                    opt.textContent = `${c.NameAr} (${c.Category === 6 ? 'خصم' : 'إضافة'})`;
                     select.appendChild(opt);
                 });
             });
@@ -254,9 +254,8 @@
                     console.log('Salaries data:', data.salaries[0]); // debug to see property names
                     data.salaries.forEach(s => {
                         const tr = document.createElement('tr');
-                        // Support both PascalCase (PropertyNamingPolicy=null) and camelCase (default)
-                        const typeText = (s.ComponentType || s.componentType) === 'Earning' ? 'إضافة' : 'خصم';
-                        const typeClass = (s.ComponentType || s.componentType) === 'Earning' ? 'text-green-600' : 'text-red-600';
+                        const typeText = (s.ComponentCategory || s.componentCategory) === 6 ? 'خصم' : 'إضافة';
+                        const typeClass = (s.ComponentCategory || s.componentCategory) === 6 ? 'text-red-600' : 'text-green-600';
                         const activeText = (s.IsActive || s.isActive) ? 'نشط' : 'غير نشط';
                         const activeClass = (s.IsActive || s.isActive) ? 'text-green-600' : 'text-red-600';
                         const nameAr = s.ComponentNameAr || s.componentNameAr || '-';
@@ -309,7 +308,7 @@
 
             const formData = new FormData();
             formData.append('employeeId', employeeId);
-            formData.append('salaryComponentId', componentId);
+            formData.append('payrollComponentId', componentId);
             formData.append('amount', amount);
             formData.append('notes', notes);
 

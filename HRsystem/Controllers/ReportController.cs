@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using HRsystem.Data;
+using HRsystem.Helpers;
 using HRsystem.Models;
 using Microsoft.AspNetCore.Mvc;
 using QuestPDF.Fluent;
@@ -61,7 +62,7 @@ namespace HRsystem.Controllers
             int absencesNumber = _context.HREmployeeBasmas.Where(e => e.EmployeeId == employeeId && e.Status == 1 && e.DayDate >= startDate && e.DayDate <= endDate).Count();
             int offdays = _context.HREmployeeOffDays.Where(o => o.EmployeeId == employeeId && o.OffDayType != "راحة" && o.OffDayDate >= startDate && o.OffDayDate <= endDate).Count();
             int offs = _context.HREmployeeOffDays.Where(o => o.EmployeeId == employeeId && o.OffDayType == "راحة" && o.OffDayDate >= startDate && o.OffDayDate <= endDate).Count();
-            int penalties = _context.HREmployeePenalties.Where(p => p.EmployeeId == employeeId && p.PenaltyDate >= startDate && p.PenaltyDate <= endDate).Count();
+            int penalties = _context.EmployeePenalties.Where(p => p.EmployeeId == employeeId && p.IncidentDate >= startDate && p.IncidentDate <= endDate && p.Status != HRsystem.Models.Enums.PenaltyStatus.Rejected).Count();
             return Json(new { arrivalsNumber = arrivalsNumber, absencesNumber = absencesNumber, offdays = offdays, offs = offs, penalties = penalties });
         }
 
@@ -158,21 +159,7 @@ namespace HRsystem.Controllers
         [Route("/getRates")]
         public IActionResult GetRates(int employeeId, int startMonth, int endMonth, int startYear, int endYear)
         {
-            List<string> months = new List<string>
-            {
-                "يناير",  // January
-                "فبراير", // February
-                "مارس",   // March
-                "أبريل",  // April
-                "مايو",   // May
-                "يونيو",  // June
-                "يوليو",  // July
-                "أغسطس",  // August
-                "سبتمبر", // September
-                "أكتوبر", // October
-                "نوفمبر", // November
-                "ديسمبر"  // December
-            };
+            List<string> months = Enumerable.Range(1, 12).Select(m => MonthNamesHelper.GetGregorianMonthName(m)).ToList();
 
             object empRates;
             List<decimal> rates;
@@ -203,18 +190,18 @@ namespace HRsystem.Controllers
         public IActionResult GetPenalties(int employeeId, DateTime startDate, DateTime endDate)
         {
             Console.WriteLine(string.Format("🔴employeeId: {0}, startDate: {1}, endDate: {2}", employeeId, startDate, endDate));
-            // Example: Query the OffDays table (edit to match your DB)
-            var penalties = _context.HREmployeePenalties
-                .Where(o => o.EmployeeId == employeeId &&
-                            o.IsActive == true &&
-                            o.PenaltyDate >= startDate &&
-                            o.PenaltyDate <= endDate)
-                .Select(o => new
+            // Example: Query the EmployeePenalties table
+            var penalties = _context.EmployeePenalties
+                .Where(p => p.EmployeeId == employeeId &&
+                            p.Status != HRsystem.Models.Enums.PenaltyStatus.Rejected &&
+                            p.IncidentDate >= startDate &&
+                            p.IncidentDate <= endDate)
+                .Select(p => new
                 {
-                    o.PenaltyDate,
-                    o.Decision,
-                    o.PenaltyPoints,
-                    o.Reason
+                    PenaltyDate = p.IncidentDate,
+                    Decision = p.PenaltyRule.NameAr,
+                    PenaltyPoints = p.DeductionValue,
+                    Reason = p.ManagerNotes ?? ""
                 })
                 .ToList();
 
