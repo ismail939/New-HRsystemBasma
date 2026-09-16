@@ -32,6 +32,123 @@ namespace HRsystem.Controllers
         {
             return View();
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        [Route("/admin/payroll-rules")]
+        public IActionResult PayrollRules(int? id)
+        {
+            var policy = (id.HasValue ? _context.PayrollPolicies.FirstOrDefault(p => p.Id == id.Value) : null)
+                ?? _context.PayrollPolicies.FirstOrDefault(p => p.IsActive)
+                ?? new PayrollPolicy();
+            ViewBag.PayrollPolicies = _context.PayrollPolicies
+                .OrderByDescending(p => p.IsActive)
+                .ThenByDescending(p => p.CreatedAt)
+                .ToList();
+            ViewBag.TaxBrackets = _context.TaxBrackets.Where(x => x.PayrollPolicyId == policy.Id && x.IsActive).OrderBy(x => x.FromAmount).ToList();
+            ViewBag.InsurancePolicy = _context.InsurancePolicies.Where(x => x.PayrollPolicyId == policy.Id && x.IsActive).OrderByDescending(x => x.EffectiveDate).FirstOrDefault();
+            return View("PayrollRules", policy);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        [Route("/admin/payroll-rules/new")]
+        public IActionResult NewPayrollRules()
+        {
+            ViewBag.PayrollPolicies = _context.PayrollPolicies
+                .OrderByDescending(p => p.IsActive).ThenByDescending(p => p.CreatedAt).ToList();
+            return View("PayrollRules", new PayrollPolicy());
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("/admin/payroll-rules/tax-bracket")]
+        public async Task<IActionResult> AddTaxBracket(TaxBracket bracket)
+        {
+            if (bracket.PayrollPolicyId <= 0 || bracket.FromAmount < 0 || bracket.Rate < 0) return BadRequest();
+            _context.TaxBrackets.Add(bracket);
+            await _context.SaveChangesAsync();
+            return Redirect($"/admin/payroll-rules?id={bracket.PayrollPolicyId}");
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("/admin/payroll-rules/insurance")]
+        public async Task<IActionResult> SaveInsurancePolicy(InsurancePolicy insurance)
+        {
+            var current = await _context.InsurancePolicies.FirstOrDefaultAsync(x => x.PayrollPolicyId == insurance.PayrollPolicyId && x.IsActive);
+            if (current == null) { insurance.Id = 0; insurance.IsActive = true; _context.InsurancePolicies.Add(insurance); }
+            else { current.Name = insurance.Name; current.EmployeeRate = insurance.EmployeeRate; current.EmployerRate = insurance.EmployerRate; current.MinimumInsurableSalary = insurance.MinimumInsurableSalary; current.MaximumInsurableSalary = insurance.MaximumInsurableSalary; }
+            await _context.SaveChangesAsync();
+            return Redirect($"/admin/payroll-rules?id={insurance.PayrollPolicyId}");
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("/admin/payroll-rules")]
+        public async Task<IActionResult> SavePayrollRules(PayrollPolicy policy)
+        {
+            if (!ModelState.IsValid)
+                return View("PayrollRules", policy);
+
+            var current = policy.Id > 0
+                ? await _context.PayrollPolicies.FirstOrDefaultAsync(p => p.Id == policy.Id)
+                : null;
+            if (current == null)
+            {
+                policy.Id = 0;
+                policy.CreatedAt = DateTime.Now;
+                policy.IsActive = false;
+                _context.PayrollPolicies.Add(policy);
+            }
+            else
+            {
+                current.Name = policy.Name;
+                current.WorkingDaysPerMonth = policy.WorkingDaysPerMonth;
+                current.CalendarDaysPerMonth = policy.CalendarDaysPerMonth;
+                current.WorkingHoursPerDay = policy.WorkingHoursPerDay;
+                current.DailySalaryCalcMethod = policy.DailySalaryCalcMethod;
+                current.DailySalaryFixedValue = policy.DailySalaryFixedValue;
+                current.OvertimeBase = policy.OvertimeBase;
+                current.OvertimeWeekdayMultiplier = policy.OvertimeWeekdayMultiplier;
+                current.OvertimeWeekendMultiplier = policy.OvertimeWeekendMultiplier;
+                current.OvertimeHolidayMultiplier = policy.OvertimeHolidayMultiplier;
+                current.LateDeductionMethod = policy.LateDeductionMethod;
+                current.AbsenceDeductionMethod = policy.AbsenceDeductionMethod;
+                current.LeaveEncashmentMethod = policy.LeaveEncashmentMethod;
+                current.MaxDeductionPerMonth = policy.MaxDeductionPerMonth;
+                current.MaxDeductionPerYear = policy.MaxDeductionPerYear;
+                current.MaxDeductionAmount = policy.MaxDeductionAmount;
+                current.MaxDeductionDays = policy.MaxDeductionDays;
+                current.MaxDeductionPercentage = policy.MaxDeductionPercentage;
+            }
+
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "تم حفظ قواعد الرواتب بنجاح";
+            return RedirectToAction(nameof(PayrollRules));
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("/admin/payroll-rules/activate")]
+        public async Task<IActionResult> ActivatePayrollRules(int id)
+        {
+            var selected = await _context.PayrollPolicies.FirstOrDefaultAsync(p => p.Id == id);
+            if (selected == null) return NotFound();
+
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+            await _context.PayrollPolicies.ExecuteUpdateAsync(p => p.SetProperty(x => x.IsActive, false));
+            selected.IsActive = true;
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            TempData["SuccessMessage"] = $"تم تفعيل سياسة الرواتب: {selected.Name}";
+            return RedirectToAction(nameof(PayrollRules));
+        }
         [Authorize(Roles = "Admin")]
         [HttpGet]
         [Route("/admin/users")]

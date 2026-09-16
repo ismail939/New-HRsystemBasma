@@ -1,0 +1,123 @@
+@model HRsystem.Models.PayrollPolicy
+@using HRsystem.Models.Enums
+@{
+    ViewData["Title"] = "قواعد الرواتب";
+    var success = TempData["SuccessMessage"] as string;
+    var policies = ViewBag.PayrollPolicies as List<HRsystem.Models.PayrollPolicy> ?? new();
+    var isNew = Model.Id == 0;
+    var taxBrackets = ViewBag.TaxBrackets as List<HRsystem.Models.TaxBracket> ?? new();
+    var insurance = ViewBag.InsurancePolicy as HRsystem.Models.InsurancePolicy ?? new HRsystem.Models.InsurancePolicy { PayrollPolicyId = Model.Id };
+}
+
+<div class="max-w-6xl mx-auto p-4" dir="rtl">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div>
+            <a href="/admin/dashboard" class="text-[var(--text-primary)] hover:text-[var(--accent)] hover:underline"><i class="bi bi-arrow-right"></i> الإدارة</a>
+            <h1 class="text-3xl font-bold text-[var(--text-primary)] mt-2">@(isNew ? "إضافة سياسة رواتب" : "قواعد الرواتب")</h1>
+            <p class="text-[var(--text-secondary)] mt-1">إعدادات الحساب التي يستخدمها محرك إنشاء كشف الرواتب.</p>
+        </div>
+        <i class="bi bi-sliders2 text-5xl text-color3"></i>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(success)) { <div class="alert alert-success shadow-sm">@success</div> }
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="theme-panel rounded-2xl shadow-md p-5 mb-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div><h2 class="section-title mb-1"><i class="bi bi-collection"></i> سياسات الرواتب المحفوظة</h2><p class="text-[var(--text-secondary)] text-sm">اختر السياسة الفعالة التي سيستخدمها النظام. السياسات القديمة تبقى محفوظة ويمكن إعادة تفعيلها.</p></div>
+            <a href="/admin/payroll-rules/new" class="col-button-dark px-4 py-2"><i class="bi bi-plus-lg"></i> سياسة جديدة</a>
+        </div>
+        @if (!policies.Any())
+        {
+            <p class="text-[var(--text-secondary)] mt-4">لا توجد سياسات محفوظة بعد.</p>
+        }
+        else
+        {
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 mt-4">
+                @foreach (var saved in policies)
+                {
+                    <div class="policy-card @(saved.IsActive ? "policy-active" : "")">
+                        <div class="flex items-start justify-between gap-2">
+                            <div><strong>@saved.Name</strong><div class="text-sm text-[var(--text-secondary)]">@saved.CreatedAt.ToString("yyyy-MM-dd")</div></div>
+                            @if (saved.IsActive) { <span class="policy-badge">فعالة</span> }
+                        </div>
+                        <div class="flex gap-2 mt-3">
+                            <a href="/admin/payroll-rules?id=@saved.Id" class="secondary-action">تعديل</a>
+                            @if (!saved.IsActive)
+                            {
+                                <form method="post" action="/admin/payroll-rules/activate">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@saved.Id" /><button class="secondary-action" type="submit">تفعيل</button></form>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="space-y-5">
+        <section class="theme-panel rounded-2xl shadow-md p-5">
+            <h2 class="section-title"><i class="bi bi-calendar3"></i> أساس الشهر والراتب</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div><label asp-for="Name" class="form-label">اسم السياسة</label><input asp-for="Name" form="policyForm" class="form-control" /></div>
+                <div><label asp-for="WorkingDaysPerMonth" class="form-label">أيام العمل بالشهر</label><input asp-for="WorkingDaysPerMonth" form="policyForm" class="form-control" type="number" step="0.01" /></div>
+                <div><label asp-for="CalendarDaysPerMonth" class="form-label">أيام الشهر التقويمية</label><input asp-for="CalendarDaysPerMonth" form="policyForm" class="form-control" type="number" step="0.01" /></div>
+                <div><label asp-for="WorkingHoursPerDay" class="form-label">ساعات العمل اليومية</label><input asp-for="WorkingHoursPerDay" form="policyForm" class="form-control" type="number" step="0.01" /></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div><label asp-for="DailySalaryCalcMethod" class="form-label">طريقة حساب اليومية</label><select asp-for="DailySalaryCalcMethod" form="policyForm" asp-items="Html.GetEnumSelectList<DailySalaryCalcMethod>()" class="form-select"></select></div>
+                <div><label asp-for="DailySalaryFixedValue" class="form-label">قيمة اليومية الثابتة (اختياري)</label><input asp-for="DailySalaryFixedValue" form="policyForm" class="form-control" type="number" step="0.01" /></div>
+            </div>
+        </section>
+        @if (!isNew)
+        {
+            <section class="theme-panel rounded-2xl shadow-md p-5">
+                <h2 class="section-title"><i class="bi bi-percent"></i> شرائح ضريبة الدخل</h2>
+                <form method="post" action="/admin/payroll-rules/tax-bracket" class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end mb-4">@Html.AntiForgeryToken()<input type="hidden" name="PayrollPolicyId" value="@Model.Id" /><div><label class="form-label">من</label><input name="FromAmount" class="form-control" type="number" step=".01" required /></div><div><label class="form-label">إلى (اختياري)</label><input name="ToAmount" class="form-control" type="number" step=".01" /></div><div><label class="form-label">النسبة %</label><input name="Rate" class="form-control" type="number" step=".01" required /></div><div><label class="form-label">خصم ثابت</label><input name="FixedDeduction" class="form-control" type="number" step=".01" /></div><button class="col-button-dark py-2" type="submit">إضافة شريحة</button></form>
+                <div class="overflow-x-auto"><table class="table-base min-w-full"><thead class="table-dark"><tr><th>من</th><th>إلى</th><th>النسبة</th><th>الخصم الثابت</th></tr></thead><tbody>@foreach (var bracket in taxBrackets) { <tr><td>@bracket.FromAmount</td><td>@(bracket.ToAmount?.ToString() ?? "بدون حد")</td><td>@bracket.Rate%</td><td>@bracket.FixedDeduction</td></tr> }</tbody></table></div>
+            </section>
+            <section class="theme-panel rounded-2xl shadow-md p-5">
+                <h2 class="section-title"><i class="bi bi-heart-pulse"></i> سياسة التأمينات</h2>
+                <form method="post" action="/admin/payroll-rules/insurance" class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">@Html.AntiForgeryToken()<input type="hidden" name="PayrollPolicyId" value="@Model.Id" /><div><label class="form-label">اسم السياسة</label><input name="Name" value="@insurance.Name" class="form-control" required /></div><div><label class="form-label">نسبة الموظف %</label><input name="EmployeeRate" value="@insurance.EmployeeRate" class="form-control" type="number" step=".01" /></div><div><label class="form-label">نسبة صاحب العمل %</label><input name="EmployerRate" value="@insurance.EmployerRate" class="form-control" type="number" step=".01" /></div><div><label class="form-label">الحد الأدنى</label><input name="MinimumInsurableSalary" value="@insurance.MinimumInsurableSalary" class="form-control" type="number" step=".01" /></div><div><label class="form-label">الحد الأقصى</label><input name="MaximumInsurableSalary" value="@insurance.MaximumInsurableSalary" class="form-control" type="number" step=".01" /></div><button class="col-button-dark py-2 md:col-span-5" type="submit">حفظ التأمينات</button></form>
+            </section>
+        }
+
+    <form id="policyForm" method="post" action="/admin/payroll-rules" class="space-y-5">
+        @Html.AntiForgeryToken()
+        <input asp-for="Id" type="hidden" />
+        <section class="theme-panel rounded-2xl shadow-md p-5">
+            <h2 class="section-title"><i class="bi bi-hourglass-split"></i> العمل الإضافي</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div><label asp-for="OvertimeBase" class="form-label">أساس سعر الساعة</label><select asp-for="OvertimeBase" asp-items="Html.GetEnumSelectList<OvertimeBase>()" class="form-select"></select></div>
+                <div><label asp-for="OvertimeWeekdayMultiplier" class="form-label">أيام العمل</label><input asp-for="OvertimeWeekdayMultiplier" class="form-control" type="number" step="0.01" /></div>
+                <div><label asp-for="OvertimeWeekendMultiplier" class="form-label">عطلة نهاية الأسبوع</label><input asp-for="OvertimeWeekendMultiplier" class="form-control" type="number" step="0.01" /></div>
+                <div><label asp-for="OvertimeHolidayMultiplier" class="form-label">العطلات الرسمية</label><input asp-for="OvertimeHolidayMultiplier" class="form-control" type="number" step="0.01" /></div>
+            </div>
+        </section>
+
+        <section class="theme-panel rounded-2xl shadow-md p-5">
+            <h2 class="section-title"><i class="bi bi-dash-circle"></i> الخصومات والإجازات</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div><label asp-for="LateDeductionMethod" class="form-label">خصم التأخير</label><select asp-for="LateDeductionMethod" asp-items="Html.GetEnumSelectList<DeductionMethod>()" class="form-select"></select></div>
+                <div><label asp-for="AbsenceDeductionMethod" class="form-label">خصم الغياب</label><select asp-for="AbsenceDeductionMethod" asp-items="Html.GetEnumSelectList<DeductionMethod>()" class="form-select"></select></div>
+                <div><label asp-for="LeaveEncashmentMethod" class="form-label">حساب بدل الإجازة</label><select asp-for="LeaveEncashmentMethod" asp-items="Html.GetEnumSelectList<DailySalaryCalcMethod>()" class="form-select"></select></div>
+            </div>
+            <h3 class="font-bold text-[var(--text-primary)] mt-5 mb-3">حدود الخصم الوقائية</h3>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <input asp-for="MaxDeductionPerMonth" class="form-control" type="number" step="0.01" placeholder="حد الشهر" />
+                <input asp-for="MaxDeductionPerYear" class="form-control" type="number" step="0.01" placeholder="حد السنة" />
+                <input asp-for="MaxDeductionAmount" class="form-control" type="number" step="0.01" placeholder="أقصى مبلغ" />
+                <input asp-for="MaxDeductionDays" class="form-control" type="number" step="0.01" placeholder="أقصى أيام" />
+                <input asp-for="MaxDeductionPercentage" class="form-control" type="number" step="0.01" placeholder="أقصى نسبة %" />
+            </div>
+        </section>
+        <section class="theme-panel rounded-2xl shadow-md p-5">
+            <h2 class="section-title"><i class="bi bi-info-circle"></i> عناصر مرتبطة بحالة التنفيذ</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="status-note"><strong>الضريبة والتأمينات مفعلة</strong><p>يتم حساب الضريبة من الشرائح المحفوظة والتأمين من سياسة التأمينات عند إنشاء كشف الراتب.</p></div>
+                <div class="status-note"><strong>مصادر الراتب</strong><p>تتم إدارة مكونات الراتب، إنشاء الكشف، وتاريخ تغييرات الرواتب من الصفحات المرتبطة أدناه.</p></div>
+            </div>
+            <div class="flex flex-wrap gap-3 mt-4"><a href="/payroll/salary-components" class="secondary-action">مكونات الراتب</a><a href="/payroll/generate" class="secondary-action">إنشاء راتب</a><a href="/payroll/salary-history" class="secondary-action">تاريخ الرواتب</a></div>
+        </section>
+        <div class="flex justify-end gap-3"><a href="/admin/payroll-rules" class="secondary-action px-5 py-3">إلغاء</a><button class="col-button-dark px-8 py-3" type="submit"><i class="bi bi-check2-circle"></i> @(isNew ? "حفظ سياسة جديدة" : "حفظ التعديلات")</button></div>
+    </form>
+</div>

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HRsystem.Controllers
 {
@@ -53,19 +54,22 @@ namespace HRsystem.Controllers
             var nextMonth = DateTime.Today.AddMonths(1);
             string nextMonthName = GetArabicMonthName(nextMonth.Month);
 
-            // Generate sensible salary data based on job role
-            var basicSalary = employee.JobName switch
-            {
-                "مدير" => 15000m,
-                "محاسب" => 8000m,
-                "مبرمج" => 12000m,
-                "مهندس" => 10000m,
-                "موظف إداري" => 6000m,
-                "سكرتير" => 5000m,
-                _ => 7000m
-            };
-            decimal deductions = basicSalary * 0.085m; // 8.5% deductions (insurance, tax, etc.)
-            decimal netSalary = basicSalary - deductions;
+            var salaryComponents = _context.EmployeePayrollComponents
+                .Include(x => x.PayrollComponent)
+                .Where(x => x.EmployeeId == employee.Id && x.IsActive)
+                .ToList();
+            var basicSalary = salaryComponents.FirstOrDefault(x => x.PayrollComponent.Category == Models.Enums.PayrollComponentCategory.Salary)?.Amount ?? 0m;
+            var grossSalary = salaryComponents.Where(x => x.PayrollComponent.Category != Models.Enums.PayrollComponentCategory.Deduction).Sum(x => x.Amount);
+            var netSalary = grossSalary;
+            var currentPayroll = _context.PayrollDetails.Include(x => x.Payroll)
+                .Where(x => x.EmployeeId == employee.Id && (x.Payroll.Status == Models.Enums.PayrollStatus.Approved || x.Payroll.Status == Models.Enums.PayrollStatus.Locked))
+                .OrderByDescending(x => x.Payroll.Year).ThenByDescending(x => x.Payroll.Month).FirstOrDefault();
+            var payslips = _context.PayrollDetails.Include(x => x.Payroll)
+                .Where(x => x.EmployeeId == employee.Id && (x.Payroll.Status == Models.Enums.PayrollStatus.Approved || x.Payroll.Status == Models.Enums.PayrollStatus.Locked))
+                .OrderByDescending(x => x.Payroll.Year).ThenByDescending(x => x.Payroll.Month).Take(12).ToList();
+            if (currentPayroll != null) { basicSalary = currentPayroll.BasicSalary; netSalary = currentPayroll.NetSalary; grossSalary = currentPayroll.GrossSalary; }
+            var history = _context.PayrollComponentHistories.Include(x => x.PayrollComponent)
+                .Where(x => x.EmployeeId == employee.Id).OrderByDescending(x => x.EffectiveDate).Take(20).ToList();
 
             var vm = new EmployeeDashboardViewModel
             {
@@ -84,9 +88,11 @@ namespace HRsystem.Controllers
                 TotalPenaltyPoints = penalties.Count,
                 BasicSalary = basicSalary,
                 NetSalary = netSalary,
-                YearToDateEarnings = netSalary * DateTime.Today.Month, // accumulated from Jan till now
+                YearToDateEarnings = payslips.Where(x => x.Payroll.Year == DateTime.Today.Year).Sum(x => x.NetSalary),
                 NextPaymentDate = $"{nextMonth.Day} {nextMonthName} {nextMonth.Year}",
                 UpcomingMonthSalary = netSalary,
+                SalaryHistory = history.Select(x => new EmployeeSalaryHistoryItem { EffectiveDate = x.EffectiveDate, ComponentName = x.PayrollComponent.NameAr, OldAmount = x.OldAmount, NewAmount = x.NewAmount, Reason = x.Reason }).ToList(),
+                Payslips = payslips.Select(x => new EmployeePayslipItem { PayrollId = x.PayrollId, Period = $"{x.Payroll.Month}/{x.Payroll.Year}", BasicSalary = x.BasicSalary, GrossSalary = x.GrossSalary, TotalDeductions = x.TotalDeductions, TaxAmount = x.TaxAmount, InsuranceAmount = x.InsuranceAmount, NetSalary = x.NetSalary }).ToList(),
                 UpcomingMonthName = nextMonthName,
                 Days = GenerateDays(offDays)
             };

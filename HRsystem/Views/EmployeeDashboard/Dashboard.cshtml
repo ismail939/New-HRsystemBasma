@@ -129,6 +129,19 @@
         </div>
     </div>
 
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <section class="stat-card p-5">
+            <h2 class="text-lg font-bold text-color3 mb-3"><i class="bi bi-receipt"></i> كشوف الرواتب الجاهزة</h2>
+            @if (!Model.Payslips.Any()) { <p class="text-color5">لا يوجد كشف راتب معتمد حتى الآن.</p> }
+            else { <div class="space-y-2">@foreach (var slip in Model.Payslips) { <div class="flex flex-wrap justify-between gap-2 border-b border-color5/20 py-2"><span>@slip.Period</span><span class="font-bold">صافي: @slip.NetSalary.ToString("N2")</span><a href="/payroll/details/@slip.PayrollId" class="col-button-light px-2 py-1 text-xs">عرض</a></div> }</div> }
+        </section>
+        <section class="stat-card p-5">
+            <h2 class="text-lg font-bold text-color3 mb-3"><i class="bi bi-clock-history"></i> تاريخ الراتب</h2>
+            @if (!Model.SalaryHistory.Any()) { <p class="text-color5">لا يوجد تاريخ تغييرات مسجل.</p> }
+            else { <div class="space-y-2">@foreach (var item in Model.SalaryHistory) { <div class="border-b border-color5/20 py-2"><div class="flex justify-between"><span>@item.ComponentName</span><span>@item.EffectiveDate.ToString("yyyy-MM-dd")</span></div><small>@item.OldAmount?.ToString("N2") → @item.NewAmount.ToString("N2")</small></div> }</div> }
+        </section>
+    </div>
+
     <!-- Days Scrollable Card - bigger cards, ~10 visible -->
     <div class="bg-white/60 backdrop-blur-sm rounded-2xl shadow-xl p-4 md:p-6 border border-color3/20 days-container">
         <div class="flex items-center justify-between mb-4">

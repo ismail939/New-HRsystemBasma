@@ -62,5 +62,7 @@ namespace HRsystem.Models
         public virtual ICollection<EmployeePayrollPolicy> EmployeeAssignments { get; set; } = new List<EmployeePayrollPolicy>();
         public virtual ICollection<DepartmentPayrollPolicy> DepartmentAssignments { get; set; } = new List<DepartmentPayrollPolicy>();
         public virtual ICollection<Payroll> Payrolls { get; set; } = new List<Payroll>();
+        public virtual ICollection<TaxBracket> TaxBrackets { get; set; } = new List<TaxBracket>();
+        public virtual ICollection<InsurancePolicy> InsurancePolicies { get; set; } = new List<InsurancePolicy>();
     }
 }

@@ -5,6 +5,7 @@ using HRsystem.Models.Enums;
 using HRsystem.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HRsystem.Controllers
 {
@@ -47,6 +48,75 @@ namespace HRsystem.Controllers
             };
 
             return View(list);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        [Route("/penalty/rules-management")]
+        public IActionResult RulesManagement()
+        {
+            ViewBag.Rules = _context.PenaltyRules
+                .Include(r => r.Levels).Include(r => r.Escalations)
+                .OrderBy(r => r.NameAr).ToList();
+            ViewBag.LimitPolicies = _context.DeductionLimitPolicies
+                .OrderByDescending(p => p.CreatedAt).ToList();
+            return View("RulesManagement");
+        }
+
+        // Creates reviewable draft penalties from daily attendance. Payroll only
+        // processes these after HR approves them.
+        [Authorize(Roles = "Admin,HR")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("/penalty/rules/auto-generate")]
+        public IActionResult GenerateAttendancePenalties(int month, int year)
+        {
+            var lateRule = _context.PenaltyRules
+                .Include(r => r.Levels).Include(r => r.Escalations)
+                .FirstOrDefault(r => r.IsActive && r.Code == "ATT-LATE");
+            if (lateRule == null)
+                return BadRequest("أنشئ قاعدة فعالة بالكود ATT-LATE أولاً.");
+
+            var start = new DateTime(year, month, 1);
+            var end = start.AddMonths(1).AddDays(-1);
+            var attendance = _context.HREmployeeBasmas
+                .Where(a => a.DayDate >= start && a.DayDate <= end && (a.LateMinutes ?? 0) > 0)
+                .ToList();
+            var created = 0;
+            foreach (var record in attendance)
+            {
+                var value = (decimal)(record.LateMinutes ?? 0);
+                var exists = _context.EmployeePenalties.Any(p => p.EmployeeId == record.EmployeeId
+                    && p.PenaltyRuleId == lateRule.Id && p.IncidentDate.Date == record.DayDate.Date);
+                if (exists) continue;
+
+                var level = lateRule.Levels.OrderBy(l => l.SequenceOrder)
+                    .FirstOrDefault(l => value >= l.FromValue && value <= l.ToValue);
+                if (level == null) continue;
+
+                var occurrences = _context.EmployeePenalties.Count(p => p.EmployeeId == record.EmployeeId
+                    && p.PenaltyRuleId == lateRule.Id && p.IncidentDate >= start && p.IncidentDate <= end) + 1;
+                var escalation = lateRule.Escalations.OrderByDescending(e => e.OccurrenceCount)
+                    .FirstOrDefault(e => e.OccurrenceCount <= occurrences);
+                var unit = escalation?.DeductionUnit ?? level.DeductionUnit;
+                var deduction = escalation?.DeductionValue ?? level.DeductionValue;
+
+                _context.EmployeePenalties.Add(new EmployeePenalty
+                {
+                    EmployeeId = record.EmployeeId,
+                    PenaltyRuleId = lateRule.Id,
+                    PenaltyLevelId = level.Id,
+                    PenaltyEscalationId = escalation?.Id,
+                    IncidentDate = record.DayDate,
+                    Status = PenaltyStatus.Draft,
+                    DeductionUnit = unit,
+                    DeductionValue = deduction,
+                    ManagerNotes = $"تلقائي من البصمة: {value:0.##} دقيقة تأخير"
+                });
+                created++;
+            }
+            _context.SaveChanges();
+            return Ok(new { success = true, created, message = $"تم إنشاء {created} جزاء للمراجعة" });
         }
 
         [Authorize(Roles = "Admin,HR")]

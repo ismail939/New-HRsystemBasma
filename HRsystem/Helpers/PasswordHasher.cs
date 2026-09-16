@@ -1,12 +1,10 @@
-using System;
 using System.Security.Cryptography;
-using System.Text;
 
 public class PasswordHasher
 {
     public static string HashPassword(string password)
     {
-        // Generate a random salt
+        // Generate a random salt yep
         byte[] salt = new byte[16];
         using (var rng = RandomNumberGenerator.Create())
         {

@@ -27,6 +27,29 @@ public class EmployeeDashboardViewModel
     public decimal UpcomingMonthSalary { get; set; }
     public string UpcomingMonthName { get; set; } = string.Empty;
     public List<DayStatus> Days { get; set; } = new();
+    public List<EmployeeSalaryHistoryItem> SalaryHistory { get; set; } = new();
+    public List<EmployeePayslipItem> Payslips { get; set; } = new();
+}
+
+public class EmployeeSalaryHistoryItem
+{
+    public DateTime EffectiveDate { get; set; }
+    public string ComponentName { get; set; } = string.Empty;
+    public decimal? OldAmount { get; set; }
+    public decimal NewAmount { get; set; }
+    public string? Reason { get; set; }
+}
+
+public class EmployeePayslipItem
+{
+    public int PayrollId { get; set; }
+    public string Period { get; set; } = string.Empty;
+    public decimal BasicSalary { get; set; }
+    public decimal GrossSalary { get; set; }
+    public decimal TotalDeductions { get; set; }
+    public decimal TaxAmount { get; set; }
+    public decimal InsuranceAmount { get; set; }
+    public decimal NetSalary { get; set; }
 }
 
 public class DayStatus

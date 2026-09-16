@@ -36,7 +36,7 @@ public class DailyReport : IDocument
 
                     row.ConstantItem(80)
                         .Height(50)
-                        .Image(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/logo2hh.png"),
+                        .Image(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/logo2.png"),
                                ImageScaling.FitArea);
                 });
 

@@ -158,6 +158,13 @@ namespace HRsystem.Data
                 .Property(pp => pp.LeaveEncashmentMethod)
                 .HasConversion<int>();
 
+            modelBuilder.Entity<TaxBracket>()
+                .HasOne(t => t.PayrollPolicy).WithMany(p => p.TaxBrackets)
+                .HasForeignKey(t => t.PayrollPolicyId).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<InsurancePolicy>()
+                .HasOne(i => i.PayrollPolicy).WithMany(p => p.InsurancePolicies)
+                .HasForeignKey(i => i.PayrollPolicyId).OnDelete(DeleteBehavior.Cascade);
+
             // EmployeePayrollPolicy
             modelBuilder.Entity<EmployeePayrollPolicy>()
                 .HasOne(epp => epp.HREmployee)
@@ -436,6 +443,8 @@ namespace HRsystem.Data
         public DbSet<EmployeePayrollComponent> EmployeePayrollComponents { get; set; }
         public DbSet<PayrollComponentHistory> PayrollComponentHistories { get; set; }
         public DbSet<PayrollPolicy> PayrollPolicies { get; set; }
+        public DbSet<TaxBracket> TaxBrackets { get; set; }
+        public DbSet<InsurancePolicy> InsurancePolicies { get; set; }
         public DbSet<EmployeePayrollPolicy> EmployeePayrollPolicies { get; set; }
         public DbSet<DepartmentPayrollPolicy> DepartmentPayrollPolicies { get; set; }
         public DbSet<OvertimePolicy> OvertimePolicies { get; set; }

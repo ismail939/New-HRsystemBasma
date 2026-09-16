@@ -54,7 +54,7 @@ namespace HRsystem.Reports
                                 });
 
                                 // Left logo
-                                row.ConstantItem(80).Image("wwwroot/images/logo2hh.png", ImageScaling.FitArea);
+                                row.ConstantItem(80).Image("wwwroot/images/logo2.png", ImageScaling.FitArea);
                             });
                             headerCol.Item().PaddingTop(20).AlignCenter().Text(text => text.Span("كشف بجميع الموظفين").Bold().FontSize(13));
 ;

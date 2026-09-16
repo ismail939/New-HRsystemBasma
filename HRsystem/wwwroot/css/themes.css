@@ -77,6 +77,33 @@
   --spinner-top: #7B9669;
 }
 
+/* High-contrast surfaces used by the administration configuration screens. */
+.theme-panel {
+  background: var(--card-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--card-border);
+}
+.theme-panel .form-label,
+.theme-panel label,
+.theme-panel h1,
+.theme-panel h2,
+.theme-panel h3,
+.theme-panel p,
+.theme-panel strong,
+.theme-panel td,
+.theme-panel th { color: var(--text-primary); }
+.theme-panel .form-control,
+.theme-panel .form-select { background-color: var(--input-bg); color: var(--input-text); }
+.theme-panel .form-control::placeholder { color: var(--input-placeholder); opacity: 1; }
+.section-title { color: var(--text-primary); font-weight: 700; font-size: 1.15rem; margin-bottom: 1rem; display: flex; gap: .5rem; align-items: center; }
+.status-note { border: 1px solid var(--border); border-right: 4px solid var(--accent); border-radius: .75rem; padding: .85rem; background: var(--bg-primary); }
+.status-note p { color: var(--text-primary); font-size: .9rem; margin-top: .35rem; }
+.secondary-action { color: var(--text-primary); border: 1px solid var(--border); border-radius: .5rem; padding: .5rem .8rem; font-weight: 600; }
+.secondary-action:hover { background: var(--accent); color: #172015; }
+.policy-card { background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border); border-radius: .75rem; padding: 1rem; }
+.policy-card.policy-active { border: 2px solid var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 20%, transparent); }
+.policy-badge { background: var(--accent); color: #172015; border-radius: 999px; padding: .2rem .6rem; font-weight: 700; font-size: .8rem; }
+
 [data-theme="dark"] {
   --color1: #2a3530;
   --color2: #1f2a1d;

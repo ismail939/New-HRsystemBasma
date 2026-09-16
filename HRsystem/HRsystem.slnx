@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="HRsystem.csproj" />
+  <Project Path="HRsystem.Tests/HRsystem.Tests.csproj" />
+</Solution>

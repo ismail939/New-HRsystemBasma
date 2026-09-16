@@ -1,0 +1,77 @@
+@using HRsystem.Models
+@using HRsystem.Models.Enums
+@{
+    ViewData["Title"] = "قواعد الجزاءات";
+    var rules = ViewBag.Rules as List<PenaltyRule> ?? new();
+    var limitPolicies = ViewBag.LimitPolicies as List<DeductionLimitPolicy> ?? new();
+}
+
+<div class="max-w-7xl mx-auto p-4" dir="rtl">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div>
+            <a href="/admin/dashboard" class="text-[var(--text-primary)] hover:text-[var(--accent)] hover:underline"><i class="bi bi-arrow-right"></i> الإدارة</a>
+            <h1 class="text-3xl font-bold text-[var(--text-primary)] mt-2">قواعد الجزاءات</h1>
+            <p class="text-[var(--text-secondary)] mt-1">كتاب القواعد الذي يحدد المخالفة، درجات العقوبة، والتصعيد.</p>
+        </div>
+        <i class="bi bi-shield-exclamation text-5xl text-color3"></i>
+    </div>
+    <div class="theme-panel rounded-2xl shadow-md p-4 mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div><strong>توليد جزاءات التأخير من البصمة</strong><p class="text-sm mt-1">يبحث عن القاعدة ATT-LATE ويطابق LateMinutes مع المستويات، ثم ينشئ جزاءات Draft للمراجعة.</p></div>
+        <form method="post" action="/penalty/rules/auto-generate" class="flex items-center gap-2">@Html.AntiForgeryToken()<input name="month" type="number" min="1" max="12" value="@DateTime.Now.Month" class="form-control w-24" /><input name="year" type="number" min="2000" value="@DateTime.Now.Year" class="form-control w-28" /><button class="col-button-dark px-4 py-2" type="submit">توليد للمراجعة</button></form>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
+        <section class="theme-panel rounded-2xl shadow-md p-5 xl:col-span-2">
+            <h2 class="section-title"><i class="bi bi-journal-plus"></i> تعريف قاعدة جزاء</h2>
+            <form class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div><label class="form-label">اسم القاعدة بالعربية</label><input class="form-control" placeholder="التأخير عن موعد العمل" /></div>
+                <div><label class="form-label">اسم القاعدة بالإنجليزية</label><input class="form-control" placeholder="Late Arrival" /></div>
+                <div><label class="form-label">الكود الفريد</label><input class="form-control" placeholder="ATT-LATE" /></div>
+                <div><label class="form-label">التصنيف</label><select class="form-select"><option>حضور وانصراف</option><option>سلوك</option><option>سلامة</option><option>أداء</option><option>أخرى</option></select></div>
+                <div class="md:col-span-2"><label class="form-label">الوصف</label><textarea class="form-control" rows="2" placeholder="وصف المخالفة وكيفية تطبيقها"></textarea></div>
+                <label class="flex items-center gap-2 text-color5"><input type="checkbox" checked class="form-check-input" /> القاعدة فعالة</label>
+                <button type="button" class="col-button-dark px-5 py-2 justify-self-end">حفظ القاعدة</button>
+            </form>
+        </section>
+
+        <section class="theme-panel rounded-2xl shadow-md p-5">
+            <h2 class="section-title"><i class="bi bi-shield-check"></i> حدود الخصم</h2>
+            <p class="text-sm text-color5/70 mb-4">حدود أمان تمنع خصماً أكبر من المسموح.</p>
+            <form class="space-y-3">
+                <input class="form-control" placeholder="اسم سياسة الحدود" />
+                <input class="form-control" type="number" step=".01" placeholder="أقصى خصم بالشهر" />
+                <input class="form-control" type="number" step=".01" placeholder="أقصى خصم بالسنة" />
+                <input class="form-control" type="number" step=".01" placeholder="أقصى مبلغ للجزاء" />
+                <input class="form-control" type="number" step=".01" placeholder="أقصى أيام للجزاء" />
+                <input class="form-control" type="number" step=".01" placeholder="أقصى نسبة من الراتب %" />
+                <button type="button" class="col-button-dark w-full py-2">حفظ حدود الخصم</button>
+            </form>
+        </section>
+    </div>
+
+    <section class="theme-panel rounded-2xl shadow-md p-5 mt-5">
+        <h2 class="section-title"><i class="bi bi-bar-chart-steps"></i> مصفوفة مستويات العقوبة</h2>
+        <p class="text-sm text-color5/70 mb-4">مثال: تأخير من 16 إلى 30 دقيقة ينتج عنه خصم ربع يوم. القيم هنا تحفظ كوحدات جزاء، وليس أموالاً.</p>
+        <div class="overflow-x-auto">
+            <table class="table-base min-w-full"><thead class="table-dark col-table-header"><tr><th>الترتيب</th><th>من</th><th>إلى</th><th>نوع القيمة</th><th>وحدة الخصم</th><th>قيمة الخصم</th><th>إنذار؟</th><th></th></tr></thead>
+            <tbody><tr><td>1</td><td><input class="form-control" type="number" placeholder="0" /></td><td><input class="form-control" type="number" placeholder="15" /></td><td><select class="form-select"><option>دقائق</option><option>مرات</option><option>أيام</option></select></td><td><select class="form-select"><option>إنذار فقط</option><option>ساعة</option><option>يوم</option><option>نسبة مئوية</option><option>مبلغ مالي</option></select></td><td><input class="form-control" type="number" step=".01" placeholder="0" /></td><td><input type="checkbox" class="form-check-input" /></td><td><button type="button" class="col-button-light">إضافة</button></td></tr></tbody></table>
+        </div>
+    </section>
+
+    <section class="theme-panel rounded-2xl shadow-md p-5 mt-5">
+        <h2 class="section-title"><i class="bi bi-arrow-up-right-circle"></i> قواعد التصعيد عند التكرار</h2>
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+            <div><label class="form-label">عدد مرات التكرار</label><input class="form-control" type="number" min="1" placeholder="2" /></div>
+            <div><label class="form-label">وحدة الخصم</label><select class="form-select"><option>يوم</option><option>ساعة</option><option>نسبة مئوية</option><option>إنذار فقط</option></select></div>
+            <div><label class="form-label">قيمة الخصم</label><input class="form-control" type="number" step=".01" /></div>
+            <div><label class="form-label">إجراء مطلوب</label><input class="form-control" placeholder="إرسال للتحقيق" /></div>
+            <button type="button" class="col-button-dark py-2">إضافة تصعيد</button>
+        </div>
+    </section>
+
+    <section class="mt-5 theme-panel rounded-2xl shadow-md p-5">
+        <h2 class="section-title"><i class="bi bi-list-check"></i> القواعد المسجلة</h2>
+        @if (!rules.Any()) { <p class="text-color5/70">لا توجد قواعد مسجلة بعد.</p> }
+        else { <div class="grid grid-cols-1 md:grid-cols-2 gap-3">@foreach (var rule in rules) { <div class="border border-color3/30 rounded-xl p-4"><div class="flex justify-between"><strong>@rule.NameAr</strong><span class="text-sm">@rule.Code</span></div><p class="text-sm mt-2">المستويات: @rule.Levels.Count | التصعيد: @rule.Escalations.Count</p></div> }</div> }
+    </section>
+</div>

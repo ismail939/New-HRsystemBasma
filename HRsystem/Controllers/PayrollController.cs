@@ -453,21 +453,30 @@ namespace HRsystem.Controllers
             var employees = _context.HREmployees.ToList();
 
             // Create the payroll header
+            var selectedPolicy = _context.PayrollPolicies.FirstOrDefault(p => p.IsActive);
             var payroll = new Payroll
             {
                 Month = month,
                 Year = year,
                 Status = PayrollStatus.Draft,
                 GeneratedDate = DateTime.Now,
-                GeneratedBy = userName
+                GeneratedBy = userName,
+                PayrollPolicyId = selectedPolicy?.Id
             };
             _context.Payrolls.Add(payroll);
             _context.SaveChanges();
 
             var startDate = new DateTime(year, month, 1);
             var endDate = startDate.AddMonths(1).AddDays(-1);
-            var workingDays = (endDate - startDate).Days + 1;
-            var workingHoursPerDay = 8m;
+            var policy = _context.PayrollPolicies
+                .Include(p => p.TaxBrackets)
+                .Include(p => p.InsurancePolicies)
+                .FirstOrDefault(p => p.IsActive)
+                ?? new PayrollPolicy();
+            var workingDays = policy.DailySalaryCalcMethod == DailySalaryCalcMethod.CalendarDays
+                ? (decimal)DateTime.DaysInMonth(year, month)
+                : policy.WorkingDaysPerMonth;
+            var workingHoursPerDay = policy.WorkingHoursPerDay;
 
             // Payroll component used to post approved disciplinary penalties (الجزاءات المعتمدة) as salary deductions
             var penaltyComponent = _context.PayrollComponents
@@ -513,7 +522,9 @@ namespace HRsystem.Controllers
                 var officialHolidays = attendanceRecords.Count(b => b.OffDayType == "official");
 
                 // Daily salary rate
-                var dailySalaryRate = workingDays > 0 ? basicSalary / workingDays : 0;
+                var dailySalaryRate = policy.DailySalaryCalcMethod == DailySalaryCalcMethod.FixedValue
+                    ? policy.DailySalaryFixedValue ?? 0m
+                    : workingDays > 0 ? basicSalary / workingDays : 0;
 
                 // ===== Approved Penalties → auto salary deductions =====
                 // Only approved penalties that belong to this month and were never
@@ -587,6 +598,17 @@ namespace HRsystem.Controllers
                     .Where(s => s.PayrollComponent.IsInsurable)
                     .Sum(s => s.Amount);
 
+                var taxAmount = CalculateProgressiveTax(taxableAmount, policy.TaxBrackets
+                    .Where(b => b.IsActive && b.EffectiveDate <= endDate).ToList());
+                var insurancePolicy = policy.InsurancePolicies
+                    .Where(i => i.IsActive && i.EffectiveDate <= endDate)
+                    .OrderByDescending(i => i.EffectiveDate).FirstOrDefault();
+                var insuredBase = insurancePolicy == null ? 0m : Math.Clamp(insurableAmount,
+                    insurancePolicy.MinimumInsurableSalary ?? 0m,
+                    insurancePolicy.MaximumInsurableSalary ?? decimal.MaxValue);
+                var insuranceAmount = insuredBase * (insurancePolicy?.EmployeeRate ?? 0m) / 100m;
+                totalDeductions += taxAmount + insuranceAmount;
+
                 var grossSalary = totalEarnings;
                 var netSalary = grossSalary - totalDeductions;
 
@@ -601,8 +623,8 @@ namespace HRsystem.Controllers
                     NetSalary = netSalary,
                     TaxableAmount = taxableAmount,
                     InsurableAmount = insurableAmount,
-                    TaxAmount = 0, // يتم حساب الضريبة لاحقاً حسب الشرائح
-                    InsuranceAmount = 0, // يتم حساب التأمينات لاحقاً حسب النسبة
+                    TaxAmount = taxAmount,
+                    InsuranceAmount = insuranceAmount,
                     PresentDays = presentDays,
                     AbsentDays = absentDays,
                     LateMinutes = lateMinutes,
@@ -659,6 +681,7 @@ namespace HRsystem.Controllers
                 {
                     foreach (var (penalty, item, amount, days) in penaltyEntries)
                     {
+                        _context.PayrollItems.Add(item);
                         _context.PayrollDeductions.Add(new PayrollDeduction
                         {
                             PayrollDetailId = detail.Id,
@@ -689,6 +712,20 @@ namespace HRsystem.Controllers
             _context.SaveChanges();
 
             return Json(new { success = true, payrollId = payroll.Id });
+        }
+
+        private static decimal CalculateProgressiveTax(decimal taxableAmount, List<TaxBracket> brackets)
+        {
+            if (taxableAmount <= 0 || brackets.Count == 0) return 0m;
+            decimal tax = 0m;
+            foreach (var bracket in brackets.OrderBy(b => b.FromAmount))
+            {
+                var upper = bracket.ToAmount ?? taxableAmount;
+                var amountInBracket = Math.Max(0m, Math.Min(taxableAmount, upper) - bracket.FromAmount);
+                if (amountInBracket > 0) tax += amountInBracket * bracket.Rate / 100m;
+                if (taxableAmount <= upper) break;
+            }
+            return Math.Round(tax, 2, MidpointRounding.AwayFromZero);
         }
 
         [HttpGet]
