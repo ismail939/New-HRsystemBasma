@@ -20,4 +20,12 @@
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
   </ItemGroup>
 
+  <!-- The test project is nested under this project directory. Do not compile
+       its source or generated files as part of the web application. -->
+  <ItemGroup>
+    <Compile Remove="HRsystem.Tests\**" />
+    <None Remove="HRsystem.Tests\**" />
+    <Content Remove="HRsystem.Tests\**" />
+  </ItemGroup>
+
 </Project>
