@@ -52,6 +52,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Register Notification Service
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<PayrollCalculationService>();
+builder.Services.AddScoped<PenaltyCalculationService>();
 
 // Register OffDay Balance Auto Service
 builder.Services.AddScoped<IOffDayBalanceAutoService, OffDayBalanceAutoService>();
