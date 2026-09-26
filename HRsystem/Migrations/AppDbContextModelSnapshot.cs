@@ -104,7 +104,8 @@ namespace HRsystem.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Value")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.HasKey("Id");
 
@@ -123,12 +124,15 @@ namespace HRsystem.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("FromAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Rate")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("ToAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
@@ -147,9 +151,11 @@ namespace HRsystem.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("BaseAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("CommissionPlanId")
@@ -192,19 +198,24 @@ namespace HRsystem.Migrations
                         .HasColumnType("bit");
 
                     b.Property<decimal?>("MaxDaysPerPenalty")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("MaxDeductionPerMonth")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("MaxDeductionPerYear")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("MaxMoneyPerPenalty")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("MaxPercentageOfSalary")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -277,6 +288,7 @@ namespace HRsystem.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal?>("TargetAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
@@ -329,6 +341,7 @@ namespace HRsystem.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -413,15 +426,18 @@ namespace HRsystem.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal?>("DeductionAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("DeductionDays")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("DeductionUnit")
                         .HasColumnType("int");
 
                     b.Property<decimal>("DeductionValue")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("EmployeeId")
@@ -744,7 +760,8 @@ namespace HRsystem.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Rate")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<int>("Year")
                         .HasColumnType("int");
@@ -866,6 +883,51 @@ namespace HRsystem.Migrations
                     b.ToTable("HROffDayBalances");
                 });
 
+            modelBuilder.Entity("HRsystem.Models.InsurancePolicy", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("EffectiveDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("EmployeeRate")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("EmployerRate")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal?>("MaximumInsurableSalary")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("MinimumInsurableSalary")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("PayrollPolicyId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PayrollPolicyId");
+
+                    b.ToTable("InsurancePolicies");
+                });
+
             modelBuilder.Entity("HRsystem.Models.Notification", b =>
                 {
                     b.Property<int>("NotificationId")
@@ -919,6 +981,7 @@ namespace HRsystem.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("ApprovedBy")
@@ -938,13 +1001,15 @@ namespace HRsystem.Migrations
                         .HasColumnType("bit");
 
                     b.Property<decimal>("Multiplier")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<string>("Notes")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<decimal>("OvertimeMinutes")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("OvertimePolicyId")
@@ -957,7 +1022,8 @@ namespace HRsystem.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Rate")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.HasKey("Id");
 
@@ -980,10 +1046,12 @@ namespace HRsystem.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal?>("FixedHourlyRate")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("HolidayMultiplier")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<int>("HourlyRateMethod")
                         .HasColumnType("int");
@@ -992,9 +1060,11 @@ namespace HRsystem.Migrations
                         .HasColumnType("bit");
 
                     b.Property<decimal?>("MaxOvertimeHoursPerDay")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("MaxOvertimeHoursPerMonth")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("MinOvertimeMinutes")
@@ -1009,10 +1079,12 @@ namespace HRsystem.Migrations
                         .HasColumnType("bit");
 
                     b.Property<decimal>("WeekdayMultiplier")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("WeekendMultiplier")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.HasKey("Id");
 
@@ -1100,10 +1172,12 @@ namespace HRsystem.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal?>("DefaultAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("DefaultPercentage")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)
@@ -1167,9 +1241,11 @@ namespace HRsystem.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("NewAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("OldAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("PayrollComponentId")
@@ -1199,6 +1275,7 @@ namespace HRsystem.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsInsurable")
@@ -1238,27 +1315,33 @@ namespace HRsystem.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("BasicSalary")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("DailySalaryRate")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("GrossSalary")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("InsurableAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("InsuranceAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<double>("LateMinutes")
                         .HasColumnType("float");
 
                     b.Property<decimal>("NetSalary")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Notes")
@@ -1281,15 +1364,19 @@ namespace HRsystem.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("TaxAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("TaxableAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("TotalDeductions")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("TotalEarnings")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("UnpaidLeaves")
@@ -1313,6 +1400,7 @@ namespace HRsystem.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsInsurable")
@@ -1349,6 +1437,7 @@ namespace HRsystem.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("EmployeeId")
@@ -1371,10 +1460,12 @@ namespace HRsystem.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal?>("Quantity")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("Rate")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<int?>("SourceId")
                         .HasColumnType("int");
@@ -1407,6 +1498,7 @@ namespace HRsystem.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("CalendarDaysPerMonth")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -1416,6 +1508,7 @@ namespace HRsystem.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal?>("DailySalaryFixedValue")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsActive")
@@ -1428,19 +1521,24 @@ namespace HRsystem.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal?>("MaxDeductionAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("MaxDeductionDays")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("MaxDeductionPerMonth")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("MaxDeductionPerYear")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("MaxDeductionPercentage")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1451,18 +1549,23 @@ namespace HRsystem.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("OvertimeHolidayMultiplier")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("OvertimeWeekdayMultiplier")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("OvertimeWeekendMultiplier")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("WorkingDaysPerMonth")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("WorkingHoursPerDay")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
@@ -1483,15 +1586,18 @@ namespace HRsystem.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<decimal?>("DeductionAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("DeductionPercentage")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<int>("DeductionUnit")
                         .HasColumnType("int");
 
                     b.Property<decimal>("DeductionValue")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsWarning")
@@ -1520,18 +1626,22 @@ namespace HRsystem.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal?>("DeductionAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("DeductionPercentage")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<int>("DeductionUnit")
                         .HasColumnType("int");
 
                     b.Property<decimal>("DeductionValue")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("FromValue")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsWarning")
@@ -1544,6 +1654,7 @@ namespace HRsystem.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("ToValue")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ValueType")
@@ -1687,6 +1798,46 @@ namespace HRsystem.Migrations
                         .IsUnique();
 
                     b.ToTable("ShiftOverrides");
+                });
+
+            modelBuilder.Entity("HRsystem.Models.TaxBracket", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("EffectiveDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("FixedDeduction")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("FromAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PayrollPolicyId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Rate")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal?>("ToAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PayrollPolicyId");
+
+                    b.ToTable("TaxBrackets");
                 });
 
             modelBuilder.Entity("HRsystem.Models.User", b =>
@@ -1997,6 +2148,17 @@ namespace HRsystem.Migrations
                     b.Navigation("HREmployee");
                 });
 
+            modelBuilder.Entity("HRsystem.Models.InsurancePolicy", b =>
+                {
+                    b.HasOne("HRsystem.Models.PayrollPolicy", "PayrollPolicy")
+                        .WithMany("InsurancePolicies")
+                        .HasForeignKey("PayrollPolicyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PayrollPolicy");
+                });
+
             modelBuilder.Entity("HRsystem.Models.Notification", b =>
                 {
                     b.HasOne("HRsystem.Models.Request", "RelatedRequest")
@@ -2205,6 +2367,17 @@ namespace HRsystem.Migrations
                     b.Navigation("HRShiftOption");
                 });
 
+            modelBuilder.Entity("HRsystem.Models.TaxBracket", b =>
+                {
+                    b.HasOne("HRsystem.Models.PayrollPolicy", "PayrollPolicy")
+                        .WithMany("TaxBrackets")
+                        .HasForeignKey("PayrollPolicyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PayrollPolicy");
+                });
+
             modelBuilder.Entity("HRShiftOption", b =>
                 {
                     b.Navigation("EmployeeShifts");
@@ -2265,7 +2438,11 @@ namespace HRsystem.Migrations
 
                     b.Navigation("EmployeeAssignments");
 
+                    b.Navigation("InsurancePolicies");
+
                     b.Navigation("Payrolls");
+
+                    b.Navigation("TaxBrackets");
                 });
 
             modelBuilder.Entity("HRsystem.Models.PenaltyRule", b =>

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
@@ -22,10 +23,10 @@ namespace HRsystem.Models
 
         public virtual PayrollComponent PayrollComponent { get; set; }
 
-        public decimal? OldAmount { get; set; }
+        [Precision(18, 2)] public decimal? OldAmount { get; set; }
 
         [Required]
-        public decimal NewAmount { get; set; }
+        [Precision(18, 2)] public decimal NewAmount { get; set; }
 
         [Required]
         public DateTime EffectiveDate { get; set; }

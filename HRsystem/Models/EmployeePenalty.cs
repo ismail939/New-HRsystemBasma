@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using HRsystem.Models.Enums;
@@ -44,11 +45,11 @@ namespace HRsystem.Models
         // Snapshot values at time of creation
         public DeductionUnit DeductionUnit { get; set; } = DeductionUnit.WarningOnly;
 
-        public decimal DeductionValue { get; set; }
+        [Precision(18, 2)] public decimal DeductionValue { get; set; }
 
-        public decimal? DeductionDays { get; set; }
+        [Precision(18, 2)] public decimal? DeductionDays { get; set; }
 
-        public decimal? DeductionAmount { get; set; }
+        [Precision(18, 2)] public decimal? DeductionAmount { get; set; }
 
         [StringLength(500)]
         public string? ManagerNotes { get; set; }

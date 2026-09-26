@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
@@ -21,7 +22,7 @@ namespace HRsystem.Models
         public string Name { get; set; } = string.Empty;
 
         [Required]
-        public decimal Amount { get; set; }
+        [Precision(18, 2)] public decimal Amount { get; set; }
 
         /// <summary>هل هذا البند يخضع للضريبة؟</summary>
         public bool IsTaxable { get; set; } = true;

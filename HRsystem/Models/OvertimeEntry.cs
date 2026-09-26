@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using HRsystem.Models.Enums;
@@ -27,13 +28,13 @@ namespace HRsystem.Models
         public DateTime Date { get; set; }
 
         [Required]
-        public decimal OvertimeMinutes { get; set; }
+        [Precision(18, 2)] public decimal OvertimeMinutes { get; set; }
 
-        public decimal Rate { get; set; }
+        [Precision(18, 4)] public decimal Rate { get; set; }
 
-        public decimal Multiplier { get; set; }
+        [Precision(18, 4)] public decimal Multiplier { get; set; }
 
-        public decimal Amount { get; set; }
+        [Precision(18, 2)] public decimal Amount { get; set; }
 
         [Required]
         public OvertimeType OvertimeType { get; set; } = OvertimeType.Weekday;

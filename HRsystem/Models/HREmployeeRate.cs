@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 namespace HRsystem.Models;
@@ -15,7 +16,7 @@ public class HREmployeeRate
     [Required]
     public int Year {get; set;}
     [Required]
-    public decimal Rate { get; set; }
+    [Precision(18, 4)] public decimal Rate { get; set; }
     [JsonIgnore]
     public virtual HREmployee HREmployee { get; set; }
 }

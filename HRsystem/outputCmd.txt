@@ -1,0 +1,5 @@
+D:\Projects\C#\HRplusBasmaV2\New-HRsystemBasma\HRsystem\HRsystem.csproj : warning NU1608: Detected package version outside of dependency constraint: Microsoft.CodeAnalysis.VisualBasic 4.0.1 requires Microsoft.CodeAnalysis.Common (= 4.0.1) but version Microsoft.CodeAnalysis.Common 4.5.0 was resolved.
+D:\Projects\C#\HRplusBasmaV2\New-HRsystemBasma\HRsystem\HRsystem.csproj : warning NU1608: Detected package version outside of dependency constraint: Microsoft.CodeAnalysis.VisualBasic 4.0.1 requires Microsoft.CodeAnalysis.Common (= 4.0.1) but version Microsoft.CodeAnalysis.Common 4.5.0 was resolved.
+Build started...
+Build succeeded.
+Done. To undo this action, use 'ef migrations remove'

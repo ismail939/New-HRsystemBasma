@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
@@ -23,7 +24,7 @@ namespace HRsystem.Models
         public virtual PayrollComponent PayrollComponent { get; set; }
 
         [Required]
-        public decimal Amount { get; set; }
+        [Precision(18, 2)] public decimal Amount { get; set; }
 
         [Required]
         public DateTime StartDate { get; set; }

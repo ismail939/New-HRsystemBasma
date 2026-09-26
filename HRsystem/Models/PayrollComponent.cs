@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using HRsystem.Models.Enums;
 
 namespace HRsystem.Models
@@ -29,9 +30,9 @@ namespace HRsystem.Models
         [Required]
         public CalculationMethod CalculationMethod { get; set; } = CalculationMethod.FixedAmount;
 
-        public decimal? DefaultAmount { get; set; }
+        [Precision(18, 2)] public decimal? DefaultAmount { get; set; }
 
-        public decimal? DefaultPercentage { get; set; }
+        [Precision(18, 4)] public decimal? DefaultPercentage { get; set; }
 
         [StringLength(500)]
         public string? FormulaExpression { get; set; }

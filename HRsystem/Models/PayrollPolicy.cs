@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using HRsystem.Models.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace HRsystem.Models
 {
@@ -13,30 +14,30 @@ namespace HRsystem.Models
         public string Name { get; set; } = string.Empty;
 
         [Required]
-        public decimal WorkingDaysPerMonth { get; set; } = 22;
+        [Precision(18, 2)] public decimal WorkingDaysPerMonth { get; set; } = 22;
 
         [Required]
-        public decimal CalendarDaysPerMonth { get; set; } = 30;
+        [Precision(18, 2)] public decimal CalendarDaysPerMonth { get; set; } = 30;
 
         [Required]
-        public decimal WorkingHoursPerDay { get; set; } = 8;
+        [Precision(18, 2)] public decimal WorkingHoursPerDay { get; set; } = 8;
 
         [Required]
         public DailySalaryCalcMethod DailySalaryCalcMethod { get; set; } = DailySalaryCalcMethod.WorkingDays;
 
-        public decimal? DailySalaryFixedValue { get; set; }
+        [Precision(18, 2)] public decimal? DailySalaryFixedValue { get; set; }
 
         [Required]
         public OvertimeBase OvertimeBase { get; set; } = OvertimeBase.BasicSalary;
 
         [Required]
-        public decimal OvertimeWeekdayMultiplier { get; set; } = 1.5m;
+        [Precision(18, 4)] public decimal OvertimeWeekdayMultiplier { get; set; } = 1.5m;
 
         [Required]
-        public decimal OvertimeWeekendMultiplier { get; set; } = 2.0m;
+        [Precision(18, 4)] public decimal OvertimeWeekendMultiplier { get; set; } = 2.0m;
 
         [Required]
-        public decimal OvertimeHolidayMultiplier { get; set; } = 3.0m;
+        [Precision(18, 4)] public decimal OvertimeHolidayMultiplier { get; set; } = 3.0m;
 
         [Required]
         public DeductionMethod LateDeductionMethod { get; set; } = DeductionMethod.PerMinute;
@@ -48,11 +49,11 @@ namespace HRsystem.Models
         public DailySalaryCalcMethod LeaveEncashmentMethod { get; set; } = DailySalaryCalcMethod.WorkingDays;
 
         // Maximum deduction limits
-        public decimal? MaxDeductionPerMonth { get; set; }
-        public decimal? MaxDeductionPerYear { get; set; }
-        public decimal? MaxDeductionAmount { get; set; }
-        public decimal? MaxDeductionDays { get; set; }
-        public decimal? MaxDeductionPercentage { get; set; }
+        [Precision(18, 2)] public decimal? MaxDeductionPerMonth { get; set; }
+        [Precision(18, 2)] public decimal? MaxDeductionPerYear { get; set; }
+        [Precision(18, 2)] public decimal? MaxDeductionAmount { get; set; }
+        [Precision(18, 2)] public decimal? MaxDeductionDays { get; set; }
+        [Precision(18, 4)] public decimal? MaxDeductionPercentage { get; set; }
 
         public bool IsActive { get; set; } = true;
 

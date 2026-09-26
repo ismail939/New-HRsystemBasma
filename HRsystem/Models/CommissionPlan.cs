@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using HRsystem.Models.Enums;
 
 namespace HRsystem.Models
@@ -15,7 +16,7 @@ namespace HRsystem.Models
         [Required]
         public CommissionPlanType Type { get; set; } = CommissionPlanType.Percentage;
 
-        public decimal Value { get; set; }
+        [Precision(18, 4)] public decimal Value { get; set; }
 
         public bool IsActive { get; set; } = true;
 

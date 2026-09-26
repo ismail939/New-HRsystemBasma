@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 
 namespace HRsystem.Models
 {
@@ -23,24 +24,24 @@ namespace HRsystem.Models
         public virtual HREmployee HREmployee { get; set; }
 
         // ===== Salary Components =====
-        public decimal BasicSalary { get; set; }
-        public decimal TotalEarnings { get; set; }
-        public decimal TotalDeductions { get; set; }
-        public decimal GrossSalary { get; set; }
-        public decimal NetSalary { get; set; }
+        [Precision(18, 2)] public decimal BasicSalary { get; set; }
+        [Precision(18, 2)] public decimal TotalEarnings { get; set; }
+        [Precision(18, 2)] public decimal TotalDeductions { get; set; }
+        [Precision(18, 2)] public decimal GrossSalary { get; set; }
+        [Precision(18, 2)] public decimal NetSalary { get; set; }
 
         // ===== Tax & Insurance =====
         /// <summary>إجمالي المكونات الخاضعة للضريبة</summary>
-        public decimal TaxableAmount { get; set; }
+        [Precision(18, 2)] public decimal TaxableAmount { get; set; }
 
         /// <summary>إجمالي المكونات الخاضعة للتأمينات</summary>
-        public decimal InsurableAmount { get; set; }
+        [Precision(18, 2)] public decimal InsurableAmount { get; set; }
 
         /// <summary>قيمة ضريبة الدخل المستقطعة</summary>
-        public decimal TaxAmount { get; set; }
+        [Precision(18, 2)] public decimal TaxAmount { get; set; }
 
         /// <summary>قيمة التأمينات الاجتماعية المستقطعة</summary>
-        public decimal InsuranceAmount { get; set; }
+        [Precision(18, 2)] public decimal InsuranceAmount { get; set; }
 
         // ===== Attendance =====
         public int PresentDays { get; set; }
@@ -52,7 +53,7 @@ namespace HRsystem.Models
         public int OfficialHolidays { get; set; }
 
         /// <summary>Daily salary rate used for deductions</summary>
-        public decimal DailySalaryRate { get; set; }
+        [Precision(18, 2)] public decimal DailySalaryRate { get; set; }
 
         [StringLength(500)]
         public string? Notes { get; set; }

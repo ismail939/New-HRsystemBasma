@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
@@ -26,9 +27,9 @@ namespace HRsystem.Models
         public DateTime TransactionDate { get; set; }
 
         [Required]
-        public decimal Amount { get; set; }
+        [Precision(18, 2)] public decimal Amount { get; set; }
 
-        public decimal? BaseAmount { get; set; }
+        [Precision(18, 2)] public decimal? BaseAmount { get; set; }
 
         [StringLength(500)]
         public string? Notes { get; set; }

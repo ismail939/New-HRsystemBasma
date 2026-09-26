@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
@@ -17,12 +18,12 @@ namespace HRsystem.Models
         public virtual CommissionPlan CommissionPlan { get; set; }
 
         [Required]
-        public decimal FromAmount { get; set; }
+        [Precision(18, 2)] public decimal FromAmount { get; set; }
 
         [Required]
-        public decimal ToAmount { get; set; }
+        [Precision(18, 2)] public decimal ToAmount { get; set; }
 
         [Required]
-        public decimal Rate { get; set; }
+        [Precision(18, 4)] public decimal Rate { get; set; }
     }
 }
